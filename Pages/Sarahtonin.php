@@ -66,7 +66,7 @@ $PageTitle = "Sarahtonin";
 
             <p>
                 My username tends to be either <strong>Sarahtonin</strong>
-                or<strong>SRHTNIN</strong> online.
+                or <strong>SRHTNIN</strong> online.
                 I'm named that on Steam, YouTube, and Discord.
             </p>
 
