@@ -14,6 +14,12 @@
     </title>
 
     <link
+        rel="icon"
+        type="image/png"
+        href="/Assets/Img/Icon.png"
+    >
+
+    <link
         rel="stylesheet"
         href="/Styles/Style.css"
     >

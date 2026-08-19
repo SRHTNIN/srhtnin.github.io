@@ -30,7 +30,7 @@ $PageTitle = "Home";
                 </b>
             </p>
 
-            <h2>The author</h2>
+            <h2>About me</h2>
 
             <p>
                 I'm Sarahtonin. The creator of this very website.
