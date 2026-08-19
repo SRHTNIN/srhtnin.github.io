@@ -1,0 +1,184 @@
+@font-face {
+    font-family: "FSEX302";
+    src: url("../Assets/FSEX302.ttf") format("truetype");
+    font-style: normal;
+    font-weight: normal;
+}
+
+:root,
+:root[data-palette="CatppuccinMocha"] {
+    --Rosewater: #f5e0dc;
+    --Flamingo: #f2cdcd;
+    --Pink: #f5c2e7;
+    --Mauve: #cba6f7;
+    --Red: #f38ba8;
+    --Maroon: #eba0ac;
+    --Peach: #fab387;
+    --Yellow: #f9e2af;
+    --Green: #a6e3a1;
+    --Teal: #94e2d5;
+    --Sky: #89dceb;
+    --Sapphire: #74c7ec;
+    --Blue: #89b4fa;
+    --Lavender: #b4befe;
+
+    --Text: #cdd6f4;
+    --Subtext1: #bac2de;
+    --Subtext0: #a6adc8;
+    --Overlay2: #9399b2;
+    --Overlay1: #7f849c;
+    --Overlay0: #6c7086;
+    --Surface2: #585b70;
+    --Surface1: #45475a;
+    --Surface0: #313244;
+    --Base: #1e1e2e;
+    --Mantle: #181825;
+    --Crust: #11111b;
+}
+
+html {
+    font-family: "FSEX302";
+    color: var(--Text);
+
+    background-image: url("../Assets/Img/Tile.png");
+    background-repeat: repeat;
+}
+
+body {
+    margin: 0;
+    padding: 2rem;
+
+    font-family: inherit;
+    color: inherit;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.MainContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+
+    color: var(--Text);
+    background-color: var(--Base);
+
+    border: 4px solid var(--Mauve);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+
+    color: var(--Mauve);
+}
+
+h1 {
+    font-size: 2.5rem;
+
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--Mauve);
+}
+
+h2 {
+    font-size: 2rem;
+    color: var(--Blue);
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: var(--Green);
+}
+
+h4 {
+    font-size: 1.25rem;
+    color: var(--Peach);
+}
+
+h5 {
+    font-size: 1rem;
+    color: var(--Yellow);
+}
+
+h6 {
+    font-size: 0.9rem;
+    color: var(--Rosewater);
+}
+
+p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+
+    color: var(--Text);
+
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+a {
+    color: var(--Blue);
+}
+
+a:hover {
+    color: var(--Sky);
+}
+
+strong {
+    color: var(--Peach);
+}
+
+em {
+    color: var(--Lavender);
+}
+
+ul, ol {
+    color: var(--Text);
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+blockquote {
+    margin-left: 0;
+    padding: 1rem;
+
+    color: var(--Subtext1);
+    background-color: var(--Mantle);
+
+    border-left: 4px solid var(--Mauve);
+}
+
+code {
+    padding: 0.2rem 0.4rem;
+
+    color: var(--Green);
+    background-color: var(--Mantle);
+}
+
+pre {
+    padding: 1rem;
+    overflow-x: auto;
+
+    color: var(--Text);
+    background-color: var(--Crust);
+
+    border: 2px solid var(--Surface2);
+}
+
+pre code {
+    padding: 0;
+    background-color: transparent;
+}
+
+hr {
+    border: 0;
+    border-top: 2px solid var(--Surface2);
+}
+
+input, button, textarea, select {
+    font-family: inherit;
+    color: inherit;
+}
