@@ -24,7 +24,7 @@
                 </b>
             </p>
 
-            <h2>About Sarahtonin</h2>
+            <h2>The author</h2>
 
             <p>
                 I'm Sarahtonin. The creator of this very website.

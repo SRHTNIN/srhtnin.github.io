@@ -4,7 +4,7 @@
     <?php include __DIR__ . "/HTML/Bits/Head.php"; ?>
     <body>
         <main class="MainContainer">
-            <h1>Welcome</h1>
+            <h1>About me</h1>
 
             <p>
                 Hi. There's nothing here yet, sorry.
