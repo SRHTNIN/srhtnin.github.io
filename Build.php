@@ -139,10 +139,11 @@ foreach ($StaticDirectories as $Directory) {
  * Copy index.html.
  */
 
-copy(
-    $RootDirectory . "/index.html",
-    $OutputDirectory . "/index.html"
-);
+ RenderPage(
+     $RootDirectory . "/Pages/Home.php",
+     $OutputDirectory . "/index.html",
+     "./"
+ );
 
 
 /*
