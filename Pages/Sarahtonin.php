@@ -1,3 +1,9 @@
+<?php
+
+$PageTitle = "Sarahtonin";
+
+?>
+
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">

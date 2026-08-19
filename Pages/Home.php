@@ -1,3 +1,9 @@
+<?php
+
+$PageTitle = "Home";
+
+?>
+
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
@@ -38,7 +44,7 @@
 
             <p>
                 Speaking of introducing myself, you should probably visit the
-                <a href="HTML/Sarahtonin.php">page</a> about me.
+                <a href="./Sarahtonin.html">page</a> about me.
             </p>
 
             <h3>Credits</h3>
