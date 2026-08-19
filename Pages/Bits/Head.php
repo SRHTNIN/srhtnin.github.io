@@ -15,6 +15,6 @@
 
     <link
         rel="stylesheet"
-        href="<?= $RootPath ?>Styles/Style.css"
+        href="/Styles/Style.css"
     >
 </head>

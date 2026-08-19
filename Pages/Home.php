@@ -7,7 +7,7 @@ $PageTitle = "Home";
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
-    <?php include __DIR__ . "./Bits/Head.php"; ?>
+    <?php require __DIR__ . "/Bits/Head.php"; ?>
 
     <body>
         <main class="MainContainer">
@@ -44,7 +44,7 @@ $PageTitle = "Home";
 
             <p>
                 Speaking of introducing myself, you should probably visit the
-                <a href="./Sarahtonin.html">page</a> about me.
+                <a href="/Pages/Sarahtonin.html">page</a> about me.
             </p>
 
             <h3>Credits</h3>
@@ -66,6 +66,6 @@ $PageTitle = "Home";
             </ul>
         </main>
 
-        <script src="../JS/Script.js"></script>
+        <script src="/Scripts/Script.js"></script>
     </body>
 </html>

@@ -7,7 +7,8 @@ $PageTitle = "Sarahtonin";
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
-    <?php include __DIR__ . "./Bits/Head.php"; ?>
+    <?php require __DIR__ . "/Bits/Head.php"; ?>
+
     <body>
         <main class="MainContainer">
             <h1>About me</h1>
@@ -15,8 +16,12 @@ $PageTitle = "Sarahtonin";
             <p>
                 Hi. There's nothing here yet, sorry.
             </p>
-        </main>
-    </body>
 
-    <script src="../JS/Script.js"></script>
+            <p>
+                <a href="/">Back home</a>
+            </p>
+        </main>
+
+        <script src="/Scripts/Script.js"></script>
+    </body>
 </html>
