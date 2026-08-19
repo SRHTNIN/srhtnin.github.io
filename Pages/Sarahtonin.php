@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
-    <?php include __DIR__ . "/HTML/Bits/Head.php"; ?>
+    <?php include __DIR__ . "./Bits/Head.php"; ?>
     <body>
         <main class="MainContainer">
             <h1>About me</h1>
@@ -12,5 +12,5 @@
         </main>
     </body>
 
-    <script src="./JS/Script.js"></script>
+    <script src="../JS/Script.js"></script>
 </html>
