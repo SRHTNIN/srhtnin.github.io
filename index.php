@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
-    <div include="./HTML/Bits/Head.html"></div>
+    <?php include __DIR__ . "/HTML/Bits/Head.php"; ?>
+
     <body>
         <main class="MainContainer">
             <h1>Welcome</h1>
@@ -10,11 +11,13 @@
                 You've arrived at Sarahtonin's homepage.
                 Feel free to browse around as much as you want.
             </p>
+
             <p>
                 If you want to access <strong>other links</strong>, you probably need to join my tailscale network.
                 <br>
                 Also, this is simply the homepage. You can use the <strong>navbar</strong> to the right to navigate around.
             </p>
+
             <p>
                 <b>
                     Have fun snooping!
@@ -27,12 +30,15 @@
                 I'm Sarahtonin. The creator of this very website.
                 It's a bit strange for me to write in first-person, I suppose. No matter, though.
             </p>
+
             <p>
                 I made this website because I'd prefer an easier way to share my socials,
                 and to just introduce myself in a better way.
             </p>
+
             <p>
-                Speaking of introducing myself, you should probably visit the <a href="HTML/Sarahtonin.html">page</a> about me.
+                Speaking of introducing myself, you should probably visit the
+                <a href="HTML/Sarahtonin.php">page</a> about me.
             </p>
 
             <h3>Credits</h3>
@@ -44,6 +50,7 @@
                     by
                     <a href="https://catppuccin.com/community/">several people</a>.
                 </li>
+
                 <li>
                     The font is
                     <a href="https://github.com/kika/fixedsys">Fixedsys</a>
@@ -52,7 +59,7 @@
                 </li>
             </ul>
         </main>
-    </body>
 
-    <script src="./JS/Script.js"></script>
+        <script src="./JS/Script.js"></script>
+    </body>
 </html>

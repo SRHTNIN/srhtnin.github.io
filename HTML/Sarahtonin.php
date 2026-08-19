@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html lang="en" data-palette="CatppuccinMocha">
-    <div include="./HTML/Bits/Head.html"></div>
+    <?php include __DIR__ . "/HTML/Bits/Head.php"; ?>
     <body>
         <main class="MainContainer">
             <h1>Welcome</h1>
