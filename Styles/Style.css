@@ -79,7 +79,12 @@ body {
     border: 4px solid var(--Mauve);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin-top: 0;
     margin-bottom: 1rem;
 
@@ -144,7 +149,8 @@ em {
     color: var(--Lavender);
 }
 
-ul, ol {
+ul,
+ol {
     color: var(--Text);
 }
 
@@ -189,7 +195,10 @@ hr {
     border-top: 2px solid var(--Surface2);
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
     font-family: inherit;
     color: inherit;
 }
@@ -217,10 +226,11 @@ input, button, textarea, select {
 
     width: 4rem;
     height: 4rem;
-    padding: 0.4rem;
+    padding: 0;
 
     line-height: 0;
     text-decoration: none;
+    overflow: hidden;
 
     background-color: var(--Mantle);
     border: 3px solid var(--Surface2);
@@ -256,8 +266,10 @@ input, button, textarea, select {
     width: 100%;
     height: 100%;
 
-    object-fit: contain;
+    object-fit: fill;
+
     image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 @media (max-width: 700px) {
