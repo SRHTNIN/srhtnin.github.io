@@ -10,18 +10,14 @@ $PageTitle = "Home";
     <?php require __DIR__ . "/Bits/Head.php"; ?>
 
     <body>
+        <?php require __DIR__ . "/Bits/Navbar.php"; ?>
+
         <main class="MainContainer">
             <h1>Welcome</h1>
 
             <p>
                 You've arrived at Sarahtonin's homepage.
                 Feel free to browse around as much as you want.
-            </p>
-
-            <p>
-                If you want to access <strong>other links</strong>, you probably need to join my tailscale network.
-                <br>
-                Also, this is simply the homepage. You can use the <strong>navbar</strong> to the right to navigate around.
             </p>
 
             <p>

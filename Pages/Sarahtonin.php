@@ -10,6 +10,8 @@ $PageTitle = "Sarahtonin";
     <?php require __DIR__ . "/Bits/Head.php"; ?>
 
     <body>
+        <?php require __DIR__ . "/Bits/Navbar.php"; ?>
+
         <main class="MainContainer">
             <h1>About me</h1>
 
