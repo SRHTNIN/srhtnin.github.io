@@ -300,3 +300,204 @@ select {
         grid-row: 2;
     }
 }
+
+.GardenStatus {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+
+    background-color: var(--Mantle);
+    border: 3px solid var(--Surface2);
+}
+
+.GardenLayout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    gap: 1rem;
+
+    align-items: start;
+}
+
+.GardenGrid {
+    --GardenWidth: 3;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            var(--GardenWidth),
+            minmax(0, 1fr)
+        );
+
+    gap: 0.5rem;
+
+    padding: 0.75rem;
+
+    background-color: var(--Mantle);
+    border: 4px solid var(--Green);
+}
+
+.GardenPlot {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    padding: 0;
+
+    overflow: hidden;
+    cursor: pointer;
+
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
+}
+
+.GardenPlot:hover {
+    background-color: var(--Surface1);
+    border-color: var(--Sky);
+
+    transform:
+        translate(
+            1px,
+            1px
+        );
+
+    box-shadow:
+        2px 2px 0
+        var(--Crust);
+}
+
+.GardenPlot:focus-visible {
+    outline:
+        3px solid
+        var(--Yellow);
+
+    outline-offset: 3px;
+}
+
+.GardenPlotEmpty {
+    background-color: var(--Mantle);
+}
+
+.GardenPlotEmpty:hover {
+    background-color: var(--Surface0);
+}
+
+.GardenPlotMature {
+    border-color: var(--Green);
+}
+
+.GardenPlotMature:hover {
+    border-color: var(--Yellow);
+}
+
+.GardenPlant {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    image-rendering: pixelated;
+}
+
+.SeedPanel {
+    padding: 0.75rem;
+
+    background-color: var(--Mantle);
+    border: 4px solid var(--Mauve);
+}
+
+.SeedPanel h2 {
+    margin-bottom: 0.75rem;
+}
+
+.SeedList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.SeedButton {
+    width: 100%;
+
+    padding: 0.6rem;
+
+    cursor: pointer;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
+}
+
+.SeedButton:hover {
+    color: var(--Sky);
+    background-color: var(--Surface1);
+
+    border-color: var(--Sky);
+
+    transform:
+        translate(
+            1px,
+            1px
+        );
+
+    box-shadow:
+        2px 2px 0
+        var(--Crust);
+}
+
+.SeedButton[aria-current="true"] {
+    color: var(--Green);
+
+    background-color: var(--Surface1);
+
+    border-color: var(--Green);
+}
+
+#GardenMessage {
+    margin-top: 1rem;
+    margin-bottom: 0;
+
+    padding: 0.75rem;
+
+    color: var(--Subtext1);
+    background-color: var(--Mantle);
+
+    border-left:
+        4px solid
+        var(--Blue);
+}
+
+@media (max-width: 700px) {
+    .GardenLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .SeedPanel {
+        grid-row: 1;
+    }
+
+    .SeedList {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .SeedButton {
+        width: auto;
+    }
+
+    .GardenGrid {
+        grid-row: 2;
+    }
+}
