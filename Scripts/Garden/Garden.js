@@ -179,6 +179,11 @@ function CreatePlotElement(
 
     Button.type = "button";
 
+
+    /*
+     * Empty plot.
+     */
+
     if (Plot === null) {
         Button.classList.add(
             "GardenPlotEmpty"
@@ -210,38 +215,47 @@ function CreatePlotElement(
     }
 
 
-    const Stage =
-        GetPlantStage(
+    /*
+     * Plant image.
+     */
+
+    const ImagePath =
+        GetPlantImage(
             Plot,
             Plant
         );
 
-    const Image =
-        document.createElement(
-            "img"
+    if (ImagePath !== null) {
+        const Image =
+            document.createElement(
+                "img"
+            );
+
+        Image.className =
+            "GardenPlant";
+
+        Image.alt =
+            Plant.Name;
+
+        Image.src =
+            ImagePath;
+
+        Button.appendChild(
+            Image
         );
-
-    Image.className =
-        "GardenPlant";
-
-    Image.alt =
-        Plant.Name +
-        " - " +
-        Stage;
-
-    SetPlantImage(
-        Image,
-        Plot,
-        Plant,
-        Stage
-    );
-
-    Button.appendChild(
-        Image
-    );
+    }
 
 
-    if (Stage === "Mature") {
+    /*
+     * Mature plants can be harvested.
+     */
+
+    if (
+        IsPlantMature(
+            Plot,
+            Plant
+        )
+    ) {
         Button.classList.add(
             "GardenPlotMature"
         );
@@ -340,10 +354,10 @@ async function HarvestPlant(
         Plants[Plot.Plant];
 
     if (
-        GetPlantStage(
+        !IsPlantMature(
             Plot,
             Plant
-        ) !== "Mature"
+        )
     ) {
         return;
     }
@@ -413,35 +427,15 @@ function GetPlantGrowthProgress(
         Date.now() -
         Plot.PlantedAt;
 
-    return Math.min(
-        Age /
-        Plant.GrowthTime,
-        1
+    return Math.max(
+        0,
+        Math.min(
+            Age /
+            Plant.GrowthTime,
+            1
+        )
     );
 }
-
-
-function GetPlantStage(
-    Plot,
-    Plant
-) {
-    const Progress =
-        GetPlantGrowthProgress(
-            Plot,
-            Plant
-        );
-
-    if (Progress < 1 / 3) {
-        return "Seed";
-    }
-
-    if (Progress < 2 / 3) {
-        return "Sprout";
-    }
-
-    return "Mature";
-}
-
 
 function GetPlantTags(
     Plot,
@@ -500,65 +494,130 @@ function GetPlantVariant(
 }
 
 
-function SetPlantImage(
-    Image,
+function IsPlantMature(
     Plot,
-    Plant,
-    Stage
+    Plant
 ) {
+    return (
+        GetPlantGrowthProgress(
+            Plot,
+            Plant
+        ) >= 1
+    );
+}
+
+
+function GetPlantImages(
+    Plot,
+    Plant
+) {
+    const Variants =
+        PlantImages[
+            Plot.Plant
+        ];
+
+    if (Variants === undefined) {
+        return [];
+    }
+
+
     const Variant =
         GetPlantVariant(
             Plot,
             Plant
         );
 
-    const BasePath =
-        "/Assets/Img/Garden/Plants/" +
-        Plot.Plant +
-        "/" +
-        Variant +
-        "/";
+
+    /*
+     * Preferred variant.
+     */
+
+    if (
+        Array.isArray(
+            Variants[Variant]
+        ) &&
+        Variants[Variant].length > 0
+    ) {
+        return Variants[
+            Variant
+        ];
+    }
 
 
     /*
-     * Try the requested stage first.
-     *
-     * If that image doesn't exist,
-     * Mature.png becomes the fallback.
+     * Default visual fallback.
      */
 
-    const Candidates = [
-        BasePath + Stage + ".png",
-        BasePath + "Mature.png"
-    ];
+    if (
+        Array.isArray(
+            Variants.Default
+        ) &&
+        Variants.Default.length > 0
+    ) {
+        return Variants.Default;
+    }
 
-    let CandidateIndex = 0;
 
-    Image.src =
-        Candidates[
-            CandidateIndex
-        ];
+    /*
+     * Absolute fallback:
+     * use the first variant that has images.
+     */
 
-    Image.addEventListener(
-        "error",
-        () => {
-            CandidateIndex++;
-
-            if (
-                CandidateIndex <
-                Candidates.length
-            ) {
-                Image.src =
-                    Candidates[
-                        CandidateIndex
-                    ];
-
-                return;
-            }
-
-            Image.remove();
+    for (
+        const Images
+        of Object.values(
+            Variants
+        )
+    ) {
+        if (
+            Array.isArray(Images) &&
+            Images.length > 0
+        ) {
+            return Images;
         }
-    );
+    }
+
+
+    return [];
+}
+
+
+function GetPlantImage(
+    Plot,
+    Plant
+) {
+    const Images =
+        GetPlantImages(
+            Plot,
+            Plant
+        );
+
+    if (Images.length === 0) {
+        return null;
+    }
+
+
+    const Progress =
+        GetPlantGrowthProgress(
+            Plot,
+            Plant
+        );
+
+
+    const ImageIndex =
+        Math.min(
+            Math.floor(
+                Progress *
+                Images.length
+            ),
+
+            Images.length - 1
+        );
+
+
+    return Images[
+        ImageIndex
+    ];
 }
 
 

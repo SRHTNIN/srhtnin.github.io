@@ -631,16 +631,12 @@ select {
     width: 100%;
 
     overflow-x: auto;
-
-    border: 3px solid var(--Surface2);
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
 }
 
 .LeaderboardTable {
-    width: 100%;
+    width: auto;
+    min-width: 24rem;
+    margin: 0 auto;
 
     border-collapse: collapse;
 
@@ -648,6 +644,12 @@ select {
     background-color: var(--Base);
 
     font-size: 1.2rem;
+
+    border: 3px solid var(--Surface2);
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
 }
 
 .LeaderboardTable th {
@@ -684,6 +686,15 @@ select {
     width: 4rem;
 
     text-align: center;
+}
+
+.LeaderboardUsername {
+    min-width: 12rem;
+}
+
+.LeaderboardDewColumn,
+.LeaderboardDew {
+    min-width: 7rem;
 }
 
 .LeaderboardDew {
