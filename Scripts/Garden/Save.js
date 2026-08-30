@@ -14,6 +14,12 @@ function CreateNewSave() {
             Dew: 0
         },
 
+        Statistics: {
+            CurrencyEarned: {
+                Dew: 0
+            }
+        },
+
         Seeds: {
             Unlocked: [
                 "Rose"

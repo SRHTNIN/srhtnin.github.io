@@ -43,11 +43,61 @@ $PageTitle = "Garden";
             <p id="GardenMessage">
                 Select a seed, then choose an empty plot.
             </p>
+
+            <section class="GardenUser">
+                <h2>Player</h2>
+
+                <p>
+                    Username:
+                    <strong id="UsernameDisplay">
+                        Loading...
+                    </strong>
+                </p>
+
+                <form
+                    id="UsernameForm"
+                    hidden
+                >
+                    <input
+                        id="UsernameInput"
+                        type="text"
+                        minlength="3"
+                        maxlength="24"
+                        autocomplete="username"
+                        placeholder="Username"
+                        required
+                    >
+
+                    <button type="submit">
+                        Set username
+                    </button>
+
+                    <p id="UsernameMessage"></p>
+                </form>
+            </section>
+
+            <section class="Leaderboard">
+                <h2>Leaderboard</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Dew</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="LeaderboardBody"></tbody>
+                </table>
+            </section>
         </main>
 
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Users.js"></script>
+        <script src="/Scripts/Garden/Leaderboard.js"></script>
         <script src="/Scripts/Garden/Garden.js"></script>
     </body>
 </html>

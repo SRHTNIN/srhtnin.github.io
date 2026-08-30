@@ -6,7 +6,6 @@ const GardenUpdateInterval = 1000;
 
 async function StartGame() {
     GameSave = await LoadGame();
-
     NormalizeSave();
 
     RenderGame();
@@ -15,6 +14,8 @@ async function StartGame() {
         RenderGarden,
         GardenUpdateInterval
     );
+    await RenderUser();
+    await RenderLeaderboard();
 }
 
 
@@ -26,6 +27,12 @@ function NormalizeSave() {
     GameSave.Seeds.Unlocked ??= [
         "Rose"
     ];
+
+    GameSave.Statistics ??= {};
+    GameSave.Statistics.CurrencyEarned ??= {};
+
+    GameSave.Statistics.CurrencyEarned.Dew ??=
+        GameSave.Currency.Dew;
 
     GameSave.Garden ??= {
         Width: 3,
@@ -375,6 +382,18 @@ function GiveReward(
     ] ??= 0;
 
     GameSave.Currency[
+        Reward.Currency
+    ] += Reward.Amount;
+
+
+    GameSave.Statistics ??= {};
+    GameSave.Statistics.CurrencyEarned ??= {};
+
+    GameSave.Statistics.CurrencyEarned[
+        Reward.Currency
+    ] ??= 0;
+
+    GameSave.Statistics.CurrencyEarned[
         Reward.Currency
     ] += Reward.Amount;
 }
