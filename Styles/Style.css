@@ -270,37 +270,6 @@ select {
     image-rendering: auto;
 }
 
-@media (max-width: 700px) {
-    body {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 1rem;
-        padding: 1rem;
-    }
-
-    .Navbar {
-        grid-column: 1;
-        grid-row: 1;
-
-        flex-direction: row;
-        width: 100%;
-
-        top: 0;
-        overflow-x: auto;
-        z-index: 1;
-    }
-
-    .NavbarLink {
-        flex: 0 0 3.5rem;
-        width: 3.5rem;
-        height: 3.5rem;
-    }
-
-    .MainContainer {
-        grid-column: 1;
-        grid-row: 2;
-    }
-}
-
 .GardenStatus {
     margin-bottom: 1.5rem;
     padding: 0.75rem 1rem;
@@ -477,29 +446,6 @@ select {
     border-left:
         4px solid
         var(--Blue);
-}
-
-@media (max-width: 700px) {
-    .GardenLayout {
-        grid-template-columns: 1fr;
-    }
-
-    .SeedPanel {
-        grid-row: 1;
-    }
-
-    .SeedList {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .SeedButton {
-        width: auto;
-    }
-
-    .GardenGrid {
-        grid-row: 2;
-    }
 }
 
 .GardenUser,
@@ -730,22 +676,6 @@ select {
     text-align: center;
 }
 
-@media (max-width: 700px) {
-    .LeaderboardTable {
-        font-size: 1rem;
-    }
-
-    .LeaderboardTable th,
-    .LeaderboardTable td {
-        padding: 0.6rem;
-    }
-
-    .LeaderboardRankColumn,
-    .LeaderboardRank {
-        width: 3rem;
-    }
-}
-
 .LeaderboardTable th:last-child,
 .LeaderboardTable td:last-child {
     text-align: right;
@@ -947,6 +877,90 @@ select {
 }
 
 @media (max-width: 700px) {
+    body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .Navbar {
+        grid-column: 1;
+        grid-row: 1;
+
+        flex-direction: row;
+        width: 100%;
+
+        top: 0;
+        overflow-x: auto;
+        z-index: 1;
+    }
+
+    .NavbarLink {
+        flex: 0 0 3.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .MainContainer {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .GardenLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .SeedPanel {
+        grid-row: 1;
+    }
+
+    .SeedList {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .SeedButton {
+        width: auto;
+    }
+
+    .GardenGrid {
+        grid-row: 2;
+    }
+
+    .LeaderboardTableContainer {
+            overflow-x: visible;
+    }
+
+    .LeaderboardTable {
+        width: 100%;
+        max-width: 100%;
+
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .LeaderboardUsername,
+    .LeaderboardDewColumn,
+    .LeaderboardDew {
+        width: auto;
+        min-width: 0;
+    }
+
+    .LeaderboardRankColumn,
+    .LeaderboardRank {
+        width: 2.5rem;
+        min-width: 0;
+    }
+
+    .LeaderboardTable th,
+    .LeaderboardTable td {
+        padding: 0.6rem 0.4rem;
+    }
+
+    .LeaderboardUsername {
+        overflow-wrap: anywhere;
+    }
+
     .ProfileFormRow,
     .ProfileButtonRow {
         flex-direction: column;
