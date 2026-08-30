@@ -16,21 +16,39 @@ $SubNavbarCurrent ??= null;
 >
     <?php foreach (
         $SubNavbarItems
-        as $SubNavbarName => $SubNavbarHref
+        as $Name => $Url
     ): ?>
+        <?php
+        $Prefix =
+            str_starts_with(
+                $Url,
+                "#"
+            )
+                ? "#"
+                : ">";
+        ?>
+
         <a
             class="SubNavbarLink"
             href="<?= htmlspecialchars(
-                $SubNavbarHref,
+                $Url,
                 ENT_QUOTES,
                 "UTF-8"
             ) ?>"
-            <?= $SubNavbarCurrent === $SubNavbarName
-                ? 'aria-current="page"'
-                : "" ?>
         >
+            <span
+                class="SubNavbarPrefix"
+                aria-hidden="true"
+            >
+                <?= htmlspecialchars(
+                    $Prefix,
+                    ENT_QUOTES,
+                    "UTF-8"
+                ) ?>
+            </span>
+
             <?= htmlspecialchars(
-                $SubNavbarName,
+                $Name,
                 ENT_QUOTES,
                 "UTF-8"
             ) ?>
