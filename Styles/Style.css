@@ -270,37 +270,6 @@ select {
     image-rendering: auto;
 }
 
-@media (max-width: 700px) {
-    body {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 1rem;
-        padding: 1rem;
-    }
-
-    .Navbar {
-        grid-column: 1;
-        grid-row: 1;
-
-        flex-direction: row;
-        width: 100%;
-
-        top: 0;
-        overflow-x: auto;
-        z-index: 1;
-    }
-
-    .NavbarLink {
-        flex: 0 0 3.5rem;
-        width: 3.5rem;
-        height: 3.5rem;
-    }
-
-    .MainContainer {
-        grid-column: 1;
-        grid-row: 2;
-    }
-}
-
 .GardenStatus {
     margin-bottom: 1.5rem;
     padding: 0.75rem 1rem;
@@ -479,29 +448,6 @@ select {
         var(--Blue);
 }
 
-@media (max-width: 700px) {
-    .GardenLayout {
-        grid-template-columns: 1fr;
-    }
-
-    .SeedPanel {
-        grid-row: 1;
-    }
-
-    .SeedList {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .SeedButton {
-        width: auto;
-    }
-
-    .GardenGrid {
-        grid-row: 2;
-    }
-}
-
 .GardenUser,
 .Leaderboard {
     margin-top: 1.5rem;
@@ -634,8 +580,7 @@ select {
 }
 
 .LeaderboardTable {
-    width: auto;
-    min-width: 24rem;
+    width: 90%;
     margin: 0 auto;
 
     border-collapse: collapse;
@@ -689,12 +634,12 @@ select {
 }
 
 .LeaderboardUsername {
-    min-width: 12rem;
+    width: auto;
 }
 
 .LeaderboardDewColumn,
 .LeaderboardDew {
-    min-width: 7rem;
+    width: auto;
 }
 
 .LeaderboardDew {
@@ -730,23 +675,285 @@ select {
     text-align: center;
 }
 
+.LeaderboardTable th:last-child,
+.LeaderboardTable td:last-child {
+    text-align: right;
+}
+
+.ProfileSection {
+    margin-top: 1.5rem;
+    padding: 1rem;
+
+    background-color: var(--Mantle);
+    border: 4px solid var(--Mauve);
+}
+
+.ProfileSection h2 {
+    margin-bottom: 1rem;
+}
+
+.ProfileFormRow,
+.ProfileButtonRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    align-items: center;
+}
+
+.ProfileButtonRow {
+    margin-top: 0.75rem;
+}
+
+.ProfileSection label {
+    display: block;
+    margin-bottom: 0.5rem;
+
+    color: var(--Blue);
+}
+
+.ProfileSection input,
+.ProfileSection textarea,
+.ProfileSection button {
+    font-family: inherit;
+    font-size: 1rem;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+    border-radius: 0;
+
+    appearance: none;
+}
+
+.ProfileSection input,
+.ProfileSection textarea {
+    padding: 0.6rem;
+
+    outline: none;
+}
+
+.ProfileSection input {
+    min-width: 12rem;
+}
+
+.ProfileSection textarea {
+    width: 100%;
+    max-width: 24rem;
+
+    resize: vertical;
+}
+
+.ProfileSection input::placeholder,
+.ProfileSection textarea::placeholder {
+    color: var(--Overlay1);
+}
+
+.ProfileSection input:hover,
+.ProfileSection textarea:hover {
+    background-color: var(--Surface1);
+    border-color: var(--Overlay2);
+}
+
+.ProfileSection input:focus,
+.ProfileSection textarea:focus {
+    background-color: var(--Surface1);
+    border-color: var(--Sky);
+}
+
+.ProfileSection button {
+    padding: 0.6rem 0.8rem;
+
+    cursor: pointer;
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
+}
+
+.ProfileSection button:hover {
+    color: var(--Sky);
+    background-color: var(--Surface1);
+
+    border-color: var(--Sky);
+
+    transform: translate(1px, 1px);
+
+    box-shadow:
+        2px 2px 0
+        var(--Crust);
+}
+
+.ProfileSection button:active {
+    color: var(--Green);
+    background-color: var(--Surface2);
+
+    border-color: var(--Green);
+
+    transform: translate(2px, 2px);
+
+    box-shadow:
+        1px 1px 0
+        var(--Crust);
+}
+
+.ProfileSection button:focus-visible,
+.ProfileSection summary:focus-visible {
+    outline: 3px solid var(--Yellow);
+    outline-offset: 3px;
+}
+
+.ProfileMessage {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+
+    color: var(--Subtext1);
+}
+
+.ProfileStatistics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ProfileStatistic {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 0.75rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.ProfileStatisticName {
+    color: var(--Subtext1);
+}
+
+.AccountKeySpoiler {
+    margin-top: 1rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.AccountKeySpoiler summary {
+    padding: 0.75rem;
+
+    cursor: pointer;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+}
+
+.AccountKeySpoiler summary:hover {
+    color: var(--Sky);
+    background-color: var(--Surface1);
+}
+
+.AccountKeyContent {
+    padding: 1rem;
+    border-top: 3px solid var(--Surface2);
+}
+
+#AccountKeyDisplay {
+    display: block;
+
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+
+    color: var(--Green);
+    background-color: var(--Crust);
+
+    border: 3px solid var(--Surface2);
+}
+
 @media (max-width: 700px) {
-    .LeaderboardTable {
-        font-size: 1rem;
+    body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1rem;
     }
 
-    .LeaderboardTable th,
-    .LeaderboardTable td {
-        padding: 0.6rem;
+    .Navbar {
+        grid-column: 1;
+        grid-row: 1;
+
+        flex-direction: row;
+        width: 100%;
+
+        top: 0;
+        overflow-x: auto;
+        z-index: 1;
+    }
+
+    .NavbarLink {
+        flex: 0 0 3.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .MainContainer {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .GardenLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .SeedPanel {
+        grid-row: 1;
+    }
+
+    .SeedList {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .SeedButton {
+        width: auto;
+    }
+
+    .GardenGrid {
+        grid-row: 2;
     }
 
     .LeaderboardRankColumn,
     .LeaderboardRank {
-        width: 3rem;
+        width: 2.5rem;
     }
-}
 
-.LeaderboardTable th:last-child,
-.LeaderboardTable td:last-child {
-    text-align: right;
+    .LeaderboardTable th,
+    .LeaderboardTable td {
+        padding: 0.6rem 0.4rem;
+    }
+
+    .LeaderboardUsername {
+        overflow-wrap: anywhere;
+    }
+
+    .ProfileFormRow,
+    .ProfileButtonRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ProfileSection input,
+    .ProfileSection textarea,
+    .ProfileSection button {
+        width: 100%;
+    }
+
+    .ProfileStatistic {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
