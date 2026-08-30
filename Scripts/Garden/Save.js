@@ -145,18 +145,21 @@ async function WriteRemoteSave(SaveData) {
 }
 
 
-async function ReadRemoteSave() {
+async function ReadRemoteSave(
+    SaveKey = GetSaveKey()
+) {
     const Response = await fetch(
         ApiUrl + "/Load.php",
         {
             method: "POST",
 
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type":
+                    "application/json"
             },
 
             body: JSON.stringify({
-                SaveKey: GetSaveKey()
+                SaveKey: SaveKey
             })
         }
     );
@@ -168,7 +171,8 @@ async function ReadRemoteSave() {
         );
     }
 
-    const Result = await Response.json();
+    const Result =
+        await Response.json();
 
     if (!Result.Success) {
         throw new Error(
@@ -183,7 +187,6 @@ async function ReadRemoteSave() {
 
     return Result.SaveData;
 }
-
 
 async function SaveGame(SaveData) {
     SaveData.Revision++;

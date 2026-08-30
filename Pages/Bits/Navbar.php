@@ -3,7 +3,8 @@
 $NavbarPages = [
     "Home" => "/",
     "Sarahtonin" => "/Pages/Sarahtonin.html",
-    "Garden" => "/Pages/Garden.html"
+    "Garden" => "/Pages/Garden.html",
+    "Profile" => "/Pages/Profile.html"
 ];
 
 ?>
