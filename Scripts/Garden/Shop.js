@@ -116,17 +116,6 @@ function CreateShopSeedCard(
             "span"
         );
 
-    Number.className =
-        "ShopItemNumber";
-
-    Number.textContent =
-        "No. " +
-        String(Plant.Id).padStart(
-            3,
-            "0"
-        );
-
-
     const Name =
         document.createElement(
             "h3"
@@ -137,7 +126,6 @@ function CreateShopSeedCard(
 
 
     Header.append(
-        Number,
         Name
     );
 
@@ -291,6 +279,15 @@ function CreateShopPlantVisual(
         "ShopPlantVisual";
 
 
+    const ImageFrame =
+        document.createElement(
+            "div"
+        );
+
+    ImageFrame.className =
+        "ShopPlantImageFrame";
+
+
     const PlantKey =
         GetPlantKeyById(
             Plant.Id
@@ -316,32 +313,52 @@ function CreateShopPlantVisual(
         Missing.textContent =
             "No image";
 
-        Visual.appendChild(
+        ImageFrame.appendChild(
             Missing
         );
+    } else {
+        const Image =
+            document.createElement(
+                "img"
+            );
 
-        return Visual;
+        Image.className =
+            "ShopPlantImage";
+
+        Image.src =
+            Images[
+                Images.length - 1
+            ];
+
+        Image.alt =
+            Plant.Name;
+
+        ImageFrame.appendChild(
+            Image
+        );
     }
 
 
-    const Image =
+    const Number =
         document.createElement(
-            "img"
+            "span"
         );
 
-    Image.className =
-        "ShopPlantImage";
+    Number.className =
+        "ShopItemNumber";
 
-    Image.src =
-        Images[
-            Images.length - 1
-        ];
+    Number.textContent =
+        String(
+            Plant.Id
+        ).padStart(
+            3,
+            "0"
+        );
 
-    Image.alt =
-        Plant.Name;
 
-    Visual.appendChild(
-        Image
+    Visual.append(
+        ImageFrame,
+        Number
     );
 
 
