@@ -596,6 +596,10 @@ function GetPlantImage(
         return null;
     }
 
+    if (Images.length === 1) {
+        return Images[0];
+    }
+
 
     const Progress =
         GetPlantGrowthProgress(
@@ -603,15 +607,23 @@ function GetPlantImage(
             Plant
         );
 
+    if (Progress >= 1) {
+        return Images[
+            Images.length - 1
+        ];
+    }
+
+    const GrowingImageCount =
+        Images.length - 1;
 
     const ImageIndex =
         Math.min(
             Math.floor(
                 Progress *
-                Images.length
+                GrowingImageCount
             ),
 
-            Images.length - 1
+            GrowingImageCount - 1
         );
 
 
