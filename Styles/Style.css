@@ -403,7 +403,7 @@ select {
 
     object-fit: contain;
 
-    image-rendering: pixelated;
+    image-rendering: auto;
 }
 
 .SeedPanel {
@@ -499,5 +499,243 @@ select {
 
     .GardenGrid {
         grid-row: 2;
+    }
+}
+
+.GardenUser,
+.Leaderboard {
+    margin-top: 1.5rem;
+    padding: 1rem;
+
+    background-color: var(--Mantle);
+
+    border: 4px solid var(--Mauve);
+}
+
+.GardenUser h2,
+.Leaderboard h2 {
+    margin-bottom: 1rem;
+}
+
+.GardenUser input,
+.GardenUser button {
+    padding: 0.6rem;
+
+    font-size: 1rem;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+    border-radius: 0;
+
+    appearance: none;
+}
+
+.GardenUser input {
+    min-width: 12rem;
+
+    outline: none;
+}
+
+.GardenUser input:hover {
+    background-color: var(--Surface1);
+    border-color: var(--Overlay2);
+}
+
+.GardenUser input:focus {
+    background-color: var(--Surface1);
+    border-color: var(--Sky);
+}
+
+.GardenUser input::placeholder {
+    color: var(--Overlay1);
+}
+
+.GardenUser button {
+    cursor: pointer;
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
+}
+
+.GardenUser button:hover {
+    color: var(--Sky);
+    background-color: var(--Surface1);
+
+    border-color: var(--Sky);
+
+    transform: translate(
+        1px,
+        1px
+    );
+
+    box-shadow:
+        2px 2px 0
+        var(--Crust);
+}
+
+.GardenUser button:active {
+    color: var(--Green);
+    background-color: var(--Surface2);
+
+    border-color: var(--Green);
+
+    transform: translate(
+        2px,
+        2px
+    );
+
+    box-shadow:
+        1px 1px 0
+        var(--Crust);
+}
+
+.GardenUser button:focus-visible {
+    outline:
+        3px solid
+        var(--Yellow);
+
+    outline-offset: 3px;
+}
+
+#UsernameMessage {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+
+    color: var(--Subtext1);
+}
+
+#UsernameForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    align-items: center;
+}
+
+#UsernameForm[hidden] {
+    display: none;
+}
+
+#UsernameMessage {
+    flex-basis: 100%;
+
+    margin: 0;
+
+    color: var(--Subtext1);
+}
+
+.LeaderboardTableContainer {
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 3px solid var(--Surface2);
+
+    box-shadow:
+        3px 3px 0
+        var(--Crust);
+}
+
+.LeaderboardTable {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    color: var(--Text);
+    background-color: var(--Base);
+
+    font-size: 1.2rem;
+}
+
+.LeaderboardTable th {
+    padding: 0.75rem;
+
+    color: var(--Blue);
+    background-color: var(--Surface0);
+
+    text-align: left;
+
+    border-bottom:
+        3px solid
+        var(--Surface2);
+}
+
+.LeaderboardTable td {
+    padding: 0.7rem 0.75rem;
+
+    border-bottom:
+        2px solid
+        var(--Surface0);
+}
+
+.LeaderboardTable tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.LeaderboardRow:hover td {
+    background-color: var(--Surface0);
+}
+
+.LeaderboardRankColumn,
+.LeaderboardRank {
+    width: 4rem;
+
+    text-align: center;
+}
+
+.LeaderboardDewColumn,
+.LeaderboardDew {
+    text-align: right;
+}
+
+.LeaderboardDew {
+    color: var(--Green);
+}
+
+.LeaderboardRank1 .LeaderboardRank,
+.LeaderboardRank1 .LeaderboardUsername {
+    color: var(--Yellow);
+}
+
+.LeaderboardRank2 .LeaderboardRank,
+.LeaderboardRank2 .LeaderboardUsername {
+    color: var(--Text);
+}
+
+.LeaderboardRank3 .LeaderboardRank,
+.LeaderboardRank3 .LeaderboardUsername {
+    color: var(--Peach);
+}
+
+.LeaderboardSelf td:first-child {
+    border-left:
+        4px solid
+        var(--Mauve);
+}
+
+.LeaderboardEmpty {
+    padding: 1rem;
+
+    color: var(--Subtext1);
+
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .LeaderboardTable {
+        font-size: 1rem;
+    }
+
+    .LeaderboardTable th,
+    .LeaderboardTable td {
+        padding: 0.6rem;
+    }
+
+    .LeaderboardRankColumn,
+    .LeaderboardRank {
+        width: 3rem;
     }
 }

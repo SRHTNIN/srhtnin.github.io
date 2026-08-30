@@ -79,17 +79,27 @@ $PageTitle = "Garden";
             <section class="Leaderboard">
                 <h2>Leaderboard</h2>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Username</th>
-                            <th>Dew</th>
-                        </tr>
-                    </thead>
+                <div class="LeaderboardTableContainer">
+                    <table class="LeaderboardTable">
+                        <thead>
+                            <tr>
+                                <th class="LeaderboardRankColumn">
+                                    #
+                                </th>
 
-                    <tbody id="LeaderboardBody"></tbody>
-                </table>
+                                <th>
+                                    Username
+                                </th>
+
+                                <th class="LeaderboardDewColumn">
+                                    Dew
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="LeaderboardBody"></tbody>
+                    </table>
+                </div>
             </section>
         </main>
 
