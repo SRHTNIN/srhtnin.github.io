@@ -1220,14 +1220,14 @@ select {
 
     align-items: center;
 
-    margin-top: 0.5rem;
+    margin-top: 0.45rem;
 }
 
 .ShopPlantImageFrame {
     display: flex;
 
-    width: 5.75rem;
-    height: 5.75rem;
+    width: 5.65rem;
+    height: 5.65rem;
 
     align-items: center;
     justify-content: center;
