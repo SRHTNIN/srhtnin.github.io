@@ -57,7 +57,7 @@ $PageTitle = "Profile";
 
 
             <section class="ProfileSection">
-                <h2>Statistics</h2>
+                <h3>Statistics</h3>
 
                 <div class="ProfileStatistics">
                     <div class="ProfileStatistic">
