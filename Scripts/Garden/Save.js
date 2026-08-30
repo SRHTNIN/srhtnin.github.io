@@ -3,42 +3,40 @@ const LocalSaveName = "SarahtoninGarden";
 
 const ApiUrl = "https://api.srhtnin.garden";
 
+const StartingDew = 15;
+
+const StartingSeeds = {
+    RedRose: 1
+};
+
 
 function CreateNewSave() {
-    const StartingSeeds = {};
+    const SeedInventory = {};
     const StartingPlants = [];
 
-    if (
-        typeof Plants !==
-        "undefined"
+    for (
+        const [
+            PlantKey,
+            Amount
+        ]
+        of Object.entries(
+            StartingSeeds
+        )
     ) {
-        for (
-            const Plant
-            of Object.values(Plants)
-        ) {
-            if (
-                Plant.Shop
-                    ?.StartingPlant !==
-                true
-            ) {
-                continue;
-            }
+        const Plant =
+            Plants[PlantKey];
 
-            StartingSeeds[
-                String(Plant.Id)
-            ] = 1;
-
-            StartingPlants.push(
-                Plant.Id
-            );
+        if (Plant === undefined) {
+            continue;
         }
-    }
 
-    if (
-        StartingPlants.length === 0
-    ) {
-        StartingSeeds["1"] = 1;
-        StartingPlants.push(1);
+        SeedInventory[
+            String(Plant.Id)
+        ] = Amount;
+
+        StartingPlants.push(
+            Plant.Id
+        );
     }
 
 
@@ -48,7 +46,7 @@ function CreateNewSave() {
         LastSavedAt: Date.now(),
 
         Currency: {
-            Dew: 0
+            Dew: StartingDew
         },
 
         Statistics: {
@@ -64,7 +62,7 @@ function CreateNewSave() {
         },
 
         Inventory: {
-            Seeds: StartingSeeds
+            Seeds: SeedInventory
         },
 
         Upgrades: {
@@ -340,20 +338,25 @@ function NormalizeSaveData(
 
 
 function GetStartingPlantDefinitions() {
-    if (
-        typeof Plants ===
-        "undefined"
+    const StartingPlants = [];
+
+    for (
+        const PlantKey
+        of Object.keys(
+            StartingSeeds
+        )
     ) {
-        return [];
+        const Plant =
+            Plants[PlantKey];
+
+        if (Plant !== undefined) {
+            StartingPlants.push(
+                Plant
+            );
+        }
     }
 
-    return Object.values(Plants)
-        .filter(
-            Plant =>
-                Plant.Shop
-                    ?.StartingPlant ===
-                true
-        );
+    return StartingPlants;
 }
 
 

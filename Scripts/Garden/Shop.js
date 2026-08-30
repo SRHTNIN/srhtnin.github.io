@@ -461,6 +461,10 @@ async function BuyPlantSeed(
         PlantId
     );
 
+    DiscoverPlant(
+        ShopSave,
+        PlantId
+    );
 
     SetShopMessage(
         "Bought a " +

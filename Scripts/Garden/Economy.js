@@ -138,7 +138,7 @@ function IsPlantAvailableInShop(
     Plant
 ) {
     if (
-        Plant.Shop?.StartingPlant ===
+        Plant.Shop?.ShopPlant ===
         true
     ) {
         return true;
@@ -226,7 +226,7 @@ function GetPlantShopCost(
     }
 
     if (
-        Plant.Shop?.StartingPlant ===
+        Plant.Shop?.ShopPlant ===
         true
     ) {
         const BaseCost = Number(

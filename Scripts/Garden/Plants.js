@@ -17,7 +17,7 @@ const Plants = {
         Effects: [],
 
         Shop: {
-            StartingPlant: true,
+            ShopPlant: true,
             BaseCost: 10
         }
     },
@@ -40,13 +40,16 @@ const Plants = {
         Effects: [],
 
         Shop: {
-            StartingPlant: false
+            ShopPlant: false
         }
     },
 
     BlueRose: {
         Id: 3,
         Name: "Blue Rose",
+
+        Description:
+            "An uncommon blue rose.",
 
         Tags: [
             "Rose",
@@ -59,7 +62,7 @@ const Plants = {
         Effects: [],
 
         Shop: {
-            StartingPlant: true,
+            ShopPlant: true,
             BaseCost: 15
         }
     },
@@ -68,10 +71,13 @@ const Plants = {
         Id: 4,
         Name: "Purple Rose",
 
+        Description:
+            "A rare purple rose.",
+
         Tags: [
-            "Rose",
-            "Flower",
-            "Purple"
+              "Rose",
+              "Flower",
+              "Purple"
         ],
 
         GrowthTime: 3600000,
@@ -79,7 +85,7 @@ const Plants = {
         Effects: [],
 
         Shop: {
-            StartingPlant: false
+            ShopPlant: false
         }
     }
 };
