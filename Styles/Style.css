@@ -403,7 +403,7 @@ select {
 
     object-fit: contain;
 
-    image-rendering: auto;
+    image-rendering: pixelated;
 }
 
 .SeedPanel {
@@ -686,11 +686,6 @@ select {
     text-align: center;
 }
 
-.LeaderboardDewColumn,
-.LeaderboardDew {
-    text-align: right;
-}
-
 .LeaderboardDew {
     color: var(--Green);
 }
@@ -738,4 +733,9 @@ select {
     .LeaderboardRank {
         width: 3rem;
     }
+}
+
+.LeaderboardTable th:last-child,
+.LeaderboardTable td:last-child {
+    text-align: right;
 }
