@@ -1,6 +1,10 @@
 const Plants = {
-    Rose: {
-        Name: "Rose",
+    RedRose: {
+        Id: 1,
+        Name: "Red Rose",
+
+        Description:
+            "A common red rose.",
 
         Tags: [
             "Rose",
@@ -8,29 +12,74 @@ const Plants = {
             "Red"
         ],
 
-        GrowthTime: 60000,
-
-        Variants: [
-            {
-                Name: "Red",
-                Tags: [
-                    "Red"
-                ],
-                Priority: 10
-            },
-
-            {
-                Name: "Default",
-                Tags: [],
-                Priority: 0
-            }
-        ],
+        GrowthTime: 3600000,
 
         Effects: [],
 
-        Reward: {
-            Currency: "Dew",
-            Amount: 5
+        Shop: {
+            StartingPlant: true,
+            BaseCost: 10
+        }
+    },
+
+    DarkRose: {
+        Id: 2,
+        Name: "Dark Rose",
+
+        Description:
+            "A jet-black rose.",
+
+        Tags: [
+            "Rose",
+            "Flower",
+            "Black"
+        ],
+
+        GrowthTime: 4000000,
+
+        Effects: [],
+
+        Shop: {
+            StartingPlant: false
+        }
+    },
+
+    BlueRose: {
+        Id: 3,
+        Name: "Blue Rose",
+
+        Tags: [
+            "Rose",
+            "Flower",
+            "Blue"
+        ],
+
+        GrowthTime: 3600000,
+
+        Effects: [],
+
+        Shop: {
+            StartingPlant: true,
+            BaseCost: 15
+        }
+    },
+
+    PurpleRose: {
+        Id: 4,
+        Name: "Purple Rose",
+
+        Tags: [
+            "Rose",
+            "Flower",
+            "Purple"
+        ],
+
+        GrowthTime: 3600000,
+
+        Effects: [],
+
+        Shop: {
+            StartingPlant: false
         }
     }
 };

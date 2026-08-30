@@ -1,15 +1,18 @@
 <?php
 
 $PageTitle = "Garden";
+$PageSection = "Garden";
 
 $SubNavbarItems = [
+    "Garden" => "/Pages/Garden.html",
+    "Shop" => "/Pages/Shop.html",
     "Plots" => "#Plots",
     "Seeds" => "#Seeds",
     "Player" => "#Player",
     "Leaderboard" => "#Leaderboard"
 ];
 
-$SubNavbarCurrent = "Plots";
+$SubNavbarCurrent = "Garden";
 
 ?>
 
@@ -28,6 +31,9 @@ $SubNavbarCurrent = "Plots";
             <div class="GardenStatus">
                 <strong>Dew:</strong>
                 <span id="DewAmount">0</span>
+                <br>
+                <strong>Next harvest:</strong>
+                <span id="NextHarvest">Nothing planted</span>
             </div>
 
             <div class="GardenLayout">
@@ -127,6 +133,7 @@ $SubNavbarCurrent = "Plots";
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Economy.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Leaderboard.js"></script>
         <script src="/Scripts/Garden/Garden.js"></script>

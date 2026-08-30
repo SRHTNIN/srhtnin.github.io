@@ -261,6 +261,8 @@ $SubNavbarCurrent = "Player";
 
 
         <script src="/Scripts/SubNavbar.js"></script>
+        <script src="/Scripts/Garden/Plants.js"></script>
+        <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Profile.js"></script>

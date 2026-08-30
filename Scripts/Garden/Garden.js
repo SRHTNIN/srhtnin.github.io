@@ -1,62 +1,34 @@
 let GameSave;
-let SelectedSeed = "Rose";
+let SelectedSeedId = null;
 
 const GardenUpdateInterval = 1000;
 
 
 async function StartGame() {
     GameSave = await LoadGame();
-    NormalizeSave();
 
+    EnsureSelectedSeed();
     RenderGame();
 
     setInterval(
-        RenderGarden,
+        () => {
+            RenderGarden();
+            RenderNextHarvest();
+        },
         GardenUpdateInterval
     );
+
     await RenderUser();
     await RenderLeaderboard();
 }
 
 
-function NormalizeSave() {
-    GameSave.Currency ??= {};
-    GameSave.Currency.Dew ??= 0;
-
-    GameSave.Seeds ??= {};
-    GameSave.Seeds.Unlocked ??= [
-        "Rose"
-    ];
-
-    GameSave.Statistics ??= {};
-    GameSave.Statistics.CurrencyEarned ??= {};
-
-    GameSave.Statistics.CurrencyEarned.Dew ??=
-        GameSave.Currency.Dew;
-
-    GameSave.Garden ??= {
-        Width: 3,
-        Height: 3,
-        Plots: []
-    };
-
-    const RequiredPlots =
-        GameSave.Garden.Width *
-        GameSave.Garden.Height;
-
-    while (
-        GameSave.Garden.Plots.length <
-        RequiredPlots
-    ) {
-        GameSave.Garden.Plots.push(null);
-    }
-}
-
-
 function RenderGame() {
+    EnsureSelectedSeed();
     RenderCurrency();
     RenderSeeds();
     RenderGarden();
+    RenderNextHarvest();
 }
 
 
@@ -67,7 +39,46 @@ function RenderCurrency() {
         );
 
     DewAmount.textContent =
-        GameSave.Currency.Dew;
+        GameSave.Currency.Dew
+            .toLocaleString();
+}
+
+
+function EnsureSelectedSeed() {
+    if (
+        SelectedSeedId !== null &&
+        GetSeedCount(
+            GameSave,
+            SelectedSeedId
+        ) > 0
+    ) {
+        return;
+    }
+
+    SelectedSeedId = null;
+
+    const SeedIds = Object.keys(
+        GameSave.Inventory.Seeds
+    )
+        .map(Number)
+        .filter(
+            PlantId =>
+                GetSeedCount(
+                    GameSave,
+                    PlantId
+                ) > 0 &&
+                GetPlantById(
+                    PlantId
+                ) !== null
+        )
+        .sort(
+            (A, B) => A - B
+        );
+
+    if (SeedIds.length > 0) {
+        SelectedSeedId =
+            SeedIds[0];
+    }
 }
 
 
@@ -79,14 +90,72 @@ function RenderSeeds() {
 
     SeedList.replaceChildren();
 
+    const SeedIds = Object.keys(
+        GameSave.Inventory.Seeds
+    )
+        .map(Number)
+        .filter(
+            PlantId =>
+                GetSeedCount(
+                    GameSave,
+                    PlantId
+                ) > 0 &&
+                GetPlantById(
+                    PlantId
+                ) !== null
+        )
+        .sort(
+            (A, B) => A - B
+        );
+
+
+    if (SeedIds.length === 0) {
+        const EmptyMessage =
+            document.createElement(
+                "p"
+            );
+
+        EmptyMessage.className =
+            "SeedEmpty";
+
+        EmptyMessage.append(
+            "You don't have any seeds. Visit the "
+        );
+
+        const ShopLink =
+            document.createElement(
+                "a"
+            );
+
+        ShopLink.href =
+            "/Pages/Shop.html";
+
+        ShopLink.textContent =
+            "shop";
+
+        EmptyMessage.append(
+            ShopLink,
+            "."
+        );
+
+        SeedList.appendChild(
+            EmptyMessage
+        );
+
+        return;
+    }
+
+
     for (
         const PlantId
-        of GameSave.Seeds.Unlocked
+        of SeedIds
     ) {
         const Plant =
-            Plants[PlantId];
+            GetPlantById(
+                PlantId
+            );
 
-        if (Plant === undefined) {
+        if (Plant === null) {
             continue;
         }
 
@@ -101,11 +170,16 @@ function RenderSeeds() {
         Button.type = "button";
 
         Button.textContent =
-            Plant.Name;
+            Plant.Name +
+            " ×" +
+            GetSeedCount(
+                GameSave,
+                PlantId
+            );
 
         if (
             PlantId ===
-            SelectedSeed
+            SelectedSeedId
         ) {
             Button.setAttribute(
                 "aria-current",
@@ -116,7 +190,7 @@ function RenderSeeds() {
         Button.addEventListener(
             "click",
             () => {
-                SelectedSeed =
+                SelectedSeedId =
                     PlantId;
 
                 RenderSeeds();
@@ -180,10 +254,6 @@ function CreatePlotElement(
     Button.type = "button";
 
 
-    /*
-     * Empty plot.
-     */
-
     if (Plot === null) {
         Button.classList.add(
             "GardenPlotEmpty"
@@ -215,10 +285,6 @@ function CreatePlotElement(
     }
 
 
-    /*
-     * Plant image.
-     */
-
     const ImagePath =
         GetPlantImage(
             Plot,
@@ -243,12 +309,23 @@ function CreatePlotElement(
         Button.appendChild(
             Image
         );
+    } else {
+        const MissingImage =
+            document.createElement(
+                "span"
+            );
+
+        MissingImage.className =
+            "GardenPlantMissing";
+
+        MissingImage.textContent =
+            Plant.Name;
+
+        Button.appendChild(
+            MissingImage
+        );
     }
 
-
-    /*
-     * Mature plants can be harvested.
-     */
 
     if (
         IsPlantMature(
@@ -288,6 +365,7 @@ function CreatePlotElement(
             "% grown";
     }
 
+
     return Button;
 }
 
@@ -303,34 +381,63 @@ async function PlantSeed(
         return;
     }
 
+    EnsureSelectedSeed();
+
+    if (SelectedSeedId === null) {
+        SetGardenMessage(
+            "You don't have any seeds to plant."
+        );
+
+        return;
+    }
+
+
+    const Plant =
+        GetPlantById(
+            SelectedSeedId
+        );
+
+    const PlantKey =
+        GetPlantKeyById(
+            SelectedSeedId
+        );
+
     if (
-        !GameSave.Seeds.Unlocked
-            .includes(
-                SelectedSeed
-            )
+        Plant === null ||
+        PlantKey === null
     ) {
         return;
     }
 
+
+    if (
+        !TakeSeed(
+            GameSave,
+            SelectedSeedId
+        )
+    ) {
+        EnsureSelectedSeed();
+        RenderSeeds();
+
+        return;
+    }
+
+
     GameSave.Garden.Plots[
         PlotIndex
     ] = {
-        Plant: SelectedSeed,
-
-        AddedTags: [],
-
-        VisualVariant: null,
-
+        Plant: PlantKey,
         PlantedAt: Date.now()
     };
 
+
     SetGardenMessage(
         "Planted " +
-        Plants[SelectedSeed].Name +
+        Plant.Name +
         "."
     );
 
-    RenderGarden();
+    RenderGame();
 
     await SaveGame(
         GameSave
@@ -354,6 +461,7 @@ async function HarvestPlant(
         Plants[Plot.Plant];
 
     if (
+        Plant === undefined ||
         !IsPlantMature(
             Plot,
             Plant
@@ -362,22 +470,40 @@ async function HarvestPlant(
         return;
     }
 
-    GiveReward(
-        Plant.Reward
-    );
+
+    const RewardAmount =
+        GetPlantHarvestReward(
+            GameSave,
+            Plant.Id
+        );
+
+    if (RewardAmount === null) {
+        SetGardenMessage(
+            "Couldn't calculate the harvest reward for " +
+            Plant.Name +
+            "."
+        );
+
+        return;
+    }
+
+
+    GiveReward({
+        Currency: "Dew",
+        Amount: RewardAmount
+    });
 
     GameSave.Garden.Plots[
         PlotIndex
     ] = null;
 
+
     SetGardenMessage(
         "Harvested " +
         Plant.Name +
         " for " +
-        Plant.Reward.Amount +
-        " " +
-        Plant.Reward.Currency +
-        "."
+        RewardAmount +
+        " Dew."
     );
 
     RenderGame();
@@ -437,60 +563,14 @@ function GetPlantGrowthProgress(
     );
 }
 
+
 function GetPlantTags(
     Plot,
     Plant
 ) {
     return [
-        ...Plant.Tags,
-        ...(Plot.AddedTags ?? [])
+        ...(Plant.Tags ?? [])
     ];
-}
-
-
-function GetPlantVariant(
-    Plot,
-    Plant
-) {
-    if (
-        Plot.VisualVariant !==
-        null
-    ) {
-        return Plot.VisualVariant;
-    }
-
-    const Tags =
-        GetPlantTags(
-            Plot,
-            Plant
-        );
-
-    const Variants = [
-        ...Plant.Variants
-    ].sort(
-        (A, B) =>
-            B.Priority -
-            A.Priority
-    );
-
-    for (
-        const Variant
-        of Variants
-    ) {
-        const Matches =
-            Variant.Tags.every(
-                Tag =>
-                    Tags.includes(
-                        Tag
-                    )
-            );
-
-        if (Matches) {
-            return Variant.Name;
-        }
-    }
-
-    return "Default";
 }
 
 
@@ -511,74 +591,9 @@ function GetPlantImages(
     Plot,
     Plant
 ) {
-    const Variants =
-        PlantImages[
-            Plot.Plant
-        ];
-
-    if (Variants === undefined) {
-        return [];
-    }
-
-
-    const Variant =
-        GetPlantVariant(
-            Plot,
-            Plant
-        );
-
-
-    /*
-     * Preferred variant.
-     */
-
-    if (
-        Array.isArray(
-            Variants[Variant]
-        ) &&
-        Variants[Variant].length > 0
-    ) {
-        return Variants[
-            Variant
-        ];
-    }
-
-
-    /*
-     * Default visual fallback.
-     */
-
-    if (
-        Array.isArray(
-            Variants.Default
-        ) &&
-        Variants.Default.length > 0
-    ) {
-        return Variants.Default;
-    }
-
-
-    /*
-     * Absolute fallback:
-     * use the first variant that has images.
-     */
-
-    for (
-        const Images
-        of Object.values(
-            Variants
-        )
-    ) {
-        if (
-            Array.isArray(Images) &&
-            Images.length > 0
-        ) {
-            return Images;
-        }
-    }
-
-
-    return [];
+    return PlantImages[
+        Plot.Plant
+    ] ?? [];
 }
 
 
@@ -639,6 +654,198 @@ function SetGardenMessage(
     document.getElementById(
         "GardenMessage"
     ).textContent = Message;
+}
+
+
+function GetNextHarvestTime() {
+    let NextHarvestTime = null;
+
+
+    for (
+        const Plot
+        of GameSave.Garden.Plots
+    ) {
+        if (Plot === null) {
+            continue;
+        }
+
+
+        const Plant =
+            Plants[Plot.Plant];
+
+        if (Plant === undefined) {
+            continue;
+        }
+
+
+        const HarvestTime =
+            Plot.PlantedAt +
+            Plant.GrowthTime;
+
+
+        if (
+            HarvestTime <=
+            Date.now()
+        ) {
+            return Date.now();
+        }
+
+
+        if (
+            NextHarvestTime === null ||
+            HarvestTime <
+                NextHarvestTime
+        ) {
+            NextHarvestTime =
+                HarvestTime;
+        }
+    }
+
+
+    return NextHarvestTime;
+}
+
+
+function RenderNextHarvest() {
+    const Element =
+        document.getElementById(
+            "NextHarvest"
+        );
+
+    if (Element === null) {
+        return;
+    }
+
+
+    const HarvestTime =
+        GetNextHarvestTime();
+
+
+    if (HarvestTime === null) {
+        Element.textContent =
+            "Nothing planted";
+
+        Element.removeAttribute(
+            "title"
+        );
+
+        return;
+    }
+
+
+    const Remaining =
+        HarvestTime -
+        Date.now();
+
+
+    if (Remaining <= 0) {
+        Element.textContent =
+            "Ready now!";
+
+        Element.removeAttribute(
+            "title"
+        );
+
+        return;
+    }
+
+
+    Element.textContent =
+        FormatRemainingTime(
+            Remaining
+        );
+
+
+    const HarvestDate =
+        new Date(
+            HarvestTime
+        );
+
+
+    Element.title =
+        "Ready at " +
+        HarvestDate.toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+}
+
+
+function FormatRemainingTime(
+    Milliseconds
+) {
+    const TotalSeconds =
+        Math.ceil(
+            Milliseconds /
+            1000
+        );
+
+    const Days =
+        Math.floor(
+            TotalSeconds /
+            86400
+        );
+
+    const Hours =
+        Math.floor(
+            (
+                TotalSeconds %
+                86400
+            ) /
+            3600
+        );
+
+    const Minutes =
+        Math.floor(
+            (
+                TotalSeconds %
+                3600
+            ) /
+            60
+        );
+
+    const Seconds =
+        TotalSeconds %
+        60;
+
+
+    if (Days > 0) {
+        return (
+            Days +
+            "d " +
+            Hours +
+            "h"
+        );
+    }
+
+
+    if (Hours > 0) {
+        return (
+            Hours +
+            "h " +
+            Minutes +
+            "m"
+        );
+    }
+
+
+    if (Minutes > 0) {
+        return (
+            Minutes +
+            "m " +
+            Seconds +
+            "s"
+        );
+    }
+
+
+    return (
+        Seconds +
+        "s"
+    );
 }
 
 

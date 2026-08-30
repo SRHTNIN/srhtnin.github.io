@@ -35,6 +35,17 @@ $SubNavbarCurrent ??= null;
                 ENT_QUOTES,
                 "UTF-8"
             ) ?>"
+            <?php if (
+                $SubNavbarCurrent ===
+                $Name
+            ): ?>
+                aria-current="<?= str_starts_with(
+                    $Url,
+                    "#"
+                )
+                    ? "location"
+                    : "page" ?>"
+            <?php endif; ?>
         >
             <span
                 class="SubNavbarPrefix"

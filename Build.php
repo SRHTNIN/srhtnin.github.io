@@ -117,6 +117,7 @@ function GeneratePlantImageManifest(
         return;
     }
 
+
     foreach (
         new DirectoryIterator(
             $PlantsDirectory
@@ -133,143 +134,78 @@ function GeneratePlantImageManifest(
         $PlantName =
             $PlantDirectory->getFilename();
 
-        $Manifest[$PlantName] = [];
+        $Images = [];
 
 
         foreach (
             new DirectoryIterator(
                 $PlantDirectory->getPathname()
             )
-            as $VariantDirectory
+            as $Image
+        ) {
+            if (!$Image->isFile()) {
+                continue;
+            }
+
+            if (
+                preg_match(
+                    "/^([0-9]+)\\.png$/i",
+                    $Image->getFilename(),
+                    $Matches
+                ) !== 1
+            ) {
+                continue;
+            }
+
+            $ImageNumber =
+                (int) $Matches[1];
+
+            if ($ImageNumber < 1) {
+                continue;
+            }
+
+            $Images[$ImageNumber] =
+                "/Assets/Img/Garden/Plants/" .
+                $PlantName .
+                "/" .
+                $Image->getFilename();
+        }
+
+
+        ksort(
+            $Images,
+            SORT_NUMERIC
+        );
+
+
+        $ExpectedNumber = 1;
+
+        foreach (
+            array_keys($Images)
+            as $ImageNumber
         ) {
             if (
-                $VariantDirectory->isDot() ||
-                !$VariantDirectory->isDir()
+                $ImageNumber !==
+                $ExpectedNumber
             ) {
-                continue;
+                throw new RuntimeException(
+                    "Missing plant image " .
+                    $ExpectedNumber .
+                    ".png in " .
+                    $PlantName
+                );
             }
 
-            $VariantName =
-                $VariantDirectory->getFilename();
-
-            $Images = [];
-
-
-            foreach (
-                new DirectoryIterator(
-                    $VariantDirectory->getPathname()
-                )
-                as $Image
-            ) {
-                if (!$Image->isFile()) {
-                    continue;
-                }
-
-                if (
-                    preg_match(
-                        "/^([0-9]+)\.png$/i",
-                        $Image->getFilename(),
-                        $Matches
-                    ) !== 1
-                ) {
-                    continue;
-                }
-
-                $ImageNumber =
-                    (int) $Matches[1];
-
-                if ($ImageNumber < 1) {
-                    continue;
-                }
-
-                $Images[$ImageNumber] =
-                    "/Assets/Img/Garden/Plants/" .
-                    $PlantName .
-                    "/" .
-                    $VariantName .
-                    "/" .
-                    $Image->getFilename();
-            }
-
-
-            /*
-             * Sort numerically:
-             *
-             * 1.png
-             * 2.png
-             * ...
-             * 10.png
-             *
-             * instead of:
-             *
-             * 1.png
-             * 10.png
-             * 2.png
-             */
-
-            ksort(
-                $Images,
-                SORT_NUMERIC
-            );
-
-
-            /*
-             * Require consecutive numbering.
-             */
-
-            $ExpectedNumber = 1;
-
-            foreach (
-                array_keys($Images)
-                as $ImageNumber
-            ) {
-                if (
-                    $ImageNumber !==
-                    $ExpectedNumber
-                ) {
-                    throw new RuntimeException(
-                        "Missing plant image " .
-                        $ExpectedNumber .
-                        ".png in " .
-                        $PlantName .
-                        "/" .
-                        $VariantName
-                    );
-                }
-
-                $ExpectedNumber++;
-            }
-
-
-            if (count($Images) === 0) {
-                continue;
-            }
-
-            $Manifest[
-                $PlantName
-            ][
-                $VariantName
-            ] = array_values(
-                $Images
-            );
+            $ExpectedNumber++;
         }
 
 
-        if (
-            count(
-                $Manifest[$PlantName]
-            ) === 0
-        ) {
-            unset(
-                $Manifest[$PlantName]
-            );
-        } else {
-            ksort(
-                $Manifest[$PlantName],
-                SORT_NATURAL |
-                SORT_FLAG_CASE
-            );
+        if (count($Images) === 0) {
+            continue;
         }
+
+        $Manifest[$PlantName] =
+            array_values($Images);
     }
 
 
@@ -305,7 +241,6 @@ function GeneratePlantImageManifest(
     file_put_contents(
         $ManifestDirectory .
         "/PlantImages.js",
-
         "const PlantImages = " .
         $Json .
         ";" .
