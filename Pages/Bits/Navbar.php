@@ -16,7 +16,7 @@ $NavbarPages = [
             href="<?= htmlspecialchars($NavbarHref, ENT_QUOTES, "UTF-8") ?>"
             aria-label="<?= htmlspecialchars($NavbarPage, ENT_QUOTES, "UTF-8") ?>"
             title="<?= htmlspecialchars($NavbarPage, ENT_QUOTES, "UTF-8") ?>"
-            <?= ($PageTitle ?? "") === $NavbarPage ? 'aria-current="page"' : "" ?>
+            <?= ($PageSection ?? $PageTitle ?? "") === $NavbarPage ? 'aria-current="page"' : "" ?>
         >
             <img
                 class="NavbarIcon"

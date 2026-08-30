@@ -2,6 +2,15 @@
 
 $PageTitle = "Profile";
 
+$SubNavbarItems = [
+    "Player" => "#Player",
+    "Statistics" => "#Statistics",
+    "Account" => "#Account",
+    "Import" => "#Import"
+];
+
+$SubNavbarCurrent = "Player";
+
 ?>
 
 <!DOCTYPE html>
@@ -11,6 +20,7 @@ $PageTitle = "Profile";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
+        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1>Profile</h1>
@@ -22,7 +32,10 @@ $PageTitle = "Profile";
             </p>
 
 
-            <section class="ProfileSection">
+            <section
+                id="Player"
+                class="ProfileSection"
+            >
                 <h2>Player</h2>
 
                 <form id="ProfileUsernameForm">
@@ -56,7 +69,10 @@ $PageTitle = "Profile";
             </section>
 
 
-            <section class="ProfileSection">
+            <section
+                id="Statistics"
+                class="ProfileSection"
+            >
                 <h3>Statistics</h3>
 
                 <div class="ProfileStatistics">
@@ -113,7 +129,10 @@ $PageTitle = "Profile";
             </section>
 
 
-            <section class="ProfileSection">
+            <section
+                id="Account"
+                class="ProfileSection"
+            >
                 <h2>Account</h2>
 
                 <p>
@@ -177,7 +196,10 @@ $PageTitle = "Profile";
             </section>
 
 
-            <section class="ProfileSection">
+            <section
+                id="Import"
+                class="ProfileSection"
+            >
                 <h3>Import Account</h3>
 
                 <p>
@@ -238,6 +260,7 @@ $PageTitle = "Profile";
         </main>
 
 
+        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Profile.js"></script>

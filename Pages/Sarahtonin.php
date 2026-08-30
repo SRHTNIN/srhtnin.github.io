@@ -2,6 +2,16 @@
 
 $PageTitle = "Sarahtonin";
 
+$SubNavbarItems = [
+    "About" => "#About",
+    "Skills" => "#Skills",
+    "Who I am" => "#WhoIAm",
+    "Socials" => "#Socials",
+    "Misc info" => "#MiscInfo"
+];
+
+$SubNavbarCurrent = "About";
+
 ?>
 
 <!DOCTYPE html>
@@ -11,9 +21,10 @@ $PageTitle = "Sarahtonin";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
+        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
-            <h1>About me</h1>
+            <h1 id="About">About me</h1>
 
             <p>
                 I'm Sarah, also known as Sarahtonin.
@@ -26,7 +37,7 @@ $PageTitle = "Sarahtonin";
                 Linux, and generally messing around with technology until it does what I want.
             </p>
 
-            <h2>Skills</h2>
+            <h2 id="Skills">Skills</h2>
 
             <p>
                 I work in IT, so I've learned a lot of different stuff in my time.
@@ -50,7 +61,7 @@ $PageTitle = "Sarahtonin";
                 "Quality over quantity" describes my preferences pretty well.
             </p>
 
-            <h2>Who I am</h2>
+            <h2 id="WhoIAm">Who I am</h2>
 
             <p>
                 I'm Norwegian, my pronouns are she/her,
@@ -62,7 +73,7 @@ $PageTitle = "Sarahtonin";
                 I'm also asexual, lesbian, and trans. It's quite queer..
             </p>
 
-            <h3>Socials</h3>
+            <h3 id="Socials">Socials</h3>
 
             <p>
                 My username tends to be either <strong>Sarahtonin</strong>
@@ -70,7 +81,7 @@ $PageTitle = "Sarahtonin";
                 I'm named that on Steam, YouTube, and Discord.
             </p>
 
-            <h3>Misc info</h3>
+            <h3 id="MiscInfo">Misc info</h3>
 
             <ul>
                 <li>Birthday: 27 November 2008</li>
@@ -80,6 +91,7 @@ $PageTitle = "Sarahtonin";
             </ul>
         </main>
 
+        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Script.js"></script>
     </body>
 </html>

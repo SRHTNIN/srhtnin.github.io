@@ -2,6 +2,15 @@
 
 $PageTitle = "Garden";
 
+$SubNavbarItems = [
+    "Plots" => "#Plots",
+    "Seeds" => "#Seeds",
+    "Player" => "#Player",
+    "Leaderboard" => "#Leaderboard"
+];
+
+$SubNavbarCurrent = "Plots";
+
 ?>
 
 <!DOCTYPE html>
@@ -11,6 +20,7 @@ $PageTitle = "Garden";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
+        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1>Garden</h1>
@@ -21,7 +31,7 @@ $PageTitle = "Garden";
             </div>
 
             <div class="GardenLayout">
-                <section>
+                <section id="Plots">
                     <h2>Plots</h2>
 
                     <div
@@ -30,7 +40,10 @@ $PageTitle = "Garden";
                     ></div>
                 </section>
 
-                <section class="SeedPanel">
+                <section
+                    id="Seeds"
+                    class="SeedPanel"
+                >
                     <h2>Seeds</h2>
 
                     <div
@@ -44,7 +57,10 @@ $PageTitle = "Garden";
                 Select a seed, then choose an empty plot.
             </p>
 
-            <section class="GardenUser">
+            <section
+                id="Player"
+                class="GardenUser"
+            >
                 <h2>Player</h2>
 
                 <p>
@@ -76,7 +92,10 @@ $PageTitle = "Garden";
                 </form>
             </section>
 
-            <section class="Leaderboard">
+            <section
+                id="Leaderboard"
+                class="Leaderboard"
+            >
                 <h2>Leaderboard</h2>
 
                 <div class="LeaderboardTableContainer">
@@ -103,6 +122,7 @@ $PageTitle = "Garden";
             </section>
         </main>
 
+        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Garden/PlantImages.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
