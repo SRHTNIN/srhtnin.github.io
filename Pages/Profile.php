@@ -178,7 +178,7 @@ $PageTitle = "Profile";
 
 
             <section class="ProfileSection">
-                <h2>Import Account</h2>
+                <h3>Import Account</h3>
 
                 <p>
                     To use an existing Garden account on
