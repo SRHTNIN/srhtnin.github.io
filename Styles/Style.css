@@ -1356,3 +1356,25 @@ select {
         height: 4.5rem;
     }
 }
+
+#ProfileColourForm {
+    margin-top: 1.5rem;
+}
+
+.ProfileColourInput {
+    width: 4rem;
+    min-width: 4rem !important;
+    height: 2.75rem;
+
+    padding: 0.2rem !important;
+
+    cursor: pointer;
+
+    appearance: auto !important;
+}
+
+.ProfileColourPreview {
+    min-width: 8rem;
+
+    color: var(--Text);
+}

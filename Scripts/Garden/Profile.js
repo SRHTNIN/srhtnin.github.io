@@ -2,7 +2,7 @@ let ProfileSave = null;
 
 
 async function StartProfile() {
-    await RenderProfileUsername();
+    await RenderProfilePlayer();
 
     try {
         ProfileSave =
@@ -18,7 +18,6 @@ async function StartProfile() {
         RenderProfileStatisticsError();
     }
 
-
     const UsernameForm =
         document.getElementById(
             "ProfileUsernameForm"
@@ -28,16 +27,64 @@ async function StartProfile() {
         "submit",
         SubmitProfileUsername
     );
+
+    const ColourForm =
+        document.getElementById(
+            "ProfileColourForm"
+        );
+
+    const ColourInput =
+        document.getElementById(
+            "ProfileColourInput"
+        );
+
+    const ColourPreview =
+        document.getElementById(
+            "ProfileColourPreview"
+        );
+
+    const ResetColourButton =
+        document.getElementById(
+            "ResetProfileColourButton"
+        );
+
+    ColourForm.addEventListener(
+        "submit",
+        SubmitProfileColour
+    );
+
+    ColourInput.addEventListener(
+        "input",
+        () => {
+            ColourPreview.style.color =
+                ColourInput.value;
+        }
+    );
+
+    ResetColourButton.addEventListener(
+        "click",
+        ResetProfileColour
+    );
 }
 
 
-async function RenderProfileUsername() {
-    const Input =
+async function RenderProfilePlayer() {
+    const UsernameInput =
         document.getElementById(
             "ProfileUsernameInput"
         );
 
-    const Message =
+    const ColourInput =
+        document.getElementById(
+            "ProfileColourInput"
+        );
+
+    const ColourPreview =
+        document.getElementById(
+            "ProfileColourPreview"
+        );
+
+    const UsernameMessage =
         document.getElementById(
             "ProfileUsernameMessage"
         );
@@ -53,22 +100,42 @@ async function RenderProfileUsername() {
             );
         }
 
+
         if (
             Profile.Username !== null
         ) {
-            Input.value =
+            UsernameInput.value =
                 Profile.Username;
+
+            ColourPreview.textContent =
+                Profile.Username;
+        } else {
+            ColourPreview.textContent =
+                "Preview";
         }
 
-        Message.textContent = "";
+
+        if (
+            Profile.Colour !== null
+        ) {
+            ColourInput.value =
+                Profile.Colour;
+
+            ColourPreview.style.color =
+                Profile.Colour;
+        }
+
+
+        UsernameMessage.textContent =
+            "";
     } catch (Error) {
         console.error(
-            "Couldn't load username:",
+            "Couldn't load profile:",
             Error
         );
 
-        Message.textContent =
-            "Couldn't load username.";
+        UsernameMessage.textContent =
+            "Couldn't load profile.";
     }
 }
 
@@ -137,6 +204,114 @@ async function SubmitProfileUsername(
     }
 }
 
+async function SubmitProfileColour(
+    Event
+) {
+    Event.preventDefault();
+
+    const Input =
+        document.getElementById(
+            "ProfileColourInput"
+        );
+
+    const Preview =
+        document.getElementById(
+            "ProfileColourPreview"
+        );
+
+    const Message =
+        document.getElementById(
+            "ProfileColourMessage"
+        );
+
+
+    Message.textContent =
+        "Saving...";
+
+
+    try {
+        const Result =
+            await SetColour(
+                Input.value
+            );
+
+        if (!Result.Success) {
+            Message.textContent =
+                Result.Error ??
+                "Couldn't save colour.";
+
+            return;
+        }
+
+
+        Preview.style.color =
+            Result.Colour;
+
+        Message.textContent =
+            "Colour saved.";
+    } catch (Error) {
+        console.error(
+            "Couldn't save colour:",
+            Error
+        );
+
+        Message.textContent =
+            "Couldn't save colour.";
+    }
+}
+
+
+async function ResetProfileColour() {
+    const Input =
+        document.getElementById(
+            "ProfileColourInput"
+        );
+
+    const Preview =
+        document.getElementById(
+            "ProfileColourPreview"
+        );
+
+    const Message =
+        document.getElementById(
+            "ProfileColourMessage"
+        );
+
+
+    try {
+        const Result =
+            await SetColour(
+                null
+            );
+
+        if (!Result.Success) {
+            Message.textContent =
+                Result.Error ??
+                "Couldn't reset colour.";
+
+            return;
+        }
+
+
+        Input.value =
+            "#cdd6f4";
+
+        Preview.style.removeProperty(
+            "color"
+        );
+
+        Message.textContent =
+            "Colour reset.";
+    } catch (Error) {
+        console.error(
+            "Couldn't reset colour:",
+            Error
+        );
+
+        Message.textContent =
+            "Couldn't reset colour.";
+    }
+}
 
 function RenderProfileStatistics() {
     const CurrentDew =

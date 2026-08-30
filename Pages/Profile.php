@@ -66,8 +66,47 @@ $SubNavbarCurrent = "Player";
                         class="ProfileMessage"
                     ></p>
                 </form>
-            </section>
 
+                <form id="ProfileColourForm">
+                    <label
+                        for="ProfileColourInput"
+                    >
+                        Colour
+                    </label>
+
+                    <div class="ProfileFormRow">
+                        <input
+                            id="ProfileColourInput"
+                            class="ProfileColourInput"
+                            type="color"
+                            value="#cdd6f4"
+                        >
+
+                        <strong
+                            id="ProfileColourPreview"
+                            class="ProfileColourPreview"
+                        >
+                            Preview
+                        </strong>
+
+                        <button type="submit">
+                            Save colour
+                        </button>
+
+                        <button
+                            id="ResetProfileColourButton"
+                            type="button"
+                        >
+                            Reset
+                        </button>
+                    </div>
+
+                    <p
+                        id="ProfileColourMessage"
+                        class="ProfileMessage"
+                    ></p>
+                </form>
+            </section>
 
             <section
                 id="Statistics"

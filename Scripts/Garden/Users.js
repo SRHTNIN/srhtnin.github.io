@@ -40,6 +40,33 @@ async function SetUsername(
     return await Response.json();
 }
 
+async function SetColour(
+    Colour
+) {
+    const Response =
+        await fetch(
+            ApiUrl +
+            "/SetColour.php",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    SaveKey:
+                        GetSaveKey(),
+
+                    Colour:
+                        Colour
+                })
+            }
+        );
+
+    return await Response.json();
+}
 
 async function RenderUser() {
     const Profile =
@@ -62,7 +89,14 @@ async function RenderUser() {
         UsernameDisplay.textContent =
             Profile.Username;
 
-        UsernameForm.hidden = true;
+        if (
+            Profile.Colour !== null
+        ) {
+            UsernameDisplay.style.color =
+                Profile.Colour;
+        }
+
+      UsernameForm.hidden = true;
 
         return;
     }
