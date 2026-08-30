@@ -1219,6 +1219,8 @@ select {
     width: 5.75rem;
 
     align-items: center;
+
+    margin-top: 0.25rem;
 }
 
 .ShopPlantImageFrame {
