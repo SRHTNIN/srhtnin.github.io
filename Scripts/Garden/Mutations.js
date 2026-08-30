@@ -6,6 +6,9 @@ const MutationSets = {
         Description:
             "A mutation that seems to corrupt roses.",
 
+        Priority: 10,
+        Rotation: "Any",
+
         Chance: 0.1,
         Cooldown: 120000,
 
@@ -58,6 +61,9 @@ const MutationSets = {
 
         Description:
             "A colourful mutation that makes a purple rose.",
+
+        Priority: 20,
+        Rotation: "Any",
 
         Chance: 1.0,
         Cooldown: 100000,

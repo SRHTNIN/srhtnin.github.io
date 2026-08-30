@@ -356,7 +356,8 @@ function GetMutationIngredientCost(
         ) {
             if (
                 Matcher === null ||
-                Matcher === "Empty"
+                Matcher === "Empty" ||
+                Matcher === "Any"
             ) {
                 continue;
             }

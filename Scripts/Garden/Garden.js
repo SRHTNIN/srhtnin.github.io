@@ -1,5 +1,8 @@
 let GameSave;
 let SelectedSeedId = null;
+let SelectedGardenTool = "Seed";
+
+let MutationCheckPending = false;
 
 const GardenUpdateInterval = 1000;
 
@@ -7,14 +10,24 @@ const GardenUpdateInterval = 1000;
 async function StartGame() {
     GameSave = await LoadGame();
 
+    BindGardenTools();
     EnsureSelectedSeed();
+
+    const InitialMutationResult =
+        CheckGardenMutations(
+            GameSave
+        );
+
     RenderGame();
 
+    if (InitialMutationResult.Attempted) {
+        await SaveGame(
+            GameSave
+        );
+    }
+
     setInterval(
-        () => {
-            RenderGarden();
-            RenderNextHarvest();
-        },
+        GardenTick,
         GardenUpdateInterval
     );
 
@@ -27,8 +40,59 @@ function RenderGame() {
     EnsureSelectedSeed();
     RenderCurrency();
     RenderSeeds();
+    RenderTools();
     RenderGarden();
     RenderNextHarvest();
+}
+
+
+function BindGardenTools() {
+    const ShovelButton =
+        document.getElementById(
+            "ShovelToolButton"
+        );
+
+    if (ShovelButton === null) {
+        return;
+    }
+
+    ShovelButton.addEventListener(
+        "click",
+        () => {
+            SelectedGardenTool =
+                "Shovel";
+
+            RenderSeeds();
+            RenderTools();
+            RenderGarden();
+        }
+    );
+}
+
+
+function RenderTools() {
+    const ShovelButton =
+        document.getElementById(
+            "ShovelToolButton"
+        );
+
+    if (ShovelButton === null) {
+        return;
+    }
+
+    if (
+        SelectedGardenTool ===
+        "Shovel"
+    ) {
+        ShovelButton.setAttribute(
+            "aria-current",
+            "true"
+        );
+    } else {
+        ShovelButton.removeAttribute(
+            "aria-current"
+        );
+    }
 }
 
 
@@ -178,8 +242,10 @@ function RenderSeeds() {
             );
 
         if (
+            SelectedGardenTool ===
+                "Seed" &&
             PlantId ===
-            SelectedSeedId
+                SelectedSeedId
         ) {
             Button.setAttribute(
                 "aria-current",
@@ -190,10 +256,15 @@ function RenderSeeds() {
         Button.addEventListener(
             "click",
             () => {
+                SelectedGardenTool =
+                    "Seed";
+
                 SelectedSeedId =
                     PlantId;
 
                 RenderSeeds();
+                RenderTools();
+                RenderGarden();
 
                 SetGardenMessage(
                     "Selected " +
@@ -262,14 +333,19 @@ function CreatePlotElement(
         Button.title =
             "Empty plot";
 
-        Button.addEventListener(
-            "click",
-            () => {
-                PlantSeed(
-                    PlotIndex
-                );
-            }
-        );
+        if (
+            SelectedGardenTool ===
+            "Seed"
+        ) {
+            Button.addEventListener(
+                "click",
+                () => {
+                    PlantSeed(
+                        PlotIndex
+                    );
+                }
+            );
+        }
 
         return Button;
     }
@@ -324,6 +400,31 @@ function CreatePlotElement(
         Button.appendChild(
             MissingImage
         );
+    }
+
+
+    if (
+        SelectedGardenTool ===
+        "Shovel"
+    ) {
+        Button.classList.add(
+            "GardenPlotRemove"
+        );
+
+        Button.title =
+            "Remove " +
+            Plant.Name;
+
+        Button.addEventListener(
+            "click",
+            () => {
+                RemovePlant(
+                    PlotIndex
+                );
+            }
+        );
+
+        return Button;
     }
 
 
@@ -437,6 +538,10 @@ async function PlantSeed(
         "."
     );
 
+    CheckGardenMutations(
+        GameSave
+    );
+
     RenderGame();
 
     await SaveGame(
@@ -506,11 +611,77 @@ async function HarvestPlant(
         " Dew."
     );
 
+    CheckGardenMutations(
+        GameSave
+    );
+
     RenderGame();
 
     await SaveGame(
         GameSave
     );
+}
+
+
+async function RemovePlant(
+    PlotIndex
+) {
+    if (
+        GameSave.Garden.Plots[
+            PlotIndex
+        ] === null
+    ) {
+        return;
+    }
+
+
+    GameSave.Garden.Plots[
+        PlotIndex
+    ] = null;
+
+
+    CheckGardenMutations(
+        GameSave
+    );
+
+    RenderGame();
+
+    await SaveGame(
+        GameSave
+    );
+}
+
+
+async function GardenTick() {
+    RenderGarden();
+    RenderNextHarvest();
+
+
+    if (MutationCheckPending) {
+        return;
+    }
+
+
+    MutationCheckPending = true;
+
+
+    try {
+        const MutationResult =
+            CheckGardenMutations(
+                GameSave
+            );
+
+
+        if (MutationResult.Attempted) {
+            RenderGame();
+
+            await SaveGame(
+                GameSave
+            );
+        }
+    } finally {
+        MutationCheckPending = false;
+    }
 }
 
 

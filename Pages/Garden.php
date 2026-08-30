@@ -56,6 +56,20 @@ $SubNavbarCurrent = "Garden";
                         id="SeedList"
                         class="SeedList"
                     ></div>
+
+                    <h3 class="GardenToolHeading">
+                        Tools
+                    </h3>
+
+                    <div class="ToolList">
+                        <button
+                            id="ShovelToolButton"
+                            class="ToolButton ToolButtonShovel"
+                            type="button"
+                        >
+                            Shovel
+                        </button>
+                    </div>
                 </section>
             </div>
 
@@ -134,6 +148,7 @@ $SubNavbarCurrent = "Garden";
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/MutationEngine.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Leaderboard.js"></script>
         <script src="/Scripts/Garden/Garden.js"></script>
