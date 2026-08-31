@@ -141,14 +141,12 @@ async function RenderLeaderboard() {
             Username.textContent =
                 Player.Username;
 
-            if (
-                Player.Colour !== null
-            ) {
-                Username.style.color =
-                    Player.Colour;
-            }
+            ApplyPlayerColour(
+                Username,
+                Player.Colour
+            );
 
-          Dew.textContent =
+            Dew.textContent =
                 Player.Dew.toLocaleString();
 
 

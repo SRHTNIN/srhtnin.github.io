@@ -59,8 +59,16 @@ function BindGardenTools() {
     ShovelButton.addEventListener(
         "click",
         () => {
-            SelectedGardenTool =
-                "Shovel";
+            if (
+                SelectedGardenTool ===
+                "Shovel"
+            ) {
+                SelectedGardenTool =
+                    null;
+            } else {
+                SelectedGardenTool =
+                    "Shovel";
+            }
 
             RenderSeeds();
             RenderTools();
@@ -142,6 +150,15 @@ function EnsureSelectedSeed() {
     if (SeedIds.length > 0) {
         SelectedSeedId =
             SeedIds[0];
+
+        return;
+    }
+
+    if (
+        SelectedGardenTool ===
+        "Seed"
+    ) {
+        SelectedGardenTool = null;
     }
 }
 

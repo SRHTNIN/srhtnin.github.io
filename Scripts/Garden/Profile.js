@@ -56,8 +56,10 @@ async function StartProfile() {
     ColourInput.addEventListener(
         "input",
         () => {
-            ColourPreview.style.color =
-                ColourInput.value;
+            ApplyPlayerColour(
+                ColourPreview,
+                ColourInput.value
+            );
         }
     );
 
@@ -115,15 +117,24 @@ async function RenderProfilePlayer() {
         }
 
 
-        if (
-            Profile.Colour !== null
-        ) {
-            ColourInput.value =
-                Profile.Colour;
+        const ProfileColour =
+            IsValidPlayerColour(
+                Profile.Colour
+            )
+                ? Profile.Colour
+                : DefaultPlayerColour;
 
-            ColourPreview.style.color =
-                Profile.Colour;
-        }
+        ColourInput.value =
+            ProfileColour;
+
+        ApplyPlayerColour(
+            ColourPreview,
+            IsValidPlayerColour(
+                Profile.Colour
+            )
+                ? Profile.Colour
+                : null
+        );
 
 
         UsernameMessage.textContent =
@@ -244,8 +255,14 @@ async function SubmitProfileColour(
         }
 
 
-        Preview.style.color =
-            Result.Colour;
+        ApplyPlayerColour(
+            Preview,
+            IsValidPlayerColour(
+                Result.Colour
+            )
+                ? Result.Colour
+                : Input.value
+        );
 
         Message.textContent =
             "Colour saved.";
@@ -294,10 +311,11 @@ async function ResetProfileColour() {
 
 
         Input.value =
-            "#cdd6f4";
+            DefaultPlayerColour;
 
-        Preview.style.removeProperty(
-            "color"
+        ApplyPlayerColour(
+            Preview,
+            null
         );
 
         Message.textContent =

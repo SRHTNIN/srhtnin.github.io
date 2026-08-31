@@ -1,4 +1,4 @@
-const MutationTimeFeePerHour = 10;
+const MutationTimeFeePerMinute = 15;
 
 const PlantKeysById = new Map();
 const PlantsById = new Map();
@@ -553,8 +553,8 @@ function GetMutationTimeFee(
 
     return Math.ceil(
         MutationTime /
-        3600000 *
-        MutationTimeFeePerHour
+        60000 *
+        MutationTimeFeePerMinute
     );
 }
 
