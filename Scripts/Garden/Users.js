@@ -1,4 +1,4 @@
-const DefaultPlayerColour = "#cdd6f4";
+const DefaultColourPickerValue = "#000000";
 
 
 function IsValidPlayerColour(
@@ -13,34 +13,118 @@ function IsValidPlayerColour(
 }
 
 
+function GetRelativeLuminance(
+    Colour
+) {
+    const Channels = [
+        Colour.slice(1, 3),
+        Colour.slice(3, 5),
+        Colour.slice(5, 7)
+    ].map(
+        Channel => {
+            const Value =
+                parseInt(
+                    Channel,
+                    16
+                ) / 255;
+
+            return Value <= 0.04045
+                ? Value / 12.92
+                : Math.pow(
+                    (Value + 0.055) /
+                    1.055,
+                    2.4
+                );
+        }
+    );
+
+    return (
+        0.2126 * Channels[0] +
+        0.7152 * Channels[1] +
+        0.0722 * Channels[2]
+    );
+}
+
+
+function GetContrastRatio(
+    FirstLuminance,
+    SecondLuminance
+) {
+    const Lighter = Math.max(
+        FirstLuminance,
+        SecondLuminance
+    );
+
+    const Darker = Math.min(
+        FirstLuminance,
+        SecondLuminance
+    );
+
+    return (
+        Lighter + 0.05
+    ) / (
+        Darker + 0.05
+    );
+}
+
+
 function GetPlayerColourOutline(
     Colour
 ) {
-    const Red = parseInt(
-        Colour.slice(1, 3),
-        16
+    const ColourLuminance =
+        GetRelativeLuminance(
+            Colour
+        );
+
+    const LightLuminance =
+        GetRelativeLuminance(
+            "#cdd6f4"
+        );
+
+    const DarkLuminance =
+        GetRelativeLuminance(
+            "#11111b"
+        );
+
+    const LightContrast =
+        GetContrastRatio(
+            ColourLuminance,
+            LightLuminance
+        );
+
+    const DarkContrast =
+        GetContrastRatio(
+            ColourLuminance,
+            DarkLuminance
+        );
+
+    return DarkContrast >=
+        LightContrast
+            ? "var(--Crust)"
+            : "var(--Text)";
+}
+
+
+function GetPlayerColourShadow(
+    Outline
+) {
+    const Shadows = [];
+
+    for (let Y = -2; Y <= 2; Y++) {
+        for (let X = -2; X <= 2; X++) {
+            if (X === 0 && Y === 0) {
+                continue;
+            }
+
+            Shadows.push(
+                `${X}px ${Y}px 0 ${Outline}`
+            );
+        }
+    }
+
+    return Shadows.join(
+        ", "
     );
-
-    const Green = parseInt(
-        Colour.slice(3, 5),
-        16
-    );
-
-    const Blue = parseInt(
-        Colour.slice(5, 7),
-        16
-    );
-
-    const Brightness =
-        (
-            Red * 299 +
-            Green * 587 +
-            Blue * 114
-        ) / 1000;
-
-    return Brightness < 150
-        ? "var(--Text)"
-        : "var(--Crust)";
 }
 
 
@@ -73,14 +157,9 @@ function ApplyPlayerColour(
         Colour;
 
     Element.style.textShadow =
-        `-1px -1px 0 ${Outline}, ` +
-        `0 -1px 0 ${Outline}, ` +
-        `1px -1px 0 ${Outline}, ` +
-        `-1px 0 0 ${Outline}, ` +
-        `1px 0 0 ${Outline}, ` +
-        `-1px 1px 0 ${Outline}, ` +
-        `0 1px 0 ${Outline}, ` +
-        `1px 1px 0 ${Outline}`;
+        GetPlayerColourShadow(
+            Outline
+        );
 }
 
 

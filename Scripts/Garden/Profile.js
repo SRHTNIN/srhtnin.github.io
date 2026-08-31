@@ -122,7 +122,7 @@ async function RenderProfilePlayer() {
                 Profile.Colour
             )
                 ? Profile.Colour
-                : DefaultPlayerColour;
+                : DefaultColourPickerValue;
 
         ColourInput.value =
             ProfileColour;
@@ -311,7 +311,7 @@ async function ResetProfileColour() {
 
 
         Input.value =
-            DefaultPlayerColour;
+            DefaultColourPickerValue;
 
         ApplyPlayerColour(
             Preview,

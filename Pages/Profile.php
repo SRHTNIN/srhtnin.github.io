@@ -79,7 +79,7 @@ $SubNavbarCurrent = "Player";
                             id="ProfileColourInput"
                             class="ProfileColourInput"
                             type="color"
-                            value="#cdd6f4"
+                            value="#000000"
                         >
 
                         <strong
