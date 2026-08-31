@@ -1298,3 +1298,127 @@ select {
 
     color: var(--Text);
 }
+
+/*
+ * Garden guide
+ */
+
+.GuideSection {
+    margin-top: 1.5rem;
+    padding: 1rem;
+
+    background-color: var(--Mantle);
+    border: 4px solid var(--Mauve);
+}
+
+.GuideSection h2 {
+    margin-bottom: 1rem;
+}
+
+.GuideSection > :last-child {
+    margin-bottom: 0;
+}
+
+.GuideTip {
+    margin-top: 1.25rem;
+    padding: 1rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Yellow);
+}
+
+.GuideTip > :first-child {
+    display: block;
+    margin-bottom: 0.75rem;
+}
+
+.GuideRecipe {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 5.75rem)
+        );
+    gap: 0.75rem;
+
+    justify-content: center;
+
+    margin: 1rem auto;
+}
+
+.GuideRecipeCell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    min-width: 0;
+    aspect-ratio: 1;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0.35rem;
+
+    text-align: center;
+
+    background-color: var(--Surface0);
+    border: 3px solid var(--Surface2);
+}
+
+.GuideRecipePlant {
+    color: var(--Text);
+}
+
+.GuideRecipeEmpty {
+    color: var(--Overlay2);
+    background-color: var(--Crust);
+    border-style: dashed;
+}
+
+.GuideRecipeImage {
+    display: block;
+
+    width: 3.75rem;
+    height: 3.75rem;
+
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.GuideRecipeLabel {
+    max-width: 100%;
+
+    overflow: hidden;
+
+    font-size: 0.75rem;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.GuideHintText {
+    margin-bottom: 0;
+
+    color: var(--Subtext1);
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .GuideSection {
+        padding: 0.75rem;
+    }
+
+    .GuideRecipe {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+        gap: 0.5rem;
+    }
+
+    .GuideRecipeImage {
+        width: 3rem;
+        height: 3rem;
+    }
+}
