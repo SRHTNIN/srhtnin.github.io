@@ -111,11 +111,6 @@ function CreateShopSeedCard(
         "ShopItemHeader";
 
 
-    const Number =
-        document.createElement(
-            "span"
-        );
-
     const Name =
         document.createElement(
             "h3"
@@ -156,7 +151,7 @@ function CreateShopSeedCard(
 
     if (
         typeof Plant.Description ===
-        "string" &&
+            "string" &&
         Plant.Description.length > 0
     ) {
         const Description =
@@ -171,6 +166,16 @@ function CreateShopSeedCard(
             Description
         );
     }
+
+
+    Details.appendChild(
+        CreateShopStat(
+            "Growth time",
+            FormatShopGrowthTime(
+                Plant.GrowthTime
+            )
+        )
+    );
 
 
     const Cost =
@@ -363,6 +368,51 @@ function CreateShopPlantVisual(
 
 
     return Visual;
+}
+
+
+function FormatShopGrowthTime(
+    Milliseconds
+) {
+    const TotalMinutes =
+        Math.max(
+            1,
+            Math.ceil(
+                Number(
+                    Milliseconds
+                ) /
+                60000
+            )
+        );
+
+    const Hours =
+        Math.floor(
+            TotalMinutes /
+            60
+        );
+
+    const Minutes =
+        TotalMinutes %
+        60;
+
+
+    if (
+        Hours > 0 &&
+        Minutes > 0
+    ) {
+        return (
+            Hours +
+            "h " +
+            Minutes +
+            "m"
+        );
+    }
+
+    if (Hours > 0) {
+        return Hours + "h";
+    }
+
+    return Minutes + "m";
 }
 
 
