@@ -98,10 +98,16 @@ function GetPlayerColourOutline(
             DarkLuminance
         );
 
-    return DarkContrast >=
+
+    if (
+        DarkContrast >=
         LightContrast
-            ? "var(--Crust)"
-            : "var(--Text)";
+    ) {
+        return null;
+    }
+
+
+    return "var(--Text)";
 }
 
 
@@ -156,10 +162,13 @@ function ApplyPlayerColour(
     Element.style.color =
         Colour;
 
-    Element.style.textShadow =
-        GetPlayerColourShadow(
-            Outline
-        );
+
+    if (Outline !== null) {
+        Element.style.textShadow =
+            GetPlayerColourShadow(
+                Outline
+            );
+    }
 }
 
 
