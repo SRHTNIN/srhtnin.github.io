@@ -2,14 +2,6 @@
 
 $PageTitle = "Profile";
 
-$SubNavbarItems = [
-    "Player" => "#Player",
-    "Statistics" => "#Statistics",
-    "Account" => "#Account",
-    "Import" => "#Import"
-];
-
-$SubNavbarCurrent = "Player";
 
 ?>
 
@@ -20,7 +12,6 @@ $SubNavbarCurrent = "Player";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
-        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1>Profile</h1>
@@ -299,7 +290,6 @@ $SubNavbarCurrent = "Player";
         </main>
 
 
-        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>

@@ -3,16 +3,6 @@
 $PageTitle = "Garden";
 $PageSection = "Garden";
 
-$SubNavbarItems = [
-    "Garden" => "/Pages/Garden.html",
-    "Shop" => "/Pages/Shop.html",
-    "Plots" => "#Plots",
-    "Seeds" => "#Seeds",
-    "Player" => "#Player",
-    "Leaderboard" => "#Leaderboard"
-];
-
-$SubNavbarCurrent = "Garden";
 
 ?>
 
@@ -23,7 +13,6 @@ $SubNavbarCurrent = "Garden";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
-        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1>Garden</h1>
@@ -142,7 +131,6 @@ $SubNavbarCurrent = "Garden";
             </section>
         </main>
 
-        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Garden/PlantImages.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>

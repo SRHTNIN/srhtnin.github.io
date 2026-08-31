@@ -2,13 +2,6 @@
 
 $PageTitle = "Home";
 
-$SubNavbarItems = [
-    "Welcome" => "#Welcome",
-    "About me" => "#AboutMe",
-    "Credits" => "#Credits"
-];
-
-$SubNavbarCurrent = "Welcome";
 
 ?>
 
@@ -19,7 +12,6 @@ $SubNavbarCurrent = "Welcome";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
-        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1 id="Welcome">Welcome</h1>
@@ -71,7 +63,6 @@ $SubNavbarCurrent = "Welcome";
             </ul>
         </main>
 
-        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Script.js"></script>
     </body>
 </html>

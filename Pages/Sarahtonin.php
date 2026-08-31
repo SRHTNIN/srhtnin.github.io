@@ -2,15 +2,6 @@
 
 $PageTitle = "Sarahtonin";
 
-$SubNavbarItems = [
-    "About" => "#About",
-    "Skills" => "#Skills",
-    "Who I am" => "#WhoIAm",
-    "Socials" => "#Socials",
-    "Misc info" => "#MiscInfo"
-];
-
-$SubNavbarCurrent = "About";
 
 ?>
 
@@ -21,7 +12,6 @@ $SubNavbarCurrent = "About";
 
     <body>
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
-        <?php require __DIR__ . "/Bits/SubNavbar.php"; ?>
 
         <main class="MainContainer">
             <h1 id="About">About me</h1>
@@ -91,7 +81,6 @@ $SubNavbarCurrent = "About";
             </ul>
         </main>
 
-        <script src="/Scripts/SubNavbar.js"></script>
         <script src="/Scripts/Script.js"></script>
     </body>
 </html>

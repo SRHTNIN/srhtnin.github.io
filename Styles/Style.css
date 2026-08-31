@@ -49,7 +49,7 @@ body {
     padding: 2rem;
 
     display: grid;
-    grid-template-columns: minmax(0, 800px) auto auto;
+    grid-template-columns: minmax(0, 800px) auto;
     justify-content: center;
     align-items: start;
     gap: 1rem;
@@ -268,73 +268,6 @@ select {
 
     object-fit: fill;
     image-rendering: auto;
-}
-
-.SubNavbar {
-    grid-column: 3;
-    grid-row: 1;
-
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    padding: 0.5rem;
-
-    position: sticky;
-    top: 2rem;
-    align-self: start;
-
-    background-color: var(--Base);
-    border: 4px solid var(--Mauve);
-}
-
-.SubNavbarLink {
-    display: block;
-
-    padding: 0.65rem 0.8rem;
-
-    color: var(--Text);
-    background-color: var(--Mantle);
-
-    text-decoration: none;
-    white-space: nowrap;
-
-    border: 3px solid var(--Surface2);
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
-}
-
-.SubNavbarLink:hover {
-    color: var(--Sky);
-    background-color: var(--Surface0);
-
-    border-color: var(--Sky);
-
-    transform: translate(
-        1px,
-        1px
-    );
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
-}
-
-.SubNavbarLink:focus-visible {
-    outline:
-        3px solid
-        var(--Yellow);
-
-    outline-offset: 3px;
-}
-
-.SubNavbarLink[aria-current] {
-    color: var(--Green);
-    background-color: var(--Surface1);
-
-    border-color: var(--Green);
 }
 
 .GardenStatus {
@@ -999,27 +932,6 @@ select {
     border: 3px solid var(--Surface2);
 }
 
-.SubNavbarPrefix {
-    display: inline-block;
-
-    min-width: 1rem;
-    margin-right: 0.25rem;
-
-    color: var(--Overlay2);
-}
-
-.SubNavbarLink:hover
-.SubNavbarPrefix {
-    color: var(--Sky);
-}
-
-.SubNavbarLink[aria-current="location"]
-.SubNavbarPrefix,
-.SubNavbarLink[aria-current="page"]
-.SubNavbarPrefix {
-    color: var(--Green);
-}
-
 @media (max-width: 700px) {
     body {
         grid-template-columns: minmax(0, 1fr);
@@ -1045,25 +957,11 @@ select {
         height: 3.5rem;
     }
 
-    .SubNavbar {
-        grid-column: 1;
-        grid-row: 2;
-
-        flex-direction: row;
-        width: 100%;
-
-        position: static;
-        overflow-x: auto;
-    }
-
-    .SubNavbarLink {
-        flex: 0 0 auto;
-    }
-
     .MainContainer {
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 2;
     }
+
 
     .GardenLayout {
         grid-template-columns: 1fr;
