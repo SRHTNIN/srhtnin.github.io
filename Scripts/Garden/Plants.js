@@ -1,91 +1,74 @@
-const Plants = {
-    RedRose: {
-        Id: 1,
-        Name: "Red Rose",
+let Plants = {};
 
-        Description:
-            "A common red rose.",
+let PlantsLoadPromise = null;
 
-        Tags: [
-            "Rose",
-            "Flower",
-            "Red"
-        ],
 
-        GrowthTime: 3600000,
-
-        Effects: [],
-
-        Shop: {
-            ShopPlant: true,
-            BaseCost: 10
-        }
-    },
-
-    DarkRose: {
-        Id: 2,
-        Name: "Dark Rose",
-
-        Description:
-            "A jet-black rose.",
-
-        Tags: [
-            "Rose",
-            "Flower",
-            "Black"
-        ],
-
-        GrowthTime: 4000000,
-
-        Effects: [],
-
-        Shop: {
-            ShopPlant: false
-        }
-    },
-
-    BlueRose: {
-        Id: 3,
-        Name: "Blue Rose",
-
-        Description:
-            "An uncommon blue rose.",
-
-        Tags: [
-            "Rose",
-            "Flower",
-            "Blue"
-        ],
-
-        GrowthTime: 3600000,
-
-        Effects: [],
-
-        Shop: {
-            ShopPlant: true,
-            BaseCost: 15
-        }
-    },
-
-    PurpleRose: {
-        Id: 4,
-        Name: "Purple Rose",
-
-        Description:
-            "A rare purple rose.",
-
-        Tags: [
-              "Rose",
-              "Flower",
-              "Purple"
-        ],
-
-        GrowthTime: 3600000,
-
-        Effects: [],
-
-        Shop: {
-            ShopPlant: false
-        }
+async function LoadPlants() {
+    if (PlantsLoadPromise !== null) {
+        return PlantsLoadPromise;
     }
-};
+
+
+    PlantsLoadPromise =
+        LoadPlantsFromApi();
+
+
+    try {
+        return await PlantsLoadPromise;
+    } catch (Error) {
+        PlantsLoadPromise = null;
+
+        throw Error;
+    }
+}
+
+
+async function LoadPlantsFromApi() {
+    const Response =
+        await fetch(
+            ApiUrl + "/Plants.php",
+            {
+                method: "GET",
+
+                headers: {
+                    "Accept":
+                        "application/json"
+                }
+            }
+        );
+
+
+    if (!Response.ok) {
+        throw new Error(
+            "Plants API returned HTTP " +
+            Response.status
+        );
+    }
+
+
+    const Result =
+        await Response.json();
+
+
+    if (
+        !Result.Success ||
+        Result.Plants === null ||
+        typeof Result.Plants !==
+            "object" ||
+        Array.isArray(
+            Result.Plants
+        )
+    ) {
+        throw new Error(
+            Result.Error ??
+            "Plants API returned invalid data."
+        );
+    }
+
+
+    Plants =
+        Result.Plants;
+
+
+    return Plants;
+}

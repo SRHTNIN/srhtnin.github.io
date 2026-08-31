@@ -1,54 +1,90 @@
-const MutationTimeFeePerMinute = 15;
+const MutationTimeFeePerMinute = 3;
 
 const PlantKeysById = new Map();
 const PlantsById = new Map();
 const MutationsById = new Map();
 
+let IndexedPlants = null;
+let IndexedMutations = null;
 
-for (
-    const [PlantKey, Plant]
-    of Object.entries(Plants)
-) {
-    if (PlantsById.has(Plant.Id)) {
-        throw new Error(
-            "Duplicate plant ID: " +
-            Plant.Id
+
+function EnsureEconomyIndexes() {
+    if (
+        IndexedPlants === Plants &&
+        IndexedMutations ===
+            MutationSets
+    ) {
+        return;
+    }
+
+
+    PlantKeysById.clear();
+    PlantsById.clear();
+    MutationsById.clear();
+
+
+    for (
+        const [PlantKey, Plant]
+        of Object.entries(Plants)
+    ) {
+        if (
+            PlantsById.has(
+                Plant.Id
+            )
+        ) {
+            throw new Error(
+                "Duplicate plant ID: " +
+                Plant.Id
+            );
+        }
+
+        PlantKeysById.set(
+            Plant.Id,
+            PlantKey
+        );
+
+        PlantsById.set(
+            Plant.Id,
+            Plant
         );
     }
 
-    PlantKeysById.set(
-        Plant.Id,
-        PlantKey
-    );
 
-    PlantsById.set(
-        Plant.Id,
-        Plant
-    );
-}
+    for (
+        const Mutation
+        of Object.values(
+            MutationSets
+        )
+    ) {
+        if (
+            MutationsById.has(
+                Mutation.Id
+            )
+        ) {
+            throw new Error(
+                "Duplicate mutation ID: " +
+                Mutation.Id
+            );
+        }
 
-
-for (
-    const Mutation
-    of Object.values(MutationSets)
-) {
-    if (MutationsById.has(Mutation.Id)) {
-        throw new Error(
-            "Duplicate mutation ID: " +
-            Mutation.Id
+        MutationsById.set(
+            Mutation.Id,
+            Mutation
         );
     }
 
-    MutationsById.set(
-        Mutation.Id,
-        Mutation
-    );
+
+    IndexedPlants = Plants;
+    IndexedMutations =
+        MutationSets;
 }
 
 
 function GetPlantKeyById(
     PlantId
 ) {
+    EnsureEconomyIndexes();
+
     return PlantKeysById.get(
         Number(PlantId)
     ) ?? null;
@@ -58,6 +94,8 @@ function GetPlantKeyById(
 function GetPlantById(
     PlantId
 ) {
+    EnsureEconomyIndexes();
+
     return PlantsById.get(
         Number(PlantId)
     ) ?? null;
@@ -67,6 +105,8 @@ function GetPlantById(
 function GetMutationById(
     MutationId
 ) {
+    EnsureEconomyIndexes();
+
     return MutationsById.get(
         Number(MutationId)
     ) ?? null;

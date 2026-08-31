@@ -5,6 +5,8 @@ async function StartProfile() {
     await RenderProfilePlayer();
 
     try {
+        await LoadGameContent();
+
         ProfileSave =
             await LoadGame();
 

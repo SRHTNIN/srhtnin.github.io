@@ -3,6 +3,22 @@ let ShopPurchasePending = false;
 
 
 async function StartShop() {
+    try {
+        await LoadGameContent();
+    } catch (Error) {
+        console.error(
+            "Couldn't load Shop content:",
+            Error
+        );
+
+        SetShopMessage(
+            "Couldn't load plant or mutation data."
+        );
+
+        return;
+    }
+
+
     ShopSave = await LoadGame();
 
     RenderShop();

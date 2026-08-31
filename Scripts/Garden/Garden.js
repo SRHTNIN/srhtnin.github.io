@@ -8,6 +8,22 @@ const GardenUpdateInterval = 1000;
 
 
 async function StartGame() {
+    try {
+        await LoadGameContent();
+    } catch (Error) {
+        console.error(
+            "Couldn't load Garden content:",
+            Error
+        );
+
+        SetGardenMessage(
+            "Couldn't load plant or mutation data."
+        );
+
+        return;
+    }
+
+
     GameSave = await LoadGame();
 
     BindGardenTools();
