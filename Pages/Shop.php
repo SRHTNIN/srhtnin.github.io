@@ -61,6 +61,7 @@ $PageSection = "Shop";
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
         <script src="/Scripts/Garden/Shop.js"></script>
     </body>

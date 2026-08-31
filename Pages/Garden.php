@@ -135,6 +135,7 @@ $PageSection = "Garden";
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
         <script src="/Scripts/Garden/MutationEngine.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>

@@ -293,6 +293,7 @@ $PageTitle = "Profile";
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Profile.js"></script>
         <script src="/Scripts/Garden/Account.js"></script>

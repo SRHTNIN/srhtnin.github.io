@@ -1,29 +1,7 @@
 let Plants = {};
 
-let PlantsLoadPromise = null;
 
-
-async function LoadPlants() {
-    if (PlantsLoadPromise !== null) {
-        return PlantsLoadPromise;
-    }
-
-
-    PlantsLoadPromise =
-        LoadPlantsFromApi();
-
-
-    try {
-        return await PlantsLoadPromise;
-    } catch (Error) {
-        PlantsLoadPromise = null;
-
-        throw Error;
-    }
-}
-
-
-async function LoadPlantsFromApi() {
+async function FetchPlantsFromApi() {
     const Response =
         await fetch(
             ApiUrl + "/Plants.php",
@@ -33,7 +11,9 @@ async function LoadPlantsFromApi() {
                 headers: {
                     "Accept":
                         "application/json"
-                }
+                },
+
+                cache: "no-store"
             }
         );
 
@@ -66,9 +46,5 @@ async function LoadPlantsFromApi() {
     }
 
 
-    Plants =
-        Result.Plants;
-
-
-    return Plants;
+    return Result.Plants;
 }
