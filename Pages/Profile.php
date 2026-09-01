@@ -25,7 +25,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Player"
-                class="ProfileSection"
+                class="Panel ProfileSection"
             >
                 <h2>Player</h2>
 
@@ -101,7 +101,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Statistics"
-                class="ProfileSection"
+                class="Panel ProfileSection"
             >
                 <h3>Statistics</h3>
 
@@ -161,7 +161,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Account"
-                class="ProfileSection"
+                class="Panel ProfileSection"
             >
                 <h2>Account</h2>
 
@@ -228,7 +228,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Import"
-                class="ProfileSection"
+                class="Panel ProfileSection"
             >
                 <h3>Import Account</h3>
 

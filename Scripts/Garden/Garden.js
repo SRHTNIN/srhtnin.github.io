@@ -262,7 +262,7 @@ function RenderSeeds() {
             );
 
         Button.className =
-            "SeedButton";
+            "ActionButton SeedButton";
 
         Button.type = "button";
 
@@ -353,7 +353,7 @@ function CreatePlotElement(
         );
 
     Button.className =
-        "GardenPlot";
+        "PlantTile GardenPlot";
 
     Button.type = "button";
 
@@ -394,6 +394,18 @@ function CreatePlotElement(
     }
 
 
+    const Progress =
+        GetPlantGrowthProgress(
+            Plot,
+            Plant
+        );
+
+    Button.style.setProperty(
+        "--GrowthProgress",
+        `${Progress * 100}%`
+    );
+
+
     const ImagePath =
         GetPlantImage(
             Plot,
@@ -407,7 +419,7 @@ function CreatePlotElement(
             );
 
         Image.className =
-            "GardenPlant";
+            "PlantSprite";
 
         Image.alt =
             Plant.Name;
@@ -462,10 +474,7 @@ function CreatePlotElement(
 
 
     if (
-        IsPlantMature(
-            Plot,
-            Plant
-        )
+        Progress >= 1
     ) {
         Button.classList.add(
             "GardenPlotMature"
@@ -484,12 +493,6 @@ function CreatePlotElement(
             }
         );
     } else {
-        const Progress =
-            GetPlantGrowthProgress(
-                Plot,
-                Plant
-            );
-
         Button.title =
             Plant.Name +
             " - " +

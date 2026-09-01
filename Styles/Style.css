@@ -79,6 +79,85 @@ body {
     border: 4px solid var(--Mauve);
 }
 
+.Panel {
+    background-color: var(--Mantle);
+    border: 4px solid var(--Mauve);
+}
+
+.StatusPanel {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
+
+    background-color: var(--Mantle);
+    border: 3px solid var(--Surface2);
+}
+
+.PageMessage {
+    margin-top: 1rem;
+    margin-bottom: 0;
+    padding: 0.75rem;
+
+    color: var(--Subtext1);
+    background-color: var(--Mantle);
+
+    border-left: 4px solid var(--Blue);
+}
+
+.PlantTile {
+    overflow: hidden;
+
+    background-color: var(--Surface0);
+    border: 3px solid var(--Surface2);
+}
+
+.PlantSprite {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.ActionButton {
+    --ActionAccent: var(--Sky);
+
+    width: 100%;
+    padding: 0.6rem;
+
+    cursor: pointer;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+    border-radius: 0;
+
+    box-shadow: 3px 3px 0 var(--Crust);
+
+    appearance: none;
+}
+
+.ActionButton:hover:not(:disabled) {
+    color: var(--ActionAccent);
+    background-color: var(--Surface1);
+    border-color: var(--ActionAccent);
+
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--Crust);
+}
+
+.ActionButton:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--Crust);
+}
+
+.ActionButton:focus-visible {
+    outline: 3px solid var(--Yellow);
+    outline-offset: 3px;
+}
+
 h1,
 h2,
 h3,
@@ -270,14 +349,6 @@ select {
     image-rendering: auto;
 }
 
-.GardenStatus {
-    margin-bottom: 1.5rem;
-    padding: 0.75rem 1rem;
-
-    background-color: var(--Mantle);
-    border: 3px solid var(--Surface2);
-}
-
 .GardenLayout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;
@@ -306,6 +377,11 @@ select {
 }
 
 .GardenPlot {
+    --GrowthProgress: 0%;
+    --GrowthColour: var(--Green);
+    --PlotBorderColour: var(--Surface2);
+    --TileBackground: var(--Surface0);
+
     position: relative;
 
     width: 100%;
@@ -313,31 +389,34 @@ select {
 
     padding: 0;
 
-    overflow: hidden;
     cursor: pointer;
 
-    background-color: var(--Surface0);
+    border-color: transparent;
 
-    border: 3px solid var(--Surface2);
+    background:
+        linear-gradient(
+            var(--TileBackground),
+            var(--TileBackground)
+        ) padding-box,
+        conic-gradient(
+            from -90deg,
+            var(--GrowthColour)
+                0
+                var(--GrowthProgress),
+            var(--PlotBorderColour)
+                var(--GrowthProgress)
+                100%
+        ) border-box;
 
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
+    box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .GardenPlot:hover {
-    background-color: var(--Surface1);
-    border-color: var(--Sky);
+    --TileBackground: var(--Surface1);
+    --PlotBorderColour: var(--Sky);
 
-    transform:
-        translate(
-            1px,
-            1px
-        );
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--Crust);
 }
 
 .GardenPlot:focus-visible {
@@ -349,37 +428,19 @@ select {
 }
 
 .GardenPlotEmpty {
-    background-color: var(--Mantle);
+    --TileBackground: var(--Mantle);
 }
 
 .GardenPlotEmpty:hover {
-    background-color: var(--Surface0);
-}
-
-.GardenPlotMature {
-    border-color: var(--Green);
+    --TileBackground: var(--Surface0);
 }
 
 .GardenPlotMature:hover {
-    border-color: var(--Yellow);
-}
-
-.GardenPlant {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    image-rendering: pixelated;
+    --GrowthColour: var(--Yellow);
 }
 
 .SeedPanel {
     padding: 0.75rem;
-
-    background-color: var(--Mantle);
-    border: 4px solid var(--Mauve);
 }
 
 .SeedPanel h2 {
@@ -392,41 +453,9 @@ select {
     gap: 0.5rem;
 }
 
-.SeedButton {
-    width: 100%;
-
-    padding: 0.6rem;
-
-    cursor: pointer;
-
-    color: var(--Text);
-    background-color: var(--Surface0);
-
-    border: 3px solid var(--Surface2);
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
-}
-
-.SeedButton:hover {
-    color: var(--Sky);
-    background-color: var(--Surface1);
-
-    border-color: var(--Sky);
-
-    transform:
-        translate(
-            1px,
-            1px
-        );
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
-}
-
 .SeedButton[aria-current="true"] {
+    --ActionAccent: var(--Green);
+
     color: var(--Green);
 
     background-color: var(--Surface1);
@@ -447,43 +476,9 @@ select {
     gap: 0.5rem;
 }
 
-.ToolButton {
-    width: 100%;
-    padding: 0.6rem;
-
-    cursor: pointer;
-
-    color: var(--Text);
-    background-color: var(--Surface0);
-
-    border: 3px solid var(--Surface2);
-    border-radius: 0;
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
-
-    appearance: none;
-}
-
-.ToolButton:hover {
-    color: var(--Sky);
-    background-color: var(--Surface1);
-
-    border-color: var(--Sky);
-
-    transform:
-        translate(
-            1px,
-            1px
-        );
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
-}
-
 .ToolButtonShovel[aria-current="true"] {
+    --ActionAccent: var(--Red);
+
     color: var(--Red);
     background-color: var(--Surface1);
 
@@ -491,31 +486,14 @@ select {
 }
 
 .GardenPlotRemove:hover {
-    border-color: var(--Red);
-}
-
-#GardenMessage {
-    margin-top: 1rem;
-    margin-bottom: 0;
-
-    padding: 0.75rem;
-
-    color: var(--Subtext1);
-    background-color: var(--Mantle);
-
-    border-left:
-        4px solid
-        var(--Blue);
+    --GrowthColour: var(--Red);
+    --PlotBorderColour: var(--Red);
 }
 
 .GardenUser,
 .Leaderboard {
     margin-top: 1.5rem;
     padding: 1rem;
-
-    background-color: var(--Mantle);
-
-    border: 4px solid var(--Mauve);
 }
 
 .GardenUser h2,
@@ -740,9 +718,6 @@ select {
 .ProfileSection {
     margin-top: 1.5rem;
     padding: 1rem;
-
-    background-color: var(--Mantle);
-    border: 4px solid var(--Mauve);
 }
 
 .ProfileSection h2 {
@@ -1041,14 +1016,6 @@ select {
     text-align: center;
 }
 
-.ShopStatus {
-    margin-bottom: 1.5rem;
-    padding: 0.75rem 1rem;
-
-    background-color: var(--Mantle);
-    border: 3px solid var(--Surface2);
-}
-
 .ShopSection {
     margin-top: 1.5rem;
 }
@@ -1070,12 +1037,7 @@ select {
 
     padding: 0.75rem;
 
-    background-color: var(--Mantle);
-    border: 4px solid var(--Mauve);
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
+    box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .ShopItemHeader {
@@ -1128,20 +1090,7 @@ select {
     align-items: center;
     justify-content: center;
 
-    overflow: hidden;
-
     background-color: var(--Base);
-    border: 3px solid var(--Surface2);
-}
-
-.ShopPlantImage {
-    display: block;
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-    image-rendering: pixelated;
 }
 
 .ShopItemNumber {
@@ -1178,48 +1127,9 @@ select {
 }
 
 .ShopBuyButton {
-    width: 100%;
+    --ActionAccent: var(--Green);
+
     padding: 0.65rem 0.8rem;
-
-    cursor: pointer;
-
-    color: var(--Text);
-    background-color: var(--Surface0);
-
-    border: 3px solid var(--Surface2);
-    border-radius: 0;
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
-
-    appearance: none;
-}
-
-.ShopBuyButton:hover:not(:disabled) {
-    color: var(--Green);
-    background-color: var(--Surface1);
-
-    border-color: var(--Green);
-
-    transform: translate(1px, 1px);
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
-}
-
-.ShopBuyButton:active:not(:disabled) {
-    transform: translate(2px, 2px);
-
-    box-shadow:
-        1px 1px 0
-        var(--Crust);
-}
-
-.ShopBuyButton:focus-visible {
-    outline: 3px solid var(--Yellow);
-    outline-offset: 3px;
 }
 
 .ShopBuyButton:disabled {
@@ -1241,19 +1151,6 @@ select {
     background-color: var(--Mantle);
 
     border: 3px solid var(--Surface2);
-}
-
-#ShopMessage {
-    margin-top: 1rem;
-    margin-bottom: 0;
-    padding: 0.75rem;
-
-    color: var(--Subtext1);
-    background-color: var(--Mantle);
-
-    border-left:
-        4px solid
-        var(--Blue);
 }
 
 @media (max-width: 700px) {
@@ -1305,14 +1202,6 @@ select {
 
 .GuideSection {
     margin-top: 1.5rem;
-    padding: 1rem;
-
-    background-color: var(--Mantle);
-    border: 4px solid var(--Mauve);
-}
-
-.GuideSection h2 {
-    margin-bottom: 1rem;
 }
 
 .GuideSection > :last-child {
@@ -1360,9 +1249,6 @@ select {
     padding: 0.35rem;
 
     text-align: center;
-
-    background-color: var(--Surface0);
-    border: 3px solid var(--Surface2);
 }
 
 .GuideRecipePlant {
@@ -1376,13 +1262,8 @@ select {
 }
 
 .GuideRecipeImage {
-    display: block;
-
     width: 3.75rem;
     height: 3.75rem;
-
-    object-fit: contain;
-    image-rendering: pixelated;
 }
 
 .GuideRecipeLabel {
@@ -1404,10 +1285,6 @@ select {
 }
 
 @media (max-width: 700px) {
-    .GuideSection {
-        padding: 0.75rem;
-    }
-
     .GuideRecipe {
         grid-template-columns:
             repeat(

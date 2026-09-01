@@ -142,7 +142,7 @@ $PageSection = "Guide";
                         aria-label="Red Rose, empty plot, Blue Rose"
                     >
                         <div
-                            class="GuideRecipeCell GuideRecipePlant"
+                            class="PlantTile GuideRecipeCell GuideRecipePlant"
                             data-plant-key="RedRose"
                         >
                             <span class="GuideRecipeLabel">
@@ -151,13 +151,13 @@ $PageSection = "Guide";
                         </div>
 
                         <div
-                            class="GuideRecipeCell GuideRecipeEmpty"
+                            class="PlantTile GuideRecipeCell GuideRecipeEmpty"
                         >
                             <span>Empty</span>
                         </div>
 
                         <div
-                            class="GuideRecipeCell GuideRecipePlant"
+                            class="PlantTile GuideRecipeCell GuideRecipePlant"
                             data-plant-key="BlueRose"
                         >
                             <span class="GuideRecipeLabel">

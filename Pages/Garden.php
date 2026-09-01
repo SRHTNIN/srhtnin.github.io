@@ -17,7 +17,7 @@ $PageSection = "Garden";
         <main class="MainContainer">
             <h1>Garden</h1>
 
-            <div class="GardenStatus">
+            <div class="StatusPanel">
                 <strong>Dew:</strong>
                 <span id="DewAmount">0</span>
                 <br>
@@ -37,7 +37,7 @@ $PageSection = "Garden";
 
                 <section
                     id="Seeds"
-                    class="SeedPanel"
+                    class="Panel SeedPanel"
                 >
                     <h2>Seeds</h2>
 
@@ -53,7 +53,7 @@ $PageSection = "Garden";
                     <div class="ToolList">
                         <button
                             id="ShovelToolButton"
-                            class="ToolButton ToolButtonShovel"
+                            class="ActionButton ToolButton ToolButtonShovel"
                             type="button"
                         >
                             Shovel
@@ -62,13 +62,13 @@ $PageSection = "Garden";
                 </section>
             </div>
 
-            <p id="GardenMessage">
+            <p id="GardenMessage" class="PageMessage">
                 Select a seed, then choose an empty plot.
             </p>
 
             <section
                 id="Player"
-                class="GardenUser"
+                class="Panel GardenUser"
             >
                 <h2>Player</h2>
 
@@ -103,7 +103,7 @@ $PageSection = "Garden";
 
             <section
                 id="Leaderboard"
-                class="Leaderboard"
+                class="Panel Leaderboard"
             >
                 <h2>Leaderboard</h2>
 

@@ -46,7 +46,7 @@ function RenderGuideRecipePlants() {
             );
 
         Image.className =
-            "GuideRecipeImage";
+            "PlantSprite GuideRecipeImage";
 
         Image.src =
             Images[

@@ -17,7 +17,7 @@ $PageSection = "Shop";
         <main class="MainContainer">
             <h1>Garden shop</h1>
 
-            <div class="ShopStatus">
+            <div class="StatusPanel">
                 <strong>Dew:</strong>
                 <span id="ShopDewAmount">0</span>
             </div>
@@ -52,7 +52,7 @@ $PageSection = "Shop";
                 ></div>
             </section>
 
-            <p id="ShopMessage">
+            <p id="ShopMessage" class="PageMessage">
                 Choose a seed to buy.
             </p>
         </main>

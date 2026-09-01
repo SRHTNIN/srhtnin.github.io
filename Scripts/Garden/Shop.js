@@ -115,7 +115,7 @@ function CreateShopSeedCard(
         );
 
     Card.className =
-        "ShopItem";
+        "Panel ShopItem";
 
 
     const Header =
@@ -250,7 +250,7 @@ function CreateShopSeedCard(
         );
 
     BuyButton.className =
-        "ShopBuyButton";
+        "ActionButton ShopBuyButton";
 
     BuyButton.type = "button";
 
@@ -306,7 +306,7 @@ function CreateShopPlantVisual(
         );
 
     ImageFrame.className =
-        "ShopPlantImageFrame";
+        "PlantTile ShopPlantImageFrame";
 
 
     const PlantKey =
@@ -344,7 +344,7 @@ function CreateShopPlantVisual(
             );
 
         Image.className =
-            "ShopPlantImage";
+            "PlantSprite";
 
         Image.src =
             Images[
