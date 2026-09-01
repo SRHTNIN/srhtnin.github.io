@@ -1299,3 +1299,179 @@ select {
         height: 3rem;
     }
 }
+
+/*
+ * Plant encyclopedia
+ */
+
+.PlantEncyclopediaList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    margin-top: 1.5rem;
+}
+
+.PlantEncyclopediaCard {
+    overflow: hidden;
+
+    box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.PlantEncyclopediaHeader {
+    display: flex;
+    gap: 0.75rem;
+
+    align-items: baseline;
+
+    padding: 0.75rem 1rem;
+
+    background-color: var(--Surface0);
+    border-bottom: 3px solid var(--Surface2);
+}
+
+.PlantEncyclopediaHeader h2 {
+    margin: 0;
+
+    color: var(--Green);
+}
+
+.PlantEncyclopediaNumber {
+    flex: 0 0 auto;
+
+    color: var(--Overlay2);
+
+    font-size: 1.1rem;
+}
+
+.PlantEncyclopediaBody {
+    display: grid;
+    grid-template-columns:
+        7rem
+        minmax(0, 1fr)
+        minmax(10rem, 0.8fr);
+    gap: 1rem;
+
+    padding: 1rem;
+
+    align-items: start;
+}
+
+.PlantEncyclopediaVisual {
+    display: flex;
+
+    width: 7rem;
+    height: 7rem;
+
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--Base);
+}
+
+.PlantEncyclopediaMissing {
+    padding: 0.5rem;
+
+    color: var(--Overlay1);
+
+    text-align: center;
+}
+
+.PlantEncyclopediaDescription {
+    margin-bottom: 0.75rem;
+}
+
+.PlantEncyclopediaStat {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    padding: 0.35rem 0;
+
+    border-bottom: 2px solid var(--Surface0);
+}
+
+.PlantEncyclopediaStat:last-child {
+    border-bottom: 0;
+}
+
+.PlantEncyclopediaStatName {
+    flex: 0 0 auto;
+
+    color: var(--Subtext1);
+}
+
+.PlantEncyclopediaStat > :last-child {
+    min-width: 0;
+
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.PlantEncyclopediaRelations {
+    min-width: 0;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.PlantEncyclopediaRelationGroup {
+    padding: 0.65rem 0.75rem;
+}
+
+.PlantEncyclopediaRelationGroup +
+.PlantEncyclopediaRelationGroup {
+    border-top: 3px solid var(--Surface2);
+}
+
+.PlantEncyclopediaRelationGroup h3 {
+    margin-bottom: 0.5rem;
+
+    color: var(--Peach);
+
+    font-size: 1rem;
+}
+
+.PlantEncyclopediaRelationList {
+    max-height: 7rem;
+    margin: 0;
+    padding-left: 1.25rem;
+
+    overflow-y: auto;
+}
+
+.PlantEncyclopediaRelationList li {
+    margin-bottom: 0.35rem;
+}
+
+.PlantEncyclopediaRelationList li:last-child {
+    margin-bottom: 0;
+}
+
+.PlantEncyclopediaRelationUnknown,
+.PlantEncyclopediaRelationEmpty {
+    color: var(--Overlay1);
+}
+
+@media (max-width: 700px) {
+    .PlantEncyclopediaBody {
+        grid-template-columns: 1fr;
+    }
+
+    .PlantEncyclopediaVisual {
+        width: min(8rem, 100%);
+        height: auto;
+        aspect-ratio: 1;
+
+        justify-self: center;
+    }
+
+    .PlantEncyclopediaStat > :last-child {
+        text-align: left;
+    }
+
+    .PlantEncyclopediaStat {
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+}

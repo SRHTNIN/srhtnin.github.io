@@ -71,7 +71,7 @@ $PageSection = "Guide";
                 id="Harvesting"
                 class="GuideSection"
             >
-                <h2>Harvesting</h2>
+                <h3>Harvesting</h3>
 
                 <p>
                     Click a mature plant to harvest it. Harvesting gives
@@ -178,7 +178,7 @@ $PageSection = "Guide";
                 id="Discoveries"
                 class="GuideSection"
             >
-                <h2>Discoveries</h2>
+                <h3>Discoveries</h3>
 
                 <p>
                     Discovering a new plant or mutation is saved with
