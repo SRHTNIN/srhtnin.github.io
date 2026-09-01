@@ -29,4 +29,25 @@ $NavbarPages = [
             >
         </a>
     <?php endforeach; ?>
+
+    <a
+        id="AdminNavbarLink"
+        class="NavbarLink"
+        href="/Pages/Admin.html"
+        aria-label="Admin"
+        title="Admin"
+        <?= ($PageSection ?? $PageTitle ?? "") === "Admin" ? 'aria-current="page"' : "" ?>
+        hidden
+    >
+        <img
+            class="NavbarIcon"
+            src="/Assets/Img/Icon.png"
+            alt=""
+        >
+    </a>
 </nav>
+
+<script
+    src="/Scripts/Garden/AdminAccess.js"
+    defer
+></script>
