@@ -6,6 +6,7 @@ $NavbarPages = [
     "Garden" => "/Pages/Garden.html",
     "Shop" => "/Pages/Shop.html",
     "Plants" => "/Pages/Plants.html",
+    "Mutations" => "/Pages/Mutations.html",
     "Guide" => "/Pages/Guide.html",
     "Profile" => "/Pages/Profile.html"
 ];
