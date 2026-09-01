@@ -1722,3 +1722,481 @@ select {
         text-align: left;
     }
 }
+
+
+/*
+ * Admin editors
+ */
+
+.AdminEditorNavigation {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 1rem;
+
+    margin-top: 1.5rem;
+}
+
+.AdminEditorLink {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    min-height: 7rem;
+
+    align-items: flex-start;
+    justify-content: center;
+
+    padding: 1rem;
+
+    text-decoration: none;
+}
+
+.AdminEditorLink strong {
+    color: var(--Green);
+    font-size: 1.2rem;
+}
+
+.AdminEditorLink span {
+    color: var(--Subtext1);
+    line-height: 1.35;
+}
+
+.AdminEditorToolbar {
+    display: grid;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr)
+        auto;
+    gap: 0.75rem;
+
+    align-items: center;
+
+    margin: 1.5rem 0 1rem;
+}
+
+.AdminEditorToolbar label {
+    color: var(--Blue);
+}
+
+.AdminEditorForm {
+    padding: 1rem;
+}
+
+.AdminEditorGrid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 1rem;
+}
+
+.AdminEditorField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    min-width: 0;
+}
+
+.AdminEditorField > span,
+.AdminMutationDimensions label {
+    color: var(--Blue);
+}
+
+.AdminEditorField small {
+    color: var(--Overlay2);
+    line-height: 1.25;
+}
+
+.AdminEditorWideField {
+    grid-column: 1 / -1;
+}
+
+.AdminEditorForm input,
+.AdminEditorForm textarea,
+.AdminEditorForm select,
+.AdminEditorToolbar select,
+.AdminMutationDimensions input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.55rem;
+
+    color: var(--Text);
+    background-color: var(--Surface0);
+
+    border: 3px solid var(--Surface2);
+    border-radius: 0;
+
+    outline: none;
+}
+
+.AdminEditorForm textarea {
+    resize: vertical;
+}
+
+.AdminEditorForm input:focus,
+.AdminEditorForm textarea:focus,
+.AdminEditorForm select:focus,
+.AdminEditorToolbar select:focus,
+.AdminMutationDimensions input:focus {
+    border-color: var(--Sky);
+}
+
+.AdminEditorForm input:read-only {
+    color: var(--Subtext0);
+    background-color: var(--Base);
+}
+
+.AdminEditorForm input:disabled {
+    opacity: 0.55;
+}
+
+.AdminEditorCheckField {
+    display: flex;
+    gap: 0.65rem;
+
+    align-items: center;
+    align-self: end;
+
+    min-height: 2.8rem;
+}
+
+.AdminEditorCheckField input {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin: 0;
+
+    accent-color: var(--Green);
+}
+
+.AdminInlineButton {
+    width: auto;
+    min-width: max-content;
+}
+
+.AdminSaveButton {
+    --ActionAccent: var(--Green);
+
+    width: auto;
+}
+
+.AdminEditorBackLink {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+}
+
+.AdminEditorActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    margin-top: 1.25rem;
+}
+
+.AdminEditorPreview,
+.AdminMutationRecipeSection,
+.AdminMutationRelationsSection,
+.AdminMutationFailureSection {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+
+    border-top: 3px solid var(--Surface2);
+}
+
+.AdminEditorPreview h2,
+.AdminMutationRecipeSection h2,
+.AdminMutationRelationsSection h2,
+.AdminMutationFailureSection h2 {
+    margin-bottom: 0.5rem;
+
+    font-size: 1.4rem;
+}
+
+.AdminPlantPreviewRow {
+    display: flex;
+    gap: 1rem;
+
+    align-items: center;
+}
+
+.AdminPlantPreviewTile {
+    display: flex;
+
+    width: 7rem;
+    height: 7rem;
+
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.AdminPlantPreviewMissing {
+    padding: 0.5rem;
+
+    color: var(--Overlay1);
+    text-align: center;
+}
+
+#AdminPlantPreviewKey,
+#AdminPlantArchiveNote,
+#AdminMutationArchiveNote {
+    margin: 0.35rem 0 0;
+
+    color: var(--Overlay2);
+}
+
+#AdminPlantArchiveNote,
+#AdminMutationArchiveNote {
+    color: var(--Yellow);
+}
+
+.AdminMutationRecipeHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+
+    align-items: end;
+}
+
+.AdminMutationRecipeHeader p,
+.AdminMutationRelationsSection > p {
+    margin-bottom: 0;
+
+    color: var(--Subtext1);
+}
+
+.AdminMutationDimensions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    align-items: end;
+}
+
+.AdminMutationDimensions label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.AdminMutationDimensions input {
+    width: 5rem;
+}
+
+.AdminMutationRecipeFlow {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+    gap: 0.75rem;
+
+    align-items: center;
+
+    margin-top: 1rem;
+}
+
+.AdminMutationGridPanel {
+    min-width: 0;
+}
+
+.AdminMutationGridPanel h3 {
+    margin-bottom: 0.25rem;
+
+    color: var(--Subtext1);
+
+    font-size: 1rem;
+    text-align: center;
+}
+
+.AdminMutationGrid {
+    width: 100%;
+    margin: 0.5rem auto;
+}
+
+.AdminMutationGridCell {
+    width: 100%;
+
+    cursor: pointer;
+}
+
+.AdminMutationGridCell:hover {
+    border-color: var(--Sky);
+}
+
+.AdminMutationGridCellSelected {
+    border-color: var(--Yellow) !important;
+    box-shadow:
+        0 0 0 2px
+        var(--Crust);
+}
+
+.AdminMutationCellEditor {
+    margin-top: 1rem;
+    padding: 1rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Yellow);
+}
+
+.AdminMutationCellEditor h3 {
+    margin-bottom: 0.75rem;
+
+    color: var(--Yellow);
+}
+
+#AdminMutationPatternCellControls,
+#AdminMutationResultCellControls,
+.AdminMatcherFields {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 0.75rem;
+}
+
+.AdminMatcherFields {
+    grid-column: 1 / -1;
+}
+
+.AdminMutationRelationColumns {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+    gap: 1rem;
+
+    margin-top: 1rem;
+}
+
+.AdminMutationRelationColumns fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0.75rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.AdminMutationRelationColumns legend {
+    padding: 0 0.35rem;
+
+    color: var(--Peach);
+}
+
+.AdminPlantChecklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+
+    max-height: 14rem;
+    overflow-y: auto;
+}
+
+.AdminPlantChecklistItem {
+    display: flex;
+    gap: 0.55rem;
+
+    align-items: center;
+}
+
+.AdminPlantChecklistItem input {
+    width: 1rem;
+    height: 1rem;
+    margin: 0;
+
+    accent-color: var(--Green);
+}
+
+.AdminGeneratedJson {
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.AdminGeneratedJson summary {
+    cursor: pointer;
+    color: var(--Sky);
+}
+
+.AdminGeneratedJson pre {
+    max-height: 24rem;
+    margin: 0.75rem 0 0;
+    padding: 0.75rem;
+
+    overflow: auto;
+
+    color: var(--Subtext1);
+    background-color: var(--Crust);
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+    .AdminEditorNavigation,
+    .AdminEditorGrid,
+    #AdminMutationPatternCellControls,
+    #AdminMutationResultCellControls,
+    .AdminMatcherFields,
+    .AdminMutationRelationColumns {
+        grid-template-columns: 1fr;
+    }
+
+    .AdminEditorToolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .AdminEditorToolbar label {
+        margin-bottom: -0.35rem;
+    }
+
+    .AdminInlineButton,
+    .AdminSaveButton {
+        width: 100%;
+    }
+
+    .AdminMutationRecipeHeader {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .AdminMutationRecipeFlow {
+        grid-template-columns: 1fr;
+    }
+
+    .AdminMutationRecipeFlow >
+    .MutationEncyclopediaRecipeArrow {
+        justify-self: center;
+
+        transform: rotate(90deg);
+    }
+
+    .AdminMutationDimensions {
+        align-items: stretch;
+    }
+
+    .AdminMutationDimensions label {
+        flex: 1 1 5rem;
+    }
+
+    .AdminMutationDimensions input {
+        width: 100%;
+    }
+}

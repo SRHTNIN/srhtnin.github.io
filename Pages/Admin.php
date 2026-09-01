@@ -30,9 +30,31 @@ $PageSection = "Admin";
                 hidden
             >
                 <p>
-                    Admin access verified. Garden content
-                    editors will live here.
+                    Content tools for editing the Garden catalogue.
+                    Changes here affect the live game data.
                 </p>
+
+                <div class="AdminEditorNavigation">
+                    <a
+                        class="ActionButton AdminEditorLink"
+                        href="/Pages/AdminPlants.html"
+                    >
+                        <strong>Plant editor</strong>
+                        <span>
+                            Add plants and edit their catalogue data.
+                        </span>
+                    </a>
+
+                    <a
+                        class="ActionButton AdminEditorLink"
+                        href="/Pages/AdminMutations.html"
+                    >
+                        <strong>Mutation editor</strong>
+                        <span>
+                            Build mutation recipes with a visual grid.
+                        </span>
+                    </a>
+                </div>
             </div>
         </main>
     </body>
