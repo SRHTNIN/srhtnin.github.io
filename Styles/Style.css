@@ -5,24 +5,22 @@
     font-weight: normal;
 }
 
-:root,
-:root[data-palette="CatppuccinMocha"] {
-    --Rosewater:#f5e0dc;
+:root, :root[data-palette="CatppuccinMocha"] {
+    --Rosewater: #f5e0dc;
     --Flamingo: #f2cdcd;
-    --Pink:     #f5c2e7;
-    --Mauve:    #cba6f7;
-    --Red:      #f38ba8;
-    --Maroon:   #eba0ac;
-    --Peach:    #fab387;
-    --Yellow:   #f9e2af;
-    --Green:    #a6e3a1;
-    --Teal:     #94e2d5;
-    --Sky:      #89dceb;
+    --Pink: #f5c2e7;
+    --Mauve: #cba6f7;
+    --Red: #f38ba8;
+    --Maroon: #eba0ac;
+    --Peach: #fab387;
+    --Yellow: #f9e2af;
+    --Green: #a6e3a1;
+    --Teal: #94e2d5;
+    --Sky: #89dceb;
     --Sapphire: #74c7ec;
-    --Blue:     #89b4fa;
+    --Blue: #89b4fa;
     --Lavender: #b4befe;
-
-    --Text:     #cdd6f4;
+    --Text: #cdd6f4;
     --Subtext1: #bac2de;
     --Subtext0: #a6adc8;
     --Overlay2: #9399b2;
@@ -31,15 +29,15 @@
     --Surface2: #585b70;
     --Surface1: #45475a;
     --Surface0: #313244;
-    --Base:     #1e1e2e;
-    --Mantle:   #181825;
-    --Crust:    #11111b;
+    --Base: #1e1e2e;
+    --Mantle: #181825;
+    --Crust: #11111b;
+    --PlantBackground: var(--Surface0);
 }
 
 html {
     font-family: "FSEX302";
     color: var(--Text);
-
     background-image: url("../Assets/Img/Tile.png");
     background-repeat: repeat;
 }
@@ -47,14 +45,12 @@ html {
 body {
     margin: 0;
     padding: 2rem;
-
     display: grid;
     grid-template-columns: minmax(0, 800px) auto;
     justify-content: center;
     align-items: start;
     gap: 1rem;
     min-height: 100vh;
-
     font-family: inherit;
     color: inherit;
 }
@@ -67,15 +63,12 @@ body {
 .MainContainer {
     grid-column: 1;
     grid-row: 1;
-
     width: 100%;
     max-width: 800px;
     margin: 0;
     padding: 2rem;
-
     color: var(--Text);
     background-color: var(--Base);
-
     border: 4px solid var(--Mauve);
 }
 
@@ -87,7 +80,6 @@ body {
 .StatusPanel {
     margin-bottom: 1.5rem;
     padding: 0.75rem 1rem;
-
     background-color: var(--Mantle);
     border: 3px solid var(--Surface2);
 }
@@ -96,46 +88,35 @@ body {
     margin-top: 1rem;
     margin-bottom: 0;
     padding: 0.75rem;
-
     color: var(--Subtext1);
     background-color: var(--Mantle);
-
     border-left: 4px solid var(--Blue);
 }
 
 .PlantTile {
     overflow: hidden;
-
-    background-color: var(--Surface0);
+    background-color: var(--PlantBackground);
     border: 3px solid var(--Surface2);
 }
 
 .PlantSprite {
     display: block;
-
     width: 100%;
     height: 100%;
-
     object-fit: contain;
     image-rendering: pixelated;
 }
 
 .ActionButton {
     --ActionAccent: var(--Sky);
-
     width: 100%;
     padding: 0.6rem;
-
     cursor: pointer;
-
     color: var(--Text);
     background-color: var(--Surface0);
-
     border: 3px solid var(--Surface2);
     border-radius: 0;
-
     box-shadow: 3px 3px 0 var(--Crust);
-
     appearance: none;
 }
 
@@ -143,7 +124,6 @@ body {
     color: var(--ActionAccent);
     background-color: var(--Surface1);
     border-color: var(--ActionAccent);
-
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--Crust);
 }
@@ -158,21 +138,14 @@ body {
     outline-offset: 3px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: 1rem;
-
     color: var(--Mauve);
 }
 
 h1 {
     font-size: 2.5rem;
-
     padding-bottom: 0.5rem;
     border-bottom: 3px solid var(--Mauve);
 }
@@ -205,9 +178,7 @@ h6 {
 p {
     margin-top: 0;
     margin-bottom: 1rem;
-
     color: var(--Text);
-
     font-size: 1rem;
     line-height: 1.5;
 }
@@ -228,8 +199,7 @@ em {
     color: var(--Lavender);
 }
 
-ul,
-ol {
+ul, ol {
     color: var(--Text);
 }
 
@@ -240,16 +210,13 @@ li {
 blockquote {
     margin-left: 0;
     padding: 1rem;
-
     color: var(--Subtext1);
     background-color: var(--Mantle);
-
     border-left: 4px solid var(--Mauve);
 }
 
 code {
     padding: 0.2rem 0.4rem;
-
     color: var(--Green);
     background-color: var(--Mantle);
 }
@@ -257,10 +224,8 @@ code {
 pre {
     padding: 1rem;
     overflow-x: auto;
-
     color: var(--Text);
     background-color: var(--Crust);
-
     border: 2px solid var(--Surface2);
 }
 
@@ -274,10 +239,7 @@ hr {
     border-top: 2px solid var(--Surface2);
 }
 
-input,
-button,
-textarea,
-select {
+input, button, textarea, select {
     font-family: inherit;
     color: inherit;
 }
@@ -285,17 +247,13 @@ select {
 .Navbar {
     grid-column: 2;
     grid-row: 1;
-
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-
     padding: 0.5rem;
-
     position: sticky;
     top: 2rem;
     align-self: start;
-
     background-color: var(--Base);
     border: 4px solid var(--Mauve);
 }
@@ -306,15 +264,12 @@ select {
 
 .NavbarLink {
     display: block;
-
     width: 4rem;
     height: 4rem;
     padding: 0;
-
     line-height: 0;
     text-decoration: none;
     overflow: hidden;
-
     background-color: var(--Mantle);
     border: 3px solid var(--Surface2);
     box-shadow: 3px 3px 0 var(--Crust);
@@ -323,7 +278,6 @@ select {
 .NavbarLink:hover {
     background-color: var(--Surface0);
     border-color: var(--Sky);
-
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--Crust);
 }
@@ -345,10 +299,8 @@ select {
 
 .NavbarIcon {
     display: block;
-
     width: 100%;
     height: 100%;
-
     object-fit: fill;
     image-rendering: auto;
 }
@@ -357,77 +309,43 @@ select {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;
     gap: 1rem;
-
     align-items: start;
 }
 
 .GardenGrid {
     --GardenWidth: 3;
-
     display: grid;
-
-    grid-template-columns:
-        repeat(
-            var(--GardenWidth),
-            minmax(0, 1fr)
-        );
-
+    grid-template-columns: repeat( var(--GardenWidth), minmax(0, 1fr) );
     gap: 0.5rem;
-
     padding: 0.75rem;
-
     background-color: var(--Mantle);
-    border: 4px solid var(--Green);
+    border: 4px solid var(--Lavender);
 }
 
 .GardenPlot {
     --GrowthProgress: 0%;
     --GrowthColour: var(--Green);
     --PlotBorderColour: var(--Surface2);
-    --TileBackground: var(--Surface0);
-
+    --TileBackground: var(--PlantBackground);
     position: relative;
-
     width: 100%;
     aspect-ratio: 1;
-
     padding: 0;
-
     cursor: pointer;
-
     border-color: transparent;
-
-    background:
-        linear-gradient(
-            var(--TileBackground),
-            var(--TileBackground)
-        ) padding-box,
-        conic-gradient(
-            from -90deg,
-            var(--GrowthColour)
-                0
-                var(--GrowthProgress),
-            var(--PlotBorderColour)
-                var(--GrowthProgress)
-                100%
-        ) border-box;
-
+    background: linear-gradient( var(--TileBackground), var(--TileBackground) ) padding-box, conic-gradient( from -90deg, var(--GrowthColour) 0 var(--GrowthProgress), var(--PlotBorderColour) var(--GrowthProgress) 100% ) border-box;
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .GardenPlot:hover {
     --TileBackground: var(--Surface1);
     --PlotBorderColour: var(--Sky);
-
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--Crust);
 }
 
 .GardenPlot:focus-visible {
-    outline:
-        3px solid
-        var(--Yellow);
-
+    outline: 3px solid var(--Yellow);
     outline-offset: 3px;
 }
 
@@ -436,7 +354,7 @@ select {
 }
 
 .GardenPlotEmpty:hover {
-    --TileBackground: var(--Surface0);
+    --TileBackground: var(--PlantBackground);
 }
 
 .GardenPlotMature:hover {
@@ -459,18 +377,14 @@ select {
 
 .SeedButton[aria-current="true"] {
     --ActionAccent: var(--Green);
-
     color: var(--Green);
-
     background-color: var(--Surface1);
-
     border-color: var(--Green);
 }
 
 .GardenToolHeading {
     margin-top: 1rem;
     margin-bottom: 0.5rem;
-
     color: var(--Peach);
 }
 
@@ -482,10 +396,8 @@ select {
 
 .ToolButtonShovel[aria-current="true"] {
     --ActionAccent: var(--Red);
-
     color: var(--Red);
     background-color: var(--Surface1);
-
     border-color: var(--Red);
 }
 
@@ -494,35 +406,27 @@ select {
     --PlotBorderColour: var(--Red);
 }
 
-.GardenUser,
-.Leaderboard {
+.GardenUser, .Leaderboard {
     margin-top: 1.5rem;
     padding: 1rem;
 }
 
-.GardenUser h2,
-.Leaderboard h2 {
+.GardenUser h2, .Leaderboard h2 {
     margin-bottom: 1rem;
 }
 
-.GardenUser input,
-.GardenUser button {
+.GardenUser input, .GardenUser button {
     padding: 0.6rem;
-
     font-size: 1rem;
-
     color: var(--Text);
     background-color: var(--Surface0);
-
     border: 3px solid var(--Surface2);
     border-radius: 0;
-
     appearance: none;
 }
 
 .GardenUser input {
     min-width: 12rem;
-
     outline: none;
 }
 
@@ -542,64 +446,34 @@ select {
 
 .GardenUser button {
     cursor: pointer;
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
+    box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .GardenUser button:hover {
     color: var(--Sky);
     background-color: var(--Surface1);
-
     border-color: var(--Sky);
-
-    transform: translate(
-        1px,
-        1px
-    );
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
+    transform: translate( 1px, 1px );
+    box-shadow: 2px 2px 0 var(--Crust);
 }
 
 .GardenUser button:active {
     color: var(--Green);
     background-color: var(--Surface2);
-
     border-color: var(--Green);
-
-    transform: translate(
-        2px,
-        2px
-    );
-
-    box-shadow:
-        1px 1px 0
-        var(--Crust);
+    transform: translate( 2px, 2px );
+    box-shadow: 1px 1px 0 var(--Crust);
 }
 
 .GardenUser button:focus-visible {
-    outline:
-        3px solid
-        var(--Yellow);
-
+    outline: 3px solid var(--Yellow);
     outline-offset: 3px;
-}
-
-#UsernameMessage {
-    margin-top: 0.75rem;
-    margin-bottom: 0;
-
-    color: var(--Subtext1);
 }
 
 #UsernameForm {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-
     align-items: center;
 }
 
@@ -609,55 +483,37 @@ select {
 
 #UsernameMessage {
     flex-basis: 100%;
-
     margin: 0;
-
     color: var(--Subtext1);
 }
 
 .LeaderboardTableContainer {
     width: 100%;
-
     overflow-x: auto;
 }
 
 .LeaderboardTable {
     width: 97%;
     margin: 0 auto;
-
     border-collapse: collapse;
-
     color: var(--Text);
     background-color: var(--Base);
-
     font-size: 1.2rem;
-
     border: 3px solid var(--Surface2);
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
+    box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .LeaderboardTable th {
     padding: 0.75rem;
-
     color: var(--Blue);
     background-color: var(--Surface0);
-
     text-align: left;
-
-    border-bottom:
-        3px solid
-        var(--Surface2);
+    border-bottom: 3px solid var(--Surface2);
 }
 
 .LeaderboardTable td {
     padding: 0.7rem 0.75rem;
-
-    border-bottom:
-        2px solid
-        var(--Surface0);
+    border-bottom: 2px solid var(--Surface0);
 }
 
 .LeaderboardTable tbody tr:last-child td {
@@ -668,10 +524,8 @@ select {
     background-color: var(--Surface0);
 }
 
-.LeaderboardRankColumn,
-.LeaderboardRank {
+.LeaderboardRankColumn, .LeaderboardRank {
     width: 4rem;
-
     text-align: center;
 }
 
@@ -679,8 +533,7 @@ select {
     width: auto;
 }
 
-.LeaderboardDewColumn,
-.LeaderboardDew {
+.LeaderboardDewColumn, .LeaderboardDew {
     width: auto;
 }
 
@@ -701,21 +554,16 @@ select {
 }
 
 .LeaderboardSelf td:first-child {
-    border-left:
-        4px solid
-        var(--Mauve);
+    border-left: 4px solid var(--Mauve);
 }
 
 .LeaderboardEmpty {
     padding: 1rem;
-
     color: var(--Subtext1);
-
     text-align: center;
 }
 
-.LeaderboardTable th:last-child,
-.LeaderboardTable td:last-child {
+.LeaderboardTable th:last-child, .LeaderboardTable td:last-child {
     text-align: right;
 }
 
@@ -728,12 +576,10 @@ select {
     margin-bottom: 1rem;
 }
 
-.ProfileFormRow,
-.ProfileButtonRow {
+.ProfileFormRow, .ProfileButtonRow {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-
     align-items: center;
 }
 
@@ -744,29 +590,20 @@ select {
 .ProfileSection label {
     display: block;
     margin-bottom: 0.5rem;
-
     color: var(--Blue);
 }
 
-.ProfileSection input,
-.ProfileSection textarea,
-.ProfileSection button {
-    font-family: inherit;
+.ProfileSection input, .ProfileSection textarea, .ProfileSection button {
     font-size: 1rem;
-
     color: var(--Text);
     background-color: var(--Surface0);
-
     border: 3px solid var(--Surface2);
     border-radius: 0;
-
     appearance: none;
 }
 
-.ProfileSection input,
-.ProfileSection textarea {
+.ProfileSection input, .ProfileSection textarea {
     padding: 0.6rem;
-
     outline: none;
 }
 
@@ -777,65 +614,46 @@ select {
 .ProfileSection textarea {
     width: 100%;
     max-width: 24rem;
-
     resize: vertical;
 }
 
-.ProfileSection input::placeholder,
-.ProfileSection textarea::placeholder {
+.ProfileSection input::placeholder, .ProfileSection textarea::placeholder {
     color: var(--Overlay1);
 }
 
-.ProfileSection input:hover,
-.ProfileSection textarea:hover {
+.ProfileSection input:hover, .ProfileSection textarea:hover {
     background-color: var(--Surface1);
     border-color: var(--Overlay2);
 }
 
-.ProfileSection input:focus,
-.ProfileSection textarea:focus {
+.ProfileSection input:focus, .ProfileSection textarea:focus {
     background-color: var(--Surface1);
     border-color: var(--Sky);
 }
 
 .ProfileSection button {
     padding: 0.6rem 0.8rem;
-
     cursor: pointer;
-
-    box-shadow:
-        3px 3px 0
-        var(--Crust);
+    box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .ProfileSection button:hover {
     color: var(--Sky);
     background-color: var(--Surface1);
-
     border-color: var(--Sky);
-
     transform: translate(1px, 1px);
-
-    box-shadow:
-        2px 2px 0
-        var(--Crust);
+    box-shadow: 2px 2px 0 var(--Crust);
 }
 
 .ProfileSection button:active {
     color: var(--Green);
     background-color: var(--Surface2);
-
     border-color: var(--Green);
-
     transform: translate(2px, 2px);
-
-    box-shadow:
-        1px 1px 0
-        var(--Crust);
+    box-shadow: 1px 1px 0 var(--Crust);
 }
 
-.ProfileSection button:focus-visible,
-.ProfileSection summary:focus-visible {
+.ProfileSection button:focus-visible, .ProfileSection summary:focus-visible {
     outline: 3px solid var(--Yellow);
     outline-offset: 3px;
 }
@@ -843,7 +661,6 @@ select {
 .ProfileMessage {
     margin-top: 0.75rem;
     margin-bottom: 0;
-
     color: var(--Subtext1);
 }
 
@@ -857,9 +674,7 @@ select {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-
     padding: 0.75rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
@@ -870,16 +685,13 @@ select {
 
 .AccountKeySpoiler {
     margin-top: 1rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
 
 .AccountKeySpoiler summary {
     padding: 0.75rem;
-
     cursor: pointer;
-
     color: var(--Text);
     background-color: var(--Surface0);
 }
@@ -896,18 +708,14 @@ select {
 
 #AccountKeyDisplay {
     display: block;
-
     margin-top: 0.75rem;
     margin-bottom: 0.75rem;
     padding: 0.75rem;
-
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-all;
-
     color: var(--Green);
     background-color: var(--Crust);
-
     border: 3px solid var(--Surface2);
 }
 
@@ -921,10 +729,8 @@ select {
     .Navbar {
         grid-column: 1;
         grid-row: 1;
-
         flex-direction: row;
         width: 100%;
-
         top: 0;
         overflow-x: auto;
         z-index: 1;
@@ -941,7 +747,6 @@ select {
         grid-row: 2;
     }
 
-
     .GardenLayout {
         grid-template-columns: 1fr;
     }
@@ -950,14 +755,12 @@ select {
         grid-row: 1;
     }
 
-    .SeedList,
-    .ToolList {
+    .SeedList, .ToolList {
         flex-direction: row;
         flex-wrap: wrap;
     }
 
-    .SeedButton,
-    .ToolButton {
+    .SeedButton, .ToolButton {
         width: auto;
     }
 
@@ -965,13 +768,11 @@ select {
         grid-row: 2;
     }
 
-    .LeaderboardRankColumn,
-    .LeaderboardRank {
+    .LeaderboardRankColumn, .LeaderboardRank {
         width: 2.5rem;
     }
 
-    .LeaderboardTable th,
-    .LeaderboardTable td {
+    .LeaderboardTable th, .LeaderboardTable td {
         padding: 0.6rem 0.4rem;
     }
 
@@ -979,15 +780,12 @@ select {
         overflow-wrap: anywhere;
     }
 
-    .ProfileFormRow,
-    .ProfileButtonRow {
+    .ProfileFormRow, .ProfileButtonRow {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .ProfileSection input,
-    .ProfileSection textarea,
-    .ProfileSection button {
+    .ProfileSection input, .ProfileSection textarea, .ProfileSection button {
         width: 100%;
     }
 
@@ -999,22 +797,17 @@ select {
 
 .SeedEmpty {
     margin: 0;
-
     color: var(--Subtext1);
 }
 
 .GardenPlantMissing {
     display: flex;
-
     width: 100%;
     height: 100%;
     padding: 0.35rem;
-
     align-items: center;
     justify-content: center;
-
     color: var(--Subtext1);
-
     font-size: 0.75rem;
     line-height: 1.1;
     text-align: center;
@@ -1026,11 +819,7 @@ select {
 
 .ShopSeedList {
     display: grid;
-    grid-template-columns:
-        repeat(
-            auto-fit,
-            minmax(15rem, 1fr)
-        );
+    grid-template-columns: repeat( auto-fit, minmax(15rem, 1fr) );
     gap: 1rem;
 }
 
@@ -1038,9 +827,7 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-
     padding: 0.75rem;
-
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
@@ -1048,14 +835,9 @@ select {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-
     align-items: baseline;
-
     padding-bottom: 0.5rem;
-
-    border-bottom:
-        3px solid
-        var(--Surface2);
+    border-bottom: 3px solid var(--Surface2);
 }
 
 .ShopItemHeader h3 {
@@ -1064,11 +846,8 @@ select {
 
 .ShopItemBody {
     display: grid;
-    grid-template-columns:
-        5.75rem
-        minmax(0, 1fr);
+    grid-template-columns: 5.75rem minmax(0, 1fr);
     gap: 0.75rem;
-
     align-items: start;
 }
 
@@ -1076,40 +855,29 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-
     width: 5.75rem;
-
     align-items: center;
     justify-content: center;
-
     align-self: stretch;
 }
 
 .ShopPlantImageFrame {
     display: flex;
-
     width: 5.7rem;
     height: 5.7rem;
-
     align-items: center;
     justify-content: center;
-
-    background-color: var(--Base);
 }
 
 .ShopItemNumber {
     width: 100%;
-
     color: var(--Overlay2);
-
     text-align: center;
 }
 
 .ShopPlantMissing {
     padding: 0.35rem;
-
     color: var(--Overlay1);
-
     font-size: 0.75rem;
     text-align: center;
 }
@@ -1122,7 +890,6 @@ select {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
-
     margin-bottom: 0.4rem;
 }
 
@@ -1132,28 +899,22 @@ select {
 
 .ShopBuyButton {
     --ActionAccent: var(--Green);
-
     padding: 0.65rem 0.8rem;
 }
 
 .ShopBuyButton:disabled {
     cursor: not-allowed;
-
     color: var(--Overlay1);
     background-color: var(--Surface0);
-
     border-color: var(--Surface1);
-
     box-shadow: none;
 }
 
 .ShopEmpty {
     margin: 0;
     padding: 1rem;
-
     color: var(--Subtext1);
     background-color: var(--Mantle);
-
     border: 3px solid var(--Surface2);
 }
 
@@ -1163,9 +924,7 @@ select {
     }
 
     .ShopItemBody {
-        grid-template-columns:
-            5.25rem
-            minmax(0, 1fr);
+        grid-template-columns: 5.25rem minmax(0, 1fr);
     }
 
     .ShopPlantVisual {
@@ -1186,23 +945,17 @@ select {
     width: 4rem;
     min-width: 4rem !important;
     height: 2.75rem;
-
     padding: 0.2rem !important;
-
     cursor: pointer;
-
     appearance: auto !important;
 }
 
 .ProfileColourPreview {
     min-width: 8rem;
-
     color: var(--Text);
 }
 
-/*
- * Garden guide
- */
+/* * Garden guide */
 
 .GuideSection {
     margin-top: 1.5rem;
@@ -1215,7 +968,6 @@ select {
 .GuideTip {
     margin-top: 1.25rem;
     padding: 1rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Yellow);
 }
@@ -1227,15 +979,9 @@ select {
 
 .GuideRecipe {
     display: grid;
-    grid-template-columns:
-        repeat(
-            var(--RecipeWidth, 3),
-            minmax(0, 5.75rem)
-        );
+    grid-template-columns: repeat( var(--RecipeWidth, 3), minmax(0, 5.75rem) );
     gap: 0.75rem;
-
     justify-content: center;
-
     margin: 1rem auto;
 }
 
@@ -1243,15 +989,11 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-
     min-width: 0;
     aspect-ratio: 1;
-
     align-items: center;
     justify-content: center;
-
     padding: 0.35rem;
-
     text-align: center;
 }
 
@@ -1272,9 +1014,7 @@ select {
 
 .GuideRecipeLabel {
     max-width: 100%;
-
     overflow: hidden;
-
     font-size: 0.75rem;
     line-height: 1.1;
     text-overflow: ellipsis;
@@ -1283,18 +1023,13 @@ select {
 
 .GuideHintText {
     margin-bottom: 0;
-
     color: var(--Subtext1);
     text-align: center;
 }
 
 @media (max-width: 700px) {
     .GuideRecipe {
-        grid-template-columns:
-            repeat(
-                var(--RecipeWidth, 3),
-                minmax(0, 1fr)
-            );
+        grid-template-columns: repeat( var(--RecipeWidth, 3), minmax(0, 1fr) );
         gap: 0.5rem;
     }
 
@@ -1304,80 +1039,59 @@ select {
     }
 }
 
-/*
- * Plant encyclopedia
- */
+/* * Plant encyclopedia */
 
 .PlantEncyclopediaList {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
     margin-top: 1.5rem;
 }
 
 .PlantEncyclopediaCard {
     overflow: hidden;
-
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .PlantEncyclopediaHeader {
     display: flex;
     gap: 0.75rem;
-
     align-items: baseline;
-
     padding: 0.75rem 1rem;
-
     background-color: var(--Surface0);
     border-bottom: 3px solid var(--Surface2);
 }
 
 .PlantEncyclopediaHeader h2 {
     margin: 0;
-
     color: var(--Green);
 }
 
 .PlantEncyclopediaNumber {
     flex: 0 0 auto;
-
     color: var(--Overlay2);
-
     font-size: 1.1rem;
 }
 
 .PlantEncyclopediaBody {
     display: grid;
-    grid-template-columns:
-        7rem
-        minmax(0, 1fr)
-        minmax(10rem, 0.8fr);
+    grid-template-columns: 7rem minmax(0, 1fr) minmax(10rem, 0.8fr);
     gap: 1rem;
-
     padding: 1rem;
-
     align-items: start;
 }
 
 .PlantEncyclopediaVisual {
     display: flex;
-
     width: 7rem;
     height: 7rem;
-
     align-items: center;
     justify-content: center;
-
-    background-color: var(--Base);
 }
 
 .PlantEncyclopediaMissing {
     padding: 0.5rem;
-
     color: var(--Overlay1);
-
     text-align: center;
 }
 
@@ -1389,9 +1103,7 @@ select {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
-
     padding: 0.35rem 0;
-
     border-bottom: 2px solid var(--Surface0);
 }
 
@@ -1401,20 +1113,17 @@ select {
 
 .PlantEncyclopediaStatName {
     flex: 0 0 auto;
-
     color: var(--Subtext1);
 }
 
 .PlantEncyclopediaStat > :last-child {
     min-width: 0;
-
     text-align: right;
     overflow-wrap: anywhere;
 }
 
 .PlantEncyclopediaRelations {
     min-width: 0;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
@@ -1423,16 +1132,13 @@ select {
     padding: 0.65rem 0.75rem;
 }
 
-.PlantEncyclopediaRelationGroup +
-.PlantEncyclopediaRelationGroup {
+.PlantEncyclopediaRelationGroup + .PlantEncyclopediaRelationGroup {
     border-top: 3px solid var(--Surface2);
 }
 
 .PlantEncyclopediaRelationGroup h3 {
     margin-bottom: 0.5rem;
-
     color: var(--Peach);
-
     font-size: 1rem;
 }
 
@@ -1440,7 +1146,6 @@ select {
     max-height: 7rem;
     margin: 0;
     padding-left: 1.25rem;
-
     overflow-y: auto;
 }
 
@@ -1452,8 +1157,7 @@ select {
     margin-bottom: 0;
 }
 
-.PlantEncyclopediaRelationUnknown,
-.PlantEncyclopediaRelationEmpty {
+.PlantEncyclopediaRelationUnknown, .PlantEncyclopediaRelationEmpty {
     color: var(--Overlay1);
 }
 
@@ -1466,7 +1170,6 @@ select {
         width: min(8rem, 100%);
         height: auto;
         aspect-ratio: 1;
-
         justify-self: center;
     }
 
@@ -1480,48 +1183,37 @@ select {
     }
 }
 
-
-/*
- * Mutation encyclopedia
- */
+/* * Mutation encyclopedia */
 
 .MutationEncyclopediaList {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
     margin-top: 1.5rem;
 }
 
 .MutationEncyclopediaCard {
     overflow: hidden;
-
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .MutationEncyclopediaHeader {
     display: flex;
     gap: 0.75rem;
-
     align-items: baseline;
-
     padding: 0.75rem 1rem;
-
     background-color: var(--Surface0);
     border-bottom: 3px solid var(--Surface2);
 }
 
 .MutationEncyclopediaHeader h2 {
     margin: 0;
-
     color: var(--Mauve);
 }
 
 .MutationEncyclopediaNumber {
     flex: 0 0 auto;
-
     color: var(--Overlay2);
-
     font-size: 1.1rem;
 }
 
@@ -1535,13 +1227,8 @@ select {
 
 .MutationEncyclopediaStats {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 0 1rem;
-
     margin-bottom: 1.25rem;
 }
 
@@ -1549,21 +1236,17 @@ select {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
-
     padding: 0.35rem 0;
-
     border-bottom: 2px solid var(--Surface0);
 }
 
 .MutationEncyclopediaStatName {
     flex: 0 0 auto;
-
     color: var(--Subtext1);
 }
 
 .MutationEncyclopediaStat > :last-child {
     min-width: 0;
-
     text-align: right;
     overflow-wrap: anywhere;
 }
@@ -1571,25 +1254,19 @@ select {
 .MutationEncyclopediaRecipeSection {
     margin-bottom: 1.25rem;
     padding: 1rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
 
 .MutationEncyclopediaRecipeSection > h3 {
     margin-bottom: 0.75rem;
-
     color: var(--Peach);
 }
 
 .MutationEncyclopediaRecipeFlow {
     display: grid;
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 0.75rem;
-
     align-items: center;
 }
 
@@ -1599,9 +1276,7 @@ select {
 
 .MutationEncyclopediaRecipePanel h4 {
     margin-bottom: 0.25rem;
-
     color: var(--Subtext1);
-
     font-size: 1rem;
     text-align: center;
 }
@@ -1613,7 +1288,6 @@ select {
 
 .MutationEncyclopediaRecipeArrow {
     color: var(--Yellow);
-
     font-size: 2rem;
 }
 
@@ -1625,24 +1299,22 @@ select {
 
 .MutationRecipeMatcher {
     color: var(--Sky);
-    background-color: var(--Mantle);
+    background-color: var(--PlantBackground);
 }
 
 .MutationRecipeKeep {
     color: var(--Subtext1);
-    background-color: var(--Surface0);
+    background-color: var(--PlantBackground);
 }
 
 .MutationRecipeCapture {
     color: var(--Lavender);
-    background-color: var(--Surface0);
+    background-color: var(--PlantBackground);
 }
 
 .MutationRecipeText {
     max-width: 100%;
-
     overflow-wrap: anywhere;
-
     font-size: 0.75rem;
     line-height: 1.15;
     white-space: pre-line;
@@ -1650,32 +1322,24 @@ select {
 
 .MutationEncyclopediaMissingRecipe {
     margin-bottom: 0;
-
     color: var(--Overlay1);
 }
 
 .MutationEncyclopediaRelations {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 1rem;
 }
 
 .MutationEncyclopediaRelationGroup {
     padding: 0.75rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
 
 .MutationEncyclopediaRelationGroup h3 {
     margin-bottom: 0.5rem;
-
     color: var(--Peach);
-
     font-size: 1rem;
 }
 
@@ -1692,14 +1356,12 @@ select {
     margin-bottom: 0;
 }
 
-.MutationEncyclopediaRelationUnknown,
-.MutationEncyclopediaRelationEmpty {
+.MutationEncyclopediaRelationUnknown, .MutationEncyclopediaRelationEmpty {
     color: var(--Overlay1);
 }
 
 @media (max-width: 700px) {
-    .MutationEncyclopediaStats,
-    .MutationEncyclopediaRelations {
+    .MutationEncyclopediaStats, .MutationEncyclopediaRelations {
         grid-template-columns: 1fr;
     }
 
@@ -1709,7 +1371,6 @@ select {
 
     .MutationEncyclopediaRecipeArrow {
         justify-self: center;
-
         transform: rotate(90deg);
     }
 
@@ -1723,20 +1384,12 @@ select {
     }
 }
 
-
-/*
- * Admin editors
- */
+/* * Admin editors */
 
 .AdminEditorNavigation {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 1rem;
-
     margin-top: 1.5rem;
 }
 
@@ -1744,14 +1397,10 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-
     min-height: 7rem;
-
     align-items: flex-start;
     justify-content: center;
-
     padding: 1rem;
-
     text-decoration: none;
 }
 
@@ -1767,14 +1416,9 @@ select {
 
 .AdminEditorToolbar {
     display: grid;
-    grid-template-columns:
-        auto
-        minmax(0, 1fr)
-        auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.75rem;
-
     align-items: center;
-
     margin: 1.5rem 0 1rem;
 }
 
@@ -1788,11 +1432,7 @@ select {
 
 .AdminEditorGrid {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 1rem;
 }
 
@@ -1800,12 +1440,10 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-
     min-width: 0;
 }
 
-.AdminEditorField > span,
-.AdminMutationDimensions label {
+.AdminEditorField > span, .AdminMutationDimensions label {
     color: var(--Blue);
 }
 
@@ -1818,21 +1456,14 @@ select {
     grid-column: 1 / -1;
 }
 
-.AdminEditorForm input,
-.AdminEditorForm textarea,
-.AdminEditorForm select,
-.AdminEditorToolbar select,
-.AdminMutationDimensions input {
+.AdminEditorForm input, .AdminEditorForm textarea, .AdminEditorForm select, .AdminEditorToolbar select, .AdminMutationDimensions input {
     width: 100%;
     min-width: 0;
     padding: 0.55rem;
-
     color: var(--Text);
     background-color: var(--Surface0);
-
     border: 3px solid var(--Surface2);
     border-radius: 0;
-
     outline: none;
 }
 
@@ -1840,11 +1471,7 @@ select {
     resize: vertical;
 }
 
-.AdminEditorForm input:focus,
-.AdminEditorForm textarea:focus,
-.AdminEditorForm select:focus,
-.AdminEditorToolbar select:focus,
-.AdminMutationDimensions input:focus {
+.AdminEditorForm input:focus, .AdminEditorForm textarea:focus, .AdminEditorForm select:focus, .AdminEditorToolbar select:focus, .AdminMutationDimensions input:focus {
     border-color: var(--Sky);
 }
 
@@ -1860,10 +1487,8 @@ select {
 .AdminEditorCheckField {
     display: flex;
     gap: 0.65rem;
-
     align-items: center;
     align-self: end;
-
     min-height: 2.8rem;
 }
 
@@ -1871,7 +1496,6 @@ select {
     width: 1.2rem;
     height: 1.2rem;
     margin: 0;
-
     accent-color: var(--Green);
 }
 
@@ -1882,16 +1506,13 @@ select {
 
 .AdminSaveButton {
     --ActionAccent: var(--Green);
-
     width: auto;
 }
 
 .AdminEditorBackLink {
     display: inline-flex;
-
     align-items: center;
     justify-content: center;
-
     text-decoration: none;
 }
 
@@ -1899,42 +1520,30 @@ select {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-
     margin-top: 1.25rem;
 }
 
-.AdminEditorPreview,
-.AdminMutationRecipeSection,
-.AdminMutationRelationsSection,
-.AdminMutationFailureSection {
+.AdminEditorPreview, .AdminMutationRecipeSection, .AdminMutationRelationsSection, .AdminMutationFailureSection {
     margin-top: 1.5rem;
     padding-top: 1rem;
-
     border-top: 3px solid var(--Surface2);
 }
 
-.AdminEditorPreview h2,
-.AdminMutationRecipeSection h2,
-.AdminMutationRelationsSection h2,
-.AdminMutationFailureSection h2 {
+.AdminEditorPreview h2, .AdminMutationRecipeSection h2, .AdminMutationRelationsSection h2, .AdminMutationFailureSection h2 {
     margin-bottom: 0.5rem;
-
     font-size: 1.4rem;
 }
 
 .AdminPlantPreviewRow {
     display: flex;
     gap: 1rem;
-
     align-items: center;
 }
 
 .AdminPlantPreviewTile {
     display: flex;
-
     width: 7rem;
     height: 7rem;
-
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
@@ -1942,21 +1551,16 @@ select {
 
 .AdminPlantPreviewMissing {
     padding: 0.5rem;
-
     color: var(--Overlay1);
     text-align: center;
 }
 
-#AdminPlantPreviewKey,
-#AdminPlantArchiveNote,
-#AdminMutationArchiveNote {
+#AdminPlantPreviewKey, #AdminPlantArchiveNote, #AdminMutationArchiveNote {
     margin: 0.35rem 0 0;
-
     color: var(--Overlay2);
 }
 
-#AdminPlantArchiveNote,
-#AdminMutationArchiveNote {
+#AdminPlantArchiveNote, #AdminMutationArchiveNote {
     color: var(--Yellow);
 }
 
@@ -1964,14 +1568,11 @@ select {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-
     align-items: end;
 }
 
-.AdminMutationRecipeHeader p,
-.AdminMutationRelationsSection > p {
+.AdminMutationRecipeHeader p, .AdminMutationRelationsSection > p {
     margin-bottom: 0;
-
     color: var(--Subtext1);
 }
 
@@ -1979,7 +1580,6 @@ select {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
-
     align-items: end;
 }
 
@@ -1995,14 +1595,9 @@ select {
 
 .AdminMutationRecipeFlow {
     display: grid;
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 0.75rem;
-
     align-items: center;
-
     margin-top: 1rem;
 }
 
@@ -2012,9 +1607,7 @@ select {
 
 .AdminMutationGridPanel h3 {
     margin-bottom: 0.25rem;
-
     color: var(--Subtext1);
-
     font-size: 1rem;
     text-align: center;
 }
@@ -2026,7 +1619,6 @@ select {
 
 .AdminMutationGridCell {
     width: 100%;
-
     cursor: pointer;
 }
 
@@ -2036,34 +1628,24 @@ select {
 
 .AdminMutationGridCellSelected {
     border-color: var(--Yellow) !important;
-    box-shadow:
-        0 0 0 2px
-        var(--Crust);
+    box-shadow: 0 0 0 2px var(--Crust);
 }
 
 .AdminMutationCellEditor {
     margin-top: 1rem;
     padding: 1rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Yellow);
 }
 
 .AdminMutationCellEditor h3 {
     margin-bottom: 0.75rem;
-
     color: var(--Yellow);
 }
 
-#AdminMutationPatternCellControls,
-#AdminMutationResultCellControls,
-.AdminMatcherFields {
+#AdminMutationPatternCellControls, #AdminMutationResultCellControls, .AdminMatcherFields {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 0.75rem;
 }
 
@@ -2073,13 +1655,8 @@ select {
 
 .AdminMutationRelationColumns {
     display: grid;
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(0, 1fr)
-        );
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
     gap: 1rem;
-
     margin-top: 1rem;
 }
 
@@ -2087,14 +1664,12 @@ select {
     min-width: 0;
     margin: 0;
     padding: 0.75rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
 
 .AdminMutationRelationColumns legend {
     padding: 0 0.35rem;
-
     color: var(--Peach);
 }
 
@@ -2102,7 +1677,6 @@ select {
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
-
     max-height: 14rem;
     overflow-y: auto;
 }
@@ -2110,7 +1684,6 @@ select {
 .AdminPlantChecklistItem {
     display: flex;
     gap: 0.55rem;
-
     align-items: center;
 }
 
@@ -2118,14 +1691,12 @@ select {
     width: 1rem;
     height: 1rem;
     margin: 0;
-
     accent-color: var(--Green);
 }
 
 .AdminGeneratedJson {
     margin-top: 1.5rem;
     padding: 0.75rem;
-
     background-color: var(--Base);
     border: 3px solid var(--Surface2);
 }
@@ -2139,23 +1710,15 @@ select {
     max-height: 24rem;
     margin: 0.75rem 0 0;
     padding: 0.75rem;
-
     overflow: auto;
-
     color: var(--Subtext1);
     background-color: var(--Crust);
-
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
 @media (max-width: 700px) {
-    .AdminEditorNavigation,
-    .AdminEditorGrid,
-    #AdminMutationPatternCellControls,
-    #AdminMutationResultCellControls,
-    .AdminMatcherFields,
-    .AdminMutationRelationColumns {
+    .AdminEditorNavigation, .AdminEditorGrid, #AdminMutationPatternCellControls, #AdminMutationResultCellControls, .AdminMatcherFields, .AdminMutationRelationColumns {
         grid-template-columns: 1fr;
     }
 
@@ -2167,8 +1730,7 @@ select {
         margin-bottom: -0.35rem;
     }
 
-    .AdminInlineButton,
-    .AdminSaveButton {
+    .AdminInlineButton, .AdminSaveButton {
         width: 100%;
     }
 
@@ -2181,10 +1743,8 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .AdminMutationRecipeFlow >
-    .MutationEncyclopediaRecipeArrow {
+    .AdminMutationRecipeFlow > .MutationEncyclopediaRecipeArrow {
         justify-self: center;
-
         transform: rotate(90deg);
     }
 
