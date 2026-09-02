@@ -316,7 +316,7 @@ function CreatePlantInformationUpgradeCard() {
         );
 
     Description.textContent =
-        "Show each plant's name above its sprite and exact time remaining below it. Both displays can be toggled on or off from your Profile.";
+        "Show each plant's name above its sprite and exact time remaining below it. Both can be toggled on/off from the profile page.";
 
 
     const Details =
