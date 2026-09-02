@@ -1,5 +1,6 @@
 const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
+const GardenOverviewUpgradeCost = 1000;
 
 
 function GetGardenColumnUpgradeCost(
@@ -140,5 +141,51 @@ function UnlockPlantInformation(
         true;
 
     SaveData.Preferences.ShowGrowthTimers =
+        true;
+}
+
+
+function HasGardenOverviewUpgrade(
+    SaveData
+) {
+    return (
+        SaveData
+            ?.Upgrades
+            ?.GardenOverview ===
+        true
+    );
+}
+
+
+function GetGardenOverviewUpgradeCost() {
+    return GardenOverviewUpgradeCost;
+}
+
+
+function UnlockGardenOverview(
+    SaveData
+) {
+    SaveData.Upgrades ??= {};
+    SaveData.Preferences ??= {};
+
+    SaveData.Upgrades.GardenOverview =
+        true;
+
+    SaveData.Preferences.ShowNextHarvest =
+        true;
+
+    SaveData.Preferences.ShowGardenSize =
+        true;
+
+    SaveData.Preferences.ShowEmptyPlots =
+        true;
+
+    SaveData.Preferences.ShowPlantedPlots =
+        true;
+
+    SaveData.Preferences.ShowGrowingPlots =
+        true;
+
+    SaveData.Preferences.ShowReadyPlots =
         true;
 }

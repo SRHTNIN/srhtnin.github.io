@@ -18,11 +18,64 @@ $PageSection = "Garden";
             <h1>Garden</h1>
 
             <div class="StatusPanel">
-                <strong>Dew:</strong>
-                <span id="DewAmount">0</span>
-                <br>
-                <strong>Next harvest:</strong>
-                <span id="NextHarvest">Nothing planted</span>
+                <div class="GardenStatusLine">
+                    <strong>Dew:</strong>
+                    <span id="DewAmount">0</span>
+                </div>
+
+                <div
+                    id="NextHarvestLine"
+                    class="GardenStatusLine"
+                >
+                    <strong>Next harvest:</strong>
+                    <span id="NextHarvest">Nothing planted</span>
+                </div>
+
+                <div
+                    id="GardenOverviewDetails"
+                    class="GardenOverviewDetails"
+                    hidden
+                >
+                    <div
+                        id="GardenSizeOverviewLine"
+                        class="GardenStatusLine"
+                    >
+                        <strong>Garden size:</strong>
+                        <span id="GardenSizeOverview">3×3 (9)</span>
+                    </div>
+
+                    <div
+                        id="EmptyPlotsOverviewLine"
+                        class="GardenStatusLine"
+                    >
+                        <strong>Empty plots:</strong>
+                        <span id="EmptyPlotsOverview">9/9</span>
+                    </div>
+
+                    <div
+                        id="PlantedPlotsOverviewLine"
+                        class="GardenStatusLine"
+                    >
+                        <strong>Planted plots:</strong>
+                        <span id="PlantedPlotsOverview">0/9</span>
+                    </div>
+
+                    <div
+                        id="GrowingPlotsOverviewLine"
+                        class="GardenStatusLine"
+                    >
+                        <strong>Growing:</strong>
+                        <span id="GrowingPlotsOverview">0/9</span>
+                    </div>
+
+                    <div
+                        id="ReadyPlotsOverviewLine"
+                        class="GardenStatusLine"
+                    >
+                        <strong>Ready to harvest:</strong>
+                        <span id="ReadyPlotsOverview">0/9</span>
+                    </div>
+                </div>
             </div>
 
             <div class="GardenLayout">

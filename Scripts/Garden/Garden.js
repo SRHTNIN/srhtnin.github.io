@@ -59,6 +59,7 @@ function RenderGame() {
     RenderTools();
     RenderGarden();
     RenderNextHarvest();
+    RenderGardenOverview();
 }
 
 
@@ -940,6 +941,7 @@ async function RemovePlant(
 async function GardenTick() {
     RenderGarden();
     RenderNextHarvest();
+    RenderGardenOverview();
 
 
     if (MutationCheckPending) {
@@ -1113,8 +1115,8 @@ function SetGardenMessage(
 }
 
 
-function GetNextHarvestTime() {
-    let NextHarvestTime = null;
+function GetNextHarvestInfo() {
+    let NextHarvest = null;
 
 
     for (
@@ -1138,46 +1140,63 @@ function GetNextHarvestTime() {
             Plot.PlantedAt +
             Plant.GrowthTime;
 
-
         if (
-            HarvestTime <=
-            Date.now()
-        ) {
-            return Date.now();
-        }
-
-
-        if (
-            NextHarvestTime === null ||
+            NextHarvest === null ||
             HarvestTime <
-                NextHarvestTime
+                NextHarvest.Time
         ) {
-            NextHarvestTime =
-                HarvestTime;
+            NextHarvest = {
+                Time: HarvestTime,
+                Plant
+            };
         }
     }
 
 
-    return NextHarvestTime;
+    return NextHarvest;
 }
 
 
 function RenderNextHarvest() {
+    const Line =
+        document.getElementById(
+            "NextHarvestLine"
+        );
+
     const Element =
         document.getElementById(
             "NextHarvest"
         );
 
-    if (Element === null) {
+    if (
+        Line === null ||
+        Element === null
+    ) {
         return;
     }
 
 
-    const HarvestTime =
-        GetNextHarvestTime();
+    const HasOverview =
+        HasGardenOverviewUpgrade(
+            GameSave
+        );
+
+    const ShowNextHarvest =
+        !HasOverview ||
+        GameSave.Preferences
+            .ShowNextHarvest !== false;
+
+    Line.hidden = !ShowNextHarvest;
+
+    if (!ShowNextHarvest) {
+        return;
+    }
 
 
-    if (HarvestTime === null) {
+    const Harvest =
+        GetNextHarvestInfo();
+
+    if (Harvest === null) {
         Element.textContent =
             "Nothing planted";
 
@@ -1190,13 +1209,19 @@ function RenderNextHarvest() {
 
 
     const Remaining =
-        HarvestTime -
+        Harvest.Time -
         Date.now();
+
+    const IncludePlantName =
+        HasOverview;
 
 
     if (Remaining <= 0) {
         Element.textContent =
-            "Ready now!";
+            IncludePlantName
+                ? Harvest.Plant.Name +
+                    " is ready!"
+                : "Ready now!";
 
         Element.removeAttribute(
             "title"
@@ -1206,17 +1231,23 @@ function RenderNextHarvest() {
     }
 
 
-    Element.textContent =
+    const RemainingText =
         FormatRemainingTime(
             Remaining
         );
 
+    Element.textContent =
+        IncludePlantName
+            ? Harvest.Plant.Name +
+                " in " +
+                RemainingText
+            : RemainingText;
+
 
     const HarvestDate =
         new Date(
-            HarvestTime
+            Harvest.Time
         );
-
 
     Element.title =
         "Ready at " +
@@ -1227,6 +1258,186 @@ function RenderNextHarvest() {
                 minute: "2-digit"
             }
         );
+}
+
+
+function RenderGardenOverview() {
+    const Overview =
+        document.getElementById(
+            "GardenOverviewDetails"
+        );
+
+    if (Overview === null) {
+        return;
+    }
+
+
+    if (
+        !HasGardenOverviewUpgrade(
+            GameSave
+        )
+    ) {
+        Overview.hidden = true;
+
+        return;
+    }
+
+
+    const TotalPlots =
+        GameSave.Garden.Width *
+        GameSave.Garden.Height;
+
+    let PlantedPlots = 0;
+    let GrowingPlots = 0;
+    let ReadyPlots = 0;
+
+
+    for (
+        const Plot
+        of GameSave.Garden.Plots
+    ) {
+        if (Plot === null) {
+            continue;
+        }
+
+        PlantedPlots++;
+
+        const Plant =
+            Plants[Plot.Plant];
+
+        if (Plant === undefined) {
+            continue;
+        }
+
+        if (
+            IsPlantMature(
+                Plot,
+                Plant
+            )
+        ) {
+            ReadyPlots++;
+        } else {
+            GrowingPlots++;
+        }
+    }
+
+
+    const EmptyPlots =
+        Math.max(
+            0,
+            TotalPlots -
+            PlantedPlots
+        );
+
+    const Lines = [
+        {
+            LineId:
+                "GardenSizeOverviewLine",
+            ValueId:
+                "GardenSizeOverview",
+            Preference:
+                "ShowGardenSize",
+            Value:
+                GameSave.Garden.Width +
+                "×" +
+                GameSave.Garden.Height +
+                " (" +
+                TotalPlots.toLocaleString() +
+                ")"
+        },
+        {
+            LineId:
+                "EmptyPlotsOverviewLine",
+            ValueId:
+                "EmptyPlotsOverview",
+            Preference:
+                "ShowEmptyPlots",
+            Value:
+                EmptyPlots.toLocaleString() +
+                "/" +
+                TotalPlots.toLocaleString()
+        },
+        {
+            LineId:
+                "PlantedPlotsOverviewLine",
+            ValueId:
+                "PlantedPlotsOverview",
+            Preference:
+                "ShowPlantedPlots",
+            Value:
+                PlantedPlots.toLocaleString() +
+                "/" +
+                TotalPlots.toLocaleString()
+        },
+        {
+            LineId:
+                "GrowingPlotsOverviewLine",
+            ValueId:
+                "GrowingPlotsOverview",
+            Preference:
+                "ShowGrowingPlots",
+            Value:
+                GrowingPlots.toLocaleString() +
+                "/" +
+                TotalPlots.toLocaleString()
+        },
+        {
+            LineId:
+                "ReadyPlotsOverviewLine",
+            ValueId:
+                "ReadyPlotsOverview",
+            Preference:
+                "ShowReadyPlots",
+            Value:
+                ReadyPlots.toLocaleString() +
+                "/" +
+                TotalPlots.toLocaleString()
+        }
+    ];
+
+    let VisibleLines = 0;
+
+
+    for (
+        const Line
+        of Lines
+    ) {
+        const LineElement =
+            document.getElementById(
+                Line.LineId
+            );
+
+        const ValueElement =
+            document.getElementById(
+                Line.ValueId
+            );
+
+        if (
+            LineElement === null ||
+            ValueElement === null
+        ) {
+            continue;
+        }
+
+        const IsVisible =
+            GameSave.Preferences[
+                Line.Preference
+            ] !== false;
+
+        LineElement.hidden =
+            !IsVisible;
+
+        ValueElement.textContent =
+            Line.Value;
+
+        if (IsVisible) {
+            VisibleLines++;
+        }
+    }
+
+
+    Overview.hidden =
+        VisibleLines === 0;
 }
 
 

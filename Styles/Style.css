@@ -84,6 +84,14 @@ body {
     border: 3px solid var(--Surface2);
 }
 
+.GardenOverviewDetails {
+    margin-top: 0.5rem;
+}
+
+.GardenStatusLine + .GardenStatusLine {
+    margin-top: 0.1rem;
+}
+
 .PageMessage {
     margin-top: 1rem;
     margin-bottom: 0;
@@ -621,6 +629,10 @@ input, button, textarea, select {
 
 .ProfileSection h2 {
     margin-bottom: 1rem;
+}
+
+.ProfileSection h3 {
+    margin-top: 1.5rem;
 }
 
 .ProfileFormRow, .ProfileButtonRow {

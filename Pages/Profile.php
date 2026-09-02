@@ -105,6 +105,8 @@ $PageTitle = "Profile";
             >
                 <h2>Garden display</h2>
 
+                <h3>Plant information</h3>
+
                 <p>
                     Choose which Plant information details are
                     shown on Garden plots.
@@ -131,6 +133,65 @@ $PageTitle = "Profile";
                     class="ProfileMessage"
                 >
                     Unlock Plant information in the Shop
+                    to use these settings.
+                </p>
+
+                <h3>Garden overview</h3>
+
+                <p>
+                    Choose which Garden overview lines are
+                    shown in the Garden status box.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="ToggleNextHarvestButton"
+                        type="button"
+                    >
+                        Next harvest: Locked
+                    </button>
+
+                    <button
+                        id="ToggleGardenSizeButton"
+                        type="button"
+                    >
+                        Garden size: Locked
+                    </button>
+
+                    <button
+                        id="ToggleEmptyPlotsButton"
+                        type="button"
+                    >
+                        Empty plots: Locked
+                    </button>
+
+                    <button
+                        id="TogglePlantedPlotsButton"
+                        type="button"
+                    >
+                        Planted plots: Locked
+                    </button>
+
+                    <button
+                        id="ToggleGrowingPlotsButton"
+                        type="button"
+                    >
+                        Growing: Locked
+                    </button>
+
+                    <button
+                        id="ToggleReadyPlotsButton"
+                        type="button"
+                    >
+                        Ready to harvest: Locked
+                    </button>
+                </div>
+
+                <p
+                    id="GardenOverviewDisplayMessage"
+                    class="ProfileMessage"
+                >
+                    Unlock Garden overview in the Shop
                     to use these settings.
                 </p>
             </section>

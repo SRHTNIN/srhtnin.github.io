@@ -47,8 +47,8 @@ $PageSection = "Shop";
                 <h2>Permanent upgrades</h2>
 
                 <p>
-                    Expand your Garden one row or column at a time.
-                    Existing plants keep their positions.
+                    Permanently expand your Garden or unlock
+                    extra information and quality-of-life features.
                 </p>
 
                 <div

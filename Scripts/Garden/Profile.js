@@ -75,45 +75,77 @@ async function StartProfile() {
 
 
 function BindGardenDisplayPreferences() {
-    const PlantNamesButton =
-        document.getElementById(
-            "TogglePlantNamesButton"
-        );
+    const PreferenceButtons = [
+        [
+            "TogglePlantNamesButton",
+            "ShowPlantNames"
+        ],
+        [
+            "ToggleGrowthTimersButton",
+            "ShowGrowthTimers"
+        ],
+        [
+            "ToggleNextHarvestButton",
+            "ShowNextHarvest"
+        ],
+        [
+            "ToggleGardenSizeButton",
+            "ShowGardenSize"
+        ],
+        [
+            "ToggleEmptyPlotsButton",
+            "ShowEmptyPlots"
+        ],
+        [
+            "TogglePlantedPlotsButton",
+            "ShowPlantedPlots"
+        ],
+        [
+            "ToggleGrowingPlotsButton",
+            "ShowGrowingPlots"
+        ],
+        [
+            "ToggleReadyPlotsButton",
+            "ShowReadyPlots"
+        ]
+    ];
 
-    const GrowthTimersButton =
-        document.getElementById(
-            "ToggleGrowthTimersButton"
-        );
 
-    if (
-        PlantNamesButton === null ||
-        GrowthTimersButton === null
+    for (
+        const [
+            ButtonId,
+            PreferenceName
+        ]
+        of PreferenceButtons
     ) {
-        return;
+        const Button =
+            document.getElementById(
+                ButtonId
+            );
+
+        if (Button === null) {
+            continue;
+        }
+
+        Button.addEventListener(
+            "click",
+            () => {
+                ToggleGardenDisplayPreference(
+                    PreferenceName
+                );
+            }
+        );
     }
-
-
-    PlantNamesButton.addEventListener(
-        "click",
-        () => {
-            ToggleGardenDisplayPreference(
-                "ShowPlantNames"
-            );
-        }
-    );
-
-    GrowthTimersButton.addEventListener(
-        "click",
-        () => {
-            ToggleGardenDisplayPreference(
-                "ShowGrowthTimers"
-            );
-        }
-    );
 }
 
 
 function RenderGardenDisplayPreferences() {
+    RenderPlantInformationPreferences();
+    RenderGardenOverviewPreferences();
+}
+
+
+function RenderPlantInformationPreferences() {
     const PlantNamesButton =
         document.getElementById(
             "TogglePlantNamesButton"
@@ -144,14 +176,19 @@ function RenderGardenDisplayPreferences() {
         );
 
     if (!IsOwned) {
-        PlantNamesButton.textContent =
-            "Plant names: Locked";
+        SetPreferenceButtonState(
+            PlantNamesButton,
+            "Plant names",
+            false,
+            true
+        );
 
-        GrowthTimersButton.textContent =
-            "Growth timers: Locked";
-
-        PlantNamesButton.disabled = true;
-        GrowthTimersButton.disabled = true;
+        SetPreferenceButtonState(
+            GrowthTimersButton,
+            "Growth timers",
+            false,
+            true
+        );
 
         Message.textContent =
             "Unlock Plant information in the Shop to use these settings.";
@@ -160,38 +197,166 @@ function RenderGardenDisplayPreferences() {
     }
 
 
-    const ShowPlantNames =
+    SetPreferenceButtonState(
+        PlantNamesButton,
+        "Plant names",
         ProfileSave.Preferences
-            .ShowPlantNames !== false;
+            .ShowPlantNames !== false
+    );
 
-    const ShowGrowthTimers =
+    SetPreferenceButtonState(
+        GrowthTimersButton,
+        "Growth timers",
         ProfileSave.Preferences
-            .ShowGrowthTimers !== false;
-
-    PlantNamesButton.disabled = false;
-    GrowthTimersButton.disabled = false;
-
-    PlantNamesButton.textContent =
-        "Plant names: " +
-        (ShowPlantNames
-            ? "On"
-            : "Off");
-
-    GrowthTimersButton.textContent =
-        "Growth timers: " +
-        (ShowGrowthTimers
-            ? "On"
-            : "Off");
+            .ShowGrowthTimers !== false
+    );
 
     Message.textContent =
         "Plant names and growth timers can be changed independently.";
 }
 
 
+function RenderGardenOverviewPreferences() {
+    const Settings = [
+        [
+            "ToggleNextHarvestButton",
+            "Next harvest",
+            "ShowNextHarvest"
+        ],
+        [
+            "ToggleGardenSizeButton",
+            "Garden size",
+            "ShowGardenSize"
+        ],
+        [
+            "ToggleEmptyPlotsButton",
+            "Empty plots",
+            "ShowEmptyPlots"
+        ],
+        [
+            "TogglePlantedPlotsButton",
+            "Planted plots",
+            "ShowPlantedPlots"
+        ],
+        [
+            "ToggleGrowingPlotsButton",
+            "Growing",
+            "ShowGrowingPlots"
+        ],
+        [
+            "ToggleReadyPlotsButton",
+            "Ready to harvest",
+            "ShowReadyPlots"
+        ]
+    ];
+
+    const Message =
+        document.getElementById(
+            "GardenOverviewDisplayMessage"
+        );
+
+    if (Message === null) {
+        return;
+    }
+
+
+    const IsOwned =
+        HasGardenOverviewUpgrade(
+            ProfileSave
+        );
+
+    for (
+        const [
+            ButtonId,
+            Label,
+            PreferenceName
+        ]
+        of Settings
+    ) {
+        const Button =
+            document.getElementById(
+                ButtonId
+            );
+
+        if (Button === null) {
+            continue;
+        }
+
+        SetPreferenceButtonState(
+            Button,
+            Label,
+            ProfileSave.Preferences[
+                PreferenceName
+            ] !== false,
+            !IsOwned
+        );
+    }
+
+
+    Message.textContent =
+        IsOwned
+            ? "Every Garden overview line can be changed independently."
+            : "Unlock Garden overview in the Shop to use these settings.";
+}
+
+
+function SetPreferenceButtonState(
+    Button,
+    Label,
+    IsEnabled,
+    IsLocked = false
+) {
+    Button.disabled = IsLocked;
+
+    Button.textContent =
+        Label +
+        ": " +
+        (IsLocked
+            ? "Locked"
+            : IsEnabled
+                ? "On"
+                : "Off");
+}
+
+
 async function ToggleGardenDisplayPreference(
     PreferenceName
 ) {
+    const PlantInformationPreferences = [
+        "ShowPlantNames",
+        "ShowGrowthTimers"
+    ];
+
+    const GardenOverviewPreferences = [
+        "ShowNextHarvest",
+        "ShowGardenSize",
+        "ShowEmptyPlots",
+        "ShowPlantedPlots",
+        "ShowGrowingPlots",
+        "ShowReadyPlots"
+    ];
+
+
+    const IsPlantInformationPreference =
+        PlantInformationPreferences.includes(
+            PreferenceName
+        );
+
+    const IsGardenOverviewPreference =
+        GardenOverviewPreferences.includes(
+            PreferenceName
+        );
+
+
     if (
+        !IsPlantInformationPreference &&
+        !IsGardenOverviewPreference
+    ) {
+        return;
+    }
+
+    if (
+        IsPlantInformationPreference &&
         !HasPlantInformationUpgrade(
             ProfileSave
         )
@@ -200,10 +365,10 @@ async function ToggleGardenDisplayPreference(
     }
 
     if (
-        PreferenceName !==
-            "ShowPlantNames" &&
-        PreferenceName !==
-            "ShowGrowthTimers"
+        IsGardenOverviewPreference &&
+        !HasGardenOverviewUpgrade(
+            ProfileSave
+        )
     ) {
         return;
     }

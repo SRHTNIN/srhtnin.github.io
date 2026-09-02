@@ -67,12 +67,19 @@ function CreateNewSave() {
 
         Upgrades: {
             PlotSize: 0,
-            PlantInformation: false
+            PlantInformation: false,
+            GardenOverview: false
         },
 
         Preferences: {
             ShowPlantNames: true,
-            ShowGrowthTimers: true
+            ShowGrowthTimers: true,
+            ShowNextHarvest: true,
+            ShowGardenSize: true,
+            ShowEmptyPlots: true,
+            ShowPlantedPlots: true,
+            ShowGrowingPlots: true,
+            ShowReadyPlots: true
         },
 
         Garden: {
@@ -249,6 +256,10 @@ function NormalizeSaveData(
         SaveData.Upgrades.PlantInformation ===
         true;
 
+    SaveData.Upgrades.GardenOverview =
+        SaveData.Upgrades.GardenOverview ===
+        true;
+
 
     SaveData.Preferences ??= {};
 
@@ -258,6 +269,30 @@ function NormalizeSaveData(
 
     SaveData.Preferences.ShowGrowthTimers =
         SaveData.Preferences.ShowGrowthTimers !==
+        false;
+
+    SaveData.Preferences.ShowNextHarvest =
+        SaveData.Preferences.ShowNextHarvest !==
+        false;
+
+    SaveData.Preferences.ShowGardenSize =
+        SaveData.Preferences.ShowGardenSize !==
+        false;
+
+    SaveData.Preferences.ShowEmptyPlots =
+        SaveData.Preferences.ShowEmptyPlots !==
+        false;
+
+    SaveData.Preferences.ShowPlantedPlots =
+        SaveData.Preferences.ShowPlantedPlots !==
+        false;
+
+    SaveData.Preferences.ShowGrowingPlots =
+        SaveData.Preferences.ShowGrowingPlots !==
+        false;
+
+    SaveData.Preferences.ShowReadyPlots =
+        SaveData.Preferences.ShowReadyPlots !==
         false;
 
 

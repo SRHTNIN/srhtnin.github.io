@@ -124,7 +124,8 @@ function RenderGardenUpgrades() {
         CreateGardenExpansionCard(
             "Row"
         ),
-        CreatePlantInformationUpgradeCard()
+        CreatePlantInformationUpgradeCard(),
+        CreateGardenOverviewUpgradeCard()
     );
 }
 
@@ -371,6 +372,122 @@ function CreatePlantInformationUpgradeCard() {
         BuyButton.addEventListener(
             "click",
             BuyPlantInformationUpgrade
+        );
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
+}
+
+
+function CreateGardenOverviewUpgradeCard() {
+    const Cost =
+        GetGardenOverviewUpgradeCost();
+
+    const IsOwned =
+        HasGardenOverviewUpgrade(
+            ShopSave
+        );
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Garden overview";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Expand the Garden status box with detailed plot counts and the name of the next plant ready to harvest. Every overview line can be toggled on/off from the profile page.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Garden details",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            "Profile controls",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            BuyGardenOverviewUpgrade
         );
     }
 
@@ -1000,6 +1117,64 @@ async function BuyPlantInformationUpgrade() {
             "Bought Plant information for " +
             Cost.toLocaleString() +
             " Dew. Plant names and growth timers are now visible."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyGardenOverviewUpgrade() {
+    if (
+        ShopPurchasePending ||
+        HasGardenOverviewUpgrade(
+            ShopSave
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetGardenOverviewUpgradeCost();
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for Garden overview."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockGardenOverview(
+            ShopSave
+        );
+
+
+        SetShopMessage(
+            "Bought Garden overview for " +
+            Cost.toLocaleString() +
+            " Dew. All overview lines are now visible."
         );
 
         RenderShop();
