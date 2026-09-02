@@ -1,4 +1,5 @@
 const GardenExpansionBaseCost = 1000;
+const PlantInformationUpgradeCost = 500;
 
 
 function GetGardenColumnUpgradeCost(
@@ -106,4 +107,38 @@ function ResetGardenMutationCooldowns(
     SaveData
 ) {
     SaveData.MutationCooldowns = {};
+}
+
+
+function HasPlantInformationUpgrade(
+    SaveData
+) {
+    return (
+        SaveData
+            ?.Upgrades
+            ?.PlantInformation ===
+        true
+    );
+}
+
+
+function GetPlantInformationUpgradeCost() {
+    return PlantInformationUpgradeCost;
+}
+
+
+function UnlockPlantInformation(
+    SaveData
+) {
+    SaveData.Upgrades ??= {};
+    SaveData.Preferences ??= {};
+
+    SaveData.Upgrades.PlantInformation =
+        true;
+
+    SaveData.Preferences.ShowPlantNames =
+        true;
+
+    SaveData.Preferences.ShowGrowthTimers =
+        true;
 }

@@ -66,7 +66,13 @@ function CreateNewSave() {
         },
 
         Upgrades: {
-            PlotSize: 0
+            PlotSize: 0,
+            PlantInformation: false
+        },
+
+        Preferences: {
+            ShowPlantNames: true,
+            ShowGrowthTimers: true
         },
 
         Garden: {
@@ -239,6 +245,20 @@ function NormalizeSaveData(
 
     SaveData.Upgrades ??= {};
     SaveData.Upgrades.PlotSize ??= 0;
+    SaveData.Upgrades.PlantInformation =
+        SaveData.Upgrades.PlantInformation ===
+        true;
+
+
+    SaveData.Preferences ??= {};
+
+    SaveData.Preferences.ShowPlantNames =
+        SaveData.Preferences.ShowPlantNames !==
+        false;
+
+    SaveData.Preferences.ShowGrowthTimers =
+        SaveData.Preferences.ShowGrowthTimers !==
+        false;
 
 
     SaveData.Garden ??= {

@@ -328,6 +328,7 @@ input, button, textarea, select {
     --PlotBorderColour: var(--Surface2);
     --TileBackground: var(--PlantBackground);
     position: relative;
+    display: grid;
     width: 100%;
     aspect-ratio: 1;
     padding: 0;
@@ -335,6 +336,52 @@ input, button, textarea, select {
     border-color: transparent;
     background: linear-gradient( var(--TileBackground), var(--TileBackground) ) padding-box, conic-gradient( from -90deg, var(--GrowthColour) 0 var(--GrowthProgress), var(--PlotBorderColour) var(--GrowthProgress) 100% ) border-box;
     box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.GardenPlotWithName,
+.GardenPlotWithTimer {
+    aspect-ratio: auto;
+}
+
+.GardenPlotVisual {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--TileBackground);
+}
+
+.GardenPlotName,
+.GardenPlotTimer {
+    display: flex;
+    min-width: 0;
+    min-height: 1.5rem;
+    padding: 0.2rem 0.3rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--Subtext1);
+    background-color: var(--Mantle);
+    font-size: 0.75rem;
+    line-height: 1;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.GardenPlotName {
+    border-bottom: 2px solid var(--Surface2);
+}
+
+.GardenPlotTimer {
+    border-top: 2px solid var(--Surface2);
+}
+
+.GardenPlotMature .GardenPlotTimer {
+    color: var(--Green);
 }
 
 .GardenPlot:hover {
@@ -643,6 +690,14 @@ input, button, textarea, select {
     border-color: var(--Sky);
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--Crust);
+}
+
+.ProfileSection button:disabled {
+    cursor: not-allowed;
+    color: var(--Overlay1);
+    background-color: var(--Surface0);
+    border-color: var(--Surface1);
+    box-shadow: none;
 }
 
 .ProfileSection button:active {

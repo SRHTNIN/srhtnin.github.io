@@ -11,6 +11,8 @@ async function StartProfile() {
             await LoadGame();
 
         RenderProfileStatistics();
+        RenderGardenDisplayPreferences();
+        BindGardenDisplayPreferences();
     } catch (Error) {
         console.error(
             "Couldn't load profile statistics:",
@@ -68,6 +70,155 @@ async function StartProfile() {
     ResetColourButton.addEventListener(
         "click",
         ResetProfileColour
+    );
+}
+
+
+function BindGardenDisplayPreferences() {
+    const PlantNamesButton =
+        document.getElementById(
+            "TogglePlantNamesButton"
+        );
+
+    const GrowthTimersButton =
+        document.getElementById(
+            "ToggleGrowthTimersButton"
+        );
+
+    if (
+        PlantNamesButton === null ||
+        GrowthTimersButton === null
+    ) {
+        return;
+    }
+
+
+    PlantNamesButton.addEventListener(
+        "click",
+        () => {
+            ToggleGardenDisplayPreference(
+                "ShowPlantNames"
+            );
+        }
+    );
+
+    GrowthTimersButton.addEventListener(
+        "click",
+        () => {
+            ToggleGardenDisplayPreference(
+                "ShowGrowthTimers"
+            );
+        }
+    );
+}
+
+
+function RenderGardenDisplayPreferences() {
+    const PlantNamesButton =
+        document.getElementById(
+            "TogglePlantNamesButton"
+        );
+
+    const GrowthTimersButton =
+        document.getElementById(
+            "ToggleGrowthTimersButton"
+        );
+
+    const Message =
+        document.getElementById(
+            "GardenDisplayMessage"
+        );
+
+    if (
+        PlantNamesButton === null ||
+        GrowthTimersButton === null ||
+        Message === null
+    ) {
+        return;
+    }
+
+
+    const IsOwned =
+        HasPlantInformationUpgrade(
+            ProfileSave
+        );
+
+    if (!IsOwned) {
+        PlantNamesButton.textContent =
+            "Plant names: Locked";
+
+        GrowthTimersButton.textContent =
+            "Growth timers: Locked";
+
+        PlantNamesButton.disabled = true;
+        GrowthTimersButton.disabled = true;
+
+        Message.textContent =
+            "Unlock Plant information in the Shop to use these settings.";
+
+        return;
+    }
+
+
+    const ShowPlantNames =
+        ProfileSave.Preferences
+            .ShowPlantNames !== false;
+
+    const ShowGrowthTimers =
+        ProfileSave.Preferences
+            .ShowGrowthTimers !== false;
+
+    PlantNamesButton.disabled = false;
+    GrowthTimersButton.disabled = false;
+
+    PlantNamesButton.textContent =
+        "Plant names: " +
+        (ShowPlantNames
+            ? "On"
+            : "Off");
+
+    GrowthTimersButton.textContent =
+        "Growth timers: " +
+        (ShowGrowthTimers
+            ? "On"
+            : "Off");
+
+    Message.textContent =
+        "Plant names and growth timers can be changed independently.";
+}
+
+
+async function ToggleGardenDisplayPreference(
+    PreferenceName
+) {
+    if (
+        !HasPlantInformationUpgrade(
+            ProfileSave
+        )
+    ) {
+        return;
+    }
+
+    if (
+        PreferenceName !==
+            "ShowPlantNames" &&
+        PreferenceName !==
+            "ShowGrowthTimers"
+    ) {
+        return;
+    }
+
+
+    ProfileSave.Preferences[
+        PreferenceName
+    ] = !ProfileSave.Preferences[
+        PreferenceName
+    ];
+
+    RenderGardenDisplayPreferences();
+
+    await SaveGame(
+        ProfileSave
     );
 }
 

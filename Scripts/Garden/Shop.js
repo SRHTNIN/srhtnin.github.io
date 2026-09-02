@@ -123,7 +123,8 @@ function RenderGardenUpgrades() {
         ),
         CreateGardenExpansionCard(
             "Row"
-        )
+        ),
+        CreatePlantInformationUpgradeCard()
     );
 }
 
@@ -256,6 +257,122 @@ function CreateGardenExpansionCard(
             );
         }
     );
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
+}
+
+
+function CreatePlantInformationUpgradeCard() {
+    const Cost =
+        GetPlantInformationUpgradeCost();
+
+    const IsOwned =
+        HasPlantInformationUpgrade(
+            ShopSave
+        );
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Plant information";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Show each plant's name above its sprite and exact time remaining below it. Both displays can be toggled on or off from your Profile.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Plant names",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            "Growth timers",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            BuyPlantInformationUpgrade
+        );
+    }
 
 
     Card.append(
@@ -825,6 +942,64 @@ async function BuyGardenExpansion(
             "×" +
             ShopSave.Garden.Height +
             "."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyPlantInformationUpgrade() {
+    if (
+        ShopPurchasePending ||
+        HasPlantInformationUpgrade(
+            ShopSave
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetPlantInformationUpgradeCost();
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for Plant information."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockPlantInformation(
+            ShopSave
+        );
+
+
+        SetShopMessage(
+            "Bought Plant information for " +
+            Cost.toLocaleString() +
+            " Dew. Plant names and growth timers are now visible."
         );
 
         RenderShop();

@@ -100,6 +100,42 @@ $PageTitle = "Profile";
             </section>
 
             <section
+                id="GardenDisplay"
+                class="Panel ProfileSection"
+            >
+                <h2>Garden display</h2>
+
+                <p>
+                    Choose which Plant information details are
+                    shown on Garden plots.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="TogglePlantNamesButton"
+                        type="button"
+                    >
+                        Plant names: Locked
+                    </button>
+
+                    <button
+                        id="ToggleGrowthTimersButton"
+                        type="button"
+                    >
+                        Growth timers: Locked
+                    </button>
+                </div>
+
+                <p
+                    id="GardenDisplayMessage"
+                    class="ProfileMessage"
+                >
+                    Unlock Plant information in the Shop
+                    to use these settings.
+                </p>
+            </section>
+
+            <section
                 id="Statistics"
                 class="Panel ProfileSection"
             >
@@ -294,6 +330,7 @@ $PageTitle = "Profile";
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
+        <script src="/Scripts/Garden/Upgrades.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
         <script src="/Scripts/Garden/Profile.js"></script>
         <script src="/Scripts/Garden/Account.js"></script>

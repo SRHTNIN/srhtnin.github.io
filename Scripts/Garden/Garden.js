@@ -327,12 +327,18 @@ function RenderGarden() {
 
     GardenGrid.replaceChildren();
 
+
+    const DisplaySettings =
+        GetGardenDisplaySettings();
+
+
     GameSave.Garden.Plots.forEach(
         (Plot, PlotIndex) => {
             const PlotElement =
                 CreatePlotElement(
                     Plot,
-                    PlotIndex
+                    PlotIndex,
+                    DisplaySettings
                 );
 
             GardenGrid.appendChild(
@@ -343,9 +349,32 @@ function RenderGarden() {
 }
 
 
+function GetGardenDisplaySettings() {
+    const HasPlantInformation =
+        HasPlantInformationUpgrade(
+            GameSave
+        );
+
+    return {
+        ShowPlantNames:
+            HasPlantInformation &&
+            GameSave.Preferences
+                .ShowPlantNames !==
+                false,
+
+        ShowGrowthTimers:
+            HasPlantInformation &&
+            GameSave.Preferences
+                .ShowGrowthTimers !==
+                false
+    };
+}
+
+
 function CreatePlotElement(
     Plot,
-    PlotIndex
+    PlotIndex,
+    DisplaySettings
 ) {
     const Button =
         document.createElement(
@@ -358,6 +387,53 @@ function CreatePlotElement(
     Button.type = "button";
 
 
+    if (
+        DisplaySettings.ShowPlantNames
+    ) {
+        Button.classList.add(
+            "GardenPlotWithName"
+        );
+    }
+
+    if (
+        DisplaySettings.ShowGrowthTimers
+    ) {
+        Button.classList.add(
+            "GardenPlotWithTimer"
+        );
+    }
+
+
+    const Plant =
+        Plot === null
+            ? null
+            : Plants[Plot.Plant];
+
+    if (
+        DisplaySettings.ShowPlantNames
+    ) {
+        Button.appendChild(
+            CreateGardenPlotName(
+                Plot,
+                Plant
+            )
+        );
+    }
+
+
+    const Visual =
+        document.createElement(
+            "span"
+        );
+
+    Visual.className =
+        "GardenPlotVisual";
+
+    Button.appendChild(
+        Visual
+    );
+
+
     if (Plot === null) {
         Button.classList.add(
             "GardenPlotEmpty"
@@ -365,6 +441,19 @@ function CreatePlotElement(
 
         Button.title =
             "Empty plot";
+
+        if (
+            DisplaySettings
+                .ShowGrowthTimers
+        ) {
+            Button.appendChild(
+                CreateGardenPlotTimer(
+                    null,
+                    null,
+                    0
+                )
+            );
+        }
 
         if (
             SelectedGardenTool ===
@@ -384,11 +473,21 @@ function CreatePlotElement(
     }
 
 
-    const Plant =
-        Plants[Plot.Plant];
-
     if (Plant === undefined) {
-        Button.textContent = "?";
+        Visual.textContent = "?";
+
+        if (
+            DisplaySettings
+                .ShowGrowthTimers
+        ) {
+            Button.appendChild(
+                CreateGardenPlotTimer(
+                    Plot,
+                    null,
+                    0
+                )
+            );
+        }
 
         return Button;
     }
@@ -427,7 +526,7 @@ function CreatePlotElement(
         Image.src =
             ImagePath;
 
-        Button.appendChild(
+        Visual.appendChild(
             Image
         );
     } else {
@@ -442,8 +541,21 @@ function CreatePlotElement(
         MissingImage.textContent =
             Plant.Name;
 
-        Button.appendChild(
+        Visual.appendChild(
             MissingImage
+        );
+    }
+
+
+    if (
+        DisplaySettings.ShowGrowthTimers
+    ) {
+        Button.appendChild(
+            CreateGardenPlotTimer(
+                Plot,
+                Plant,
+                Progress
+            )
         );
     }
 
@@ -504,6 +616,143 @@ function CreatePlotElement(
 
 
     return Button;
+}
+
+
+function CreateGardenPlotName(
+    Plot,
+    Plant
+) {
+    const Name =
+        document.createElement(
+            "span"
+        );
+
+    Name.className =
+        "GardenPlotName";
+
+    if (Plot === null) {
+        Name.textContent =
+            "Empty";
+    } else if (Plant === undefined) {
+        Name.textContent =
+            "Unknown";
+    } else {
+        Name.textContent =
+            Plant.Name;
+
+        Name.title =
+            Plant.Name;
+    }
+
+    return Name;
+}
+
+
+function CreateGardenPlotTimer(
+    Plot,
+    Plant,
+    Progress
+) {
+    const Timer =
+        document.createElement(
+            "span"
+        );
+
+    Timer.className =
+        "GardenPlotTimer";
+
+    if (
+        Plot === null ||
+        Plant === null ||
+        Plant === undefined
+    ) {
+        Timer.textContent = "";
+
+        return Timer;
+    }
+
+
+    if (Progress >= 1) {
+        Timer.textContent =
+            "Ready";
+
+        return Timer;
+    }
+
+
+    const RemainingTime =
+        Math.max(
+            0,
+            Plant.GrowthTime -
+            (
+                Date.now() -
+                Plot.PlantedAt
+            )
+        );
+
+    Timer.textContent =
+        FormatGardenRemainingTime(
+            RemainingTime
+        );
+
+    return Timer;
+}
+
+
+function FormatGardenRemainingTime(
+    Milliseconds
+) {
+    const TotalSeconds =
+        Math.max(
+            0,
+            Math.ceil(
+                Number(
+                    Milliseconds
+                ) / 1000
+            )
+        );
+
+    const Hours =
+        Math.floor(
+            TotalSeconds / 3600
+        );
+
+    const Minutes =
+        Math.floor(
+            (
+                TotalSeconds % 3600
+            ) / 60
+        );
+
+    const Seconds =
+        TotalSeconds % 60;
+
+
+    if (Hours > 0) {
+        return (
+            Hours +
+            ":" +
+            String(Minutes).padStart(
+                2,
+                "0"
+            ) +
+            ":" +
+            String(Seconds).padStart(
+                2,
+                "0"
+            )
+        );
+    }
+
+    return (
+        Minutes +
+        ":" +
+        String(Seconds).padStart(
+            2,
+            "0"
+        )
+    );
 }
 
 
