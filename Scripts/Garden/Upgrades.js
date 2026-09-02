@@ -4,8 +4,20 @@ const GardenExpansionBaseCost = 1000;
 function GetGardenColumnUpgradeCost(
     SaveData
 ) {
-    return CalculateGardenExpansionCost(
-        SaveData.Garden.Height
+    const GardenWidth =
+        SaveData.Garden.Width;
+
+    const GardenHeight =
+        SaveData.Garden.Height;
+
+    return Math.round(
+        GardenExpansionBaseCost *
+        GardenHeight *
+        (
+            1 +
+            GardenHeight / 10 +
+            (GardenWidth - 3) / 10
+        )
     );
 }
 
@@ -13,26 +25,20 @@ function GetGardenColumnUpgradeCost(
 function GetGardenRowUpgradeCost(
     SaveData
 ) {
-    return CalculateGardenExpansionCost(
-        SaveData.Garden.Width
-    );
-}
+    const GardenWidth =
+        SaveData.Garden.Width;
 
-
-function CalculateGardenExpansionCost(
-    AddedPlots
-) {
-    const PlotCount = Math.max(
-        1,
-        Math.floor(
-            Number(AddedPlots) || 1
-        )
-    );
+    const GardenHeight =
+        SaveData.Garden.Height;
 
     return Math.round(
         GardenExpansionBaseCost *
-        PlotCount *
-        (1 + PlotCount / 10)
+        GardenWidth *
+        (
+            1 +
+            GardenWidth / 10 +
+            (GardenHeight - 3) / 10
+        )
     );
 }
 
