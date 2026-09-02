@@ -249,15 +249,19 @@ function NormalizeSaveData(
 
     SaveData.Garden.Width = Math.max(
         1,
-        Number(
-            SaveData.Garden.Width ?? 3
+        Math.floor(
+            Number(
+                SaveData.Garden.Width ?? 3
+            ) || 3
         )
     );
 
     SaveData.Garden.Height = Math.max(
         1,
-        Number(
-            SaveData.Garden.Height ?? 3
+        Math.floor(
+            Number(
+                SaveData.Garden.Height ?? 3
+            ) || 3
         )
     );
 

@@ -41,6 +41,23 @@ $PageSection = "Shop";
             </p>
 
             <section
+                id="PermanentUpgrades"
+                class="ShopSection"
+            >
+                <h2>Permanent upgrades</h2>
+
+                <p>
+                    Expand your Garden one row or column at a time.
+                    Existing plants keep their positions.
+                </p>
+
+                <div
+                    id="ShopGardenUpgradeList"
+                    class="ShopSeedList"
+                ></div>
+            </section>
+
+            <section
                 id="Seeds"
                 class="ShopSection"
             >
@@ -53,7 +70,7 @@ $PageSection = "Shop";
             </section>
 
             <p id="ShopMessage" class="PageMessage">
-                Choose a seed to buy.
+                Choose something to buy.
             </p>
         </main>
 
@@ -63,6 +80,7 @@ $PageSection = "Shop";
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/Upgrades.js"></script>
         <script src="/Scripts/Garden/Shop.js"></script>
     </body>
 </html>

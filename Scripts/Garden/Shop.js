@@ -28,6 +28,7 @@ async function StartShop() {
 function RenderShop() {
     RenderShopCurrency();
     RenderShopSeeds();
+    RenderGardenUpgrades();
 }
 
 
@@ -103,6 +104,169 @@ function RenderShopSeeds() {
             )
         );
     }
+}
+
+
+function RenderGardenUpgrades() {
+    const UpgradeList =
+        document.getElementById(
+            "ShopGardenUpgradeList"
+        );
+
+    if (UpgradeList === null) {
+        return;
+    }
+
+    UpgradeList.replaceChildren(
+        CreateGardenExpansionCard(
+            "Column"
+        ),
+        CreateGardenExpansionCard(
+            "Row"
+        )
+    );
+}
+
+
+function CreateGardenExpansionCard(
+    Direction
+) {
+    const IsColumn =
+        Direction === "Column";
+
+    const AddedPlots =
+        IsColumn
+            ? ShopSave.Garden.Height
+            : ShopSave.Garden.Width;
+
+    const Cost =
+        IsColumn
+            ? GetGardenColumnUpgradeCost(
+                ShopSave
+            )
+            : GetGardenRowUpgradeCost(
+                ShopSave
+            );
+
+    const NewWidth =
+        ShopSave.Garden.Width +
+        (IsColumn ? 1 : 0);
+
+    const NewHeight =
+        ShopSave.Garden.Height +
+        (IsColumn ? 0 : 1);
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Add " +
+        Direction.toLowerCase();
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        IsColumn
+            ? "Add one column to the right side of your Garden."
+            : "Add one row to the bottom of your Garden.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Current size",
+            ShopSave.Garden.Width +
+                "×" +
+                ShopSave.Garden.Height
+        ),
+        CreateShopStat(
+            "Adds",
+            AddedPlots.toLocaleString() +
+                (AddedPlots === 1
+                    ? " plot"
+                    : " plots")
+        ),
+        CreateShopStat(
+            "New size",
+            NewWidth +
+                "×" +
+                NewHeight
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    BuyButton.textContent =
+        "Buy - " +
+        Cost.toLocaleString() +
+        " Dew";
+
+    BuyButton.disabled =
+        ShopSave.Currency.Dew < Cost ||
+        ShopPurchasePending;
+
+    BuyButton.addEventListener(
+        "click",
+        () => {
+            BuyGardenExpansion(
+                Direction
+            );
+        }
+    );
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
 }
 
 
@@ -582,6 +746,96 @@ async function BuyPlantSeed(
 
     ShopPurchasePending = false;
     RenderShop();
+}
+
+
+async function BuyGardenExpansion(
+    Direction
+) {
+    if (ShopPurchasePending) {
+        return;
+    }
+
+
+    const IsColumn =
+        Direction === "Column";
+
+    const IsRow =
+        Direction === "Row";
+
+    if (
+        !IsColumn &&
+        !IsRow
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        IsColumn
+            ? GetGardenColumnUpgradeCost(
+                ShopSave
+            )
+            : GetGardenRowUpgradeCost(
+                ShopSave
+            );
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew to add a " +
+            Direction.toLowerCase() +
+            "."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+
+        if (IsColumn) {
+            AddGardenColumn(
+                ShopSave
+            );
+        } else {
+            AddGardenRow(
+                ShopSave
+            );
+        }
+
+
+        SetShopMessage(
+            "Added a Garden " +
+            Direction.toLowerCase() +
+            " for " +
+            Cost.toLocaleString() +
+            " Dew. Garden size is now " +
+            ShopSave.Garden.Width +
+            "×" +
+            ShopSave.Garden.Height +
+            "."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
 }
 
 
