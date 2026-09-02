@@ -206,6 +206,12 @@ function CreateShopSeedCard(
             Plant.Id
         );
 
+    const DewPerHour =
+        GetPlantDewPerHour(
+            ShopSave,
+            Plant.Id
+        );
+
 
     Details.appendChild(
         CreateShopStat(
@@ -224,6 +230,15 @@ function CreateShopSeedCard(
                 ? "Unavailable"
                 : Reward.toLocaleString() +
                     " Dew"
+        )
+    );
+
+    Details.appendChild(
+        CreateShopStat(
+            "Dew / hour",
+            FormatDewPerHour(
+                DewPerHour
+            )
         )
     );
 

@@ -617,3 +617,85 @@ function GetPlantHarvestReward(
         Cost * 1.5
     );
 }
+
+
+function GetPlantDewPerHour(
+    SaveData,
+    PlantId
+) {
+    const Plant =
+        GetPlantById(
+            PlantId
+        );
+
+    if (Plant === null) {
+        return null;
+    }
+
+
+    const GrowthTime = Number(
+        Plant.GrowthTime
+    );
+
+    if (
+        !Number.isFinite(
+            GrowthTime
+        ) ||
+        GrowthTime <= 0
+    ) {
+        return null;
+    }
+
+
+    const Cost =
+        GetPlantShopCost(
+            SaveData,
+            PlantId
+        );
+
+    const Reward =
+        GetPlantHarvestReward(
+            SaveData,
+            PlantId
+        );
+
+    if (
+        Cost === null ||
+        Reward === null
+    ) {
+        return null;
+    }
+
+
+    const Profit =
+        Reward - Cost;
+
+    return (
+        Profit * 3600000 /
+        GrowthTime
+    );
+}
+
+
+function FormatDewPerHour(
+    DewPerHour
+) {
+    if (
+        DewPerHour === null ||
+        !Number.isFinite(
+            DewPerHour
+        )
+    ) {
+        return "Unavailable";
+    }
+
+    return (
+        DewPerHour.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: 2
+            }
+        ) +
+        " Dew"
+    );
+}

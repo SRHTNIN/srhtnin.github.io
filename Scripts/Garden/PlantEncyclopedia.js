@@ -300,6 +300,12 @@ function CreatePlantEncyclopediaDetails(
             Plant.Id
         );
 
+    const DewPerHour =
+        GetPlantDewPerHour(
+            PlantEncyclopediaSave,
+            Plant.Id
+        );
+
     Details.appendChild(
         CreatePlantEncyclopediaStat(
             "Reward",
@@ -307,6 +313,15 @@ function CreatePlantEncyclopediaDetails(
                 ? "Unavailable"
                 : Reward.toLocaleString() +
                     " Dew"
+        )
+    );
+
+    Details.appendChild(
+        CreatePlantEncyclopediaStat(
+            "Dew / hour",
+            FormatDewPerHour(
+                DewPerHour
+            )
         )
     );
 
