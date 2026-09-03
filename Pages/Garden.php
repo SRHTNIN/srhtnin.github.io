@@ -164,6 +164,50 @@ $PageSection = "Garden";
                 </button>
             </div>
 
+            <section
+                id="QuickBuy"
+                class="Panel GardenQuickBuyPanel"
+            >
+                <div class="GardenQuickBuyHeader">
+                    <h2>Quick-buy</h2>
+
+                    <div
+                        class="QuickBuyAmountList"
+                        role="group"
+                        aria-label="Quick-buy amount"
+                    >
+                        <button
+                            id="QuickBuyOneButton"
+                            class="QuickBuyAmountButton"
+                            type="button"
+                        >
+                            ×1
+                        </button>
+
+                        <button
+                            id="QuickBuyTwoButton"
+                            class="QuickBuyAmountButton"
+                            type="button"
+                        >
+                            ×2
+                        </button>
+
+                        <button
+                            id="QuickBuyGardenButton"
+                            class="QuickBuyAmountButton"
+                            type="button"
+                        >
+                            ×9
+                        </button>
+                    </div>
+                </div>
+
+                <div
+                    id="QuickBuyPlantList"
+                    class="QuickBuyPlantList"
+                ></div>
+            </section>
+
             <div class="GardenLayout">
                 <section
                     id="Plots"

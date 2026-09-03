@@ -1001,43 +1001,95 @@ function CreateShopSeedCard(
     );
 
 
-    const BuyButton =
+    const BuyOptions =
         document.createElement(
-            "button"
+            "div"
         );
 
-    BuyButton.className =
-        "ActionButton ShopBuyButton";
+    BuyOptions.className =
+        "ShopSeedBuyOptions";
 
-    BuyButton.type = "button";
 
-    BuyButton.textContent =
-        Cost === null
-            ? "Unavailable"
-            : "Buy seed - " +
-                Cost.toLocaleString() +
-                " Dew";
+    const GardenSize =
+        Math.max(
+            1,
+            ShopSave.Garden.Width *
+            ShopSave.Garden.Height
+        );
 
-    BuyButton.disabled =
-        Cost === null ||
-        ShopSave.Currency.Dew <
-            Cost ||
-        ShopPurchasePending;
-
-    BuyButton.addEventListener(
-        "click",
-        () => {
-            BuyPlantSeed(
-                Plant.Id
-            );
+    const PurchaseOptions = [
+        {
+            Amount: 1,
+            Label: "Buy seed"
+        },
+        {
+            Amount: 10,
+            Label: "Buy 10 seeds"
+        },
+        {
+            Amount: GardenSize,
+            Label:
+                "Buy " +
+                GardenSize.toLocaleString() +
+                " seeds"
         }
-    );
+    ];
+
+
+    for (
+        const Option
+        of PurchaseOptions
+    ) {
+        const BuyButton =
+            document.createElement(
+                "button"
+            );
+
+        BuyButton.className =
+            "ActionButton ShopBuyButton";
+
+        BuyButton.type = "button";
+
+
+        const TotalCost =
+            Cost === null
+                ? null
+                : Cost * Option.Amount;
+
+        BuyButton.textContent =
+            TotalCost === null
+                ? "Unavailable"
+                : Option.Label +
+                    " - " +
+                    TotalCost.toLocaleString() +
+                    " Dew";
+
+        BuyButton.disabled =
+            TotalCost === null ||
+            ShopSave.Currency.Dew <
+                TotalCost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            () => {
+                BuyPlantSeed(
+                    Plant.Id,
+                    Option.Amount
+                );
+            }
+        );
+
+        BuyOptions.appendChild(
+            BuyButton
+        );
+    }
 
 
     Card.append(
         Header,
         Body,
-        BuyButton
+        BuyOptions
     );
 
 
@@ -1225,11 +1277,20 @@ function CreateShopStat(
 
 
 async function BuyPlantSeed(
-    PlantId
+    PlantId,
+    Amount = 1
 ) {
     if (ShopPurchasePending) {
         return;
     }
+
+
+    Amount = Math.max(
+        1,
+        Math.floor(
+            Number(Amount) || 1
+        )
+    );
 
 
     const Plant =
@@ -1248,13 +1309,13 @@ async function BuyPlantSeed(
     }
 
 
-    const Cost =
+    const UnitCost =
         GetPlantShopCost(
             ShopSave,
             PlantId
         );
 
-    if (Cost === null) {
+    if (UnitCost === null) {
         SetShopMessage(
             "That seed doesn't have a purchasable recipe yet."
         );
@@ -1263,12 +1324,19 @@ async function BuyPlantSeed(
     }
 
 
+    const TotalCost =
+        UnitCost * Amount;
+
     if (
         ShopSave.Currency.Dew <
-        Cost
+        TotalCost
     ) {
         SetShopMessage(
             "You don't have enough Dew for " +
+            Amount.toLocaleString() +
+            (Amount === 1
+                ? " seed of "
+                : " seeds of ") +
             Plant.Name +
             "."
         );
@@ -1279,44 +1347,50 @@ async function BuyPlantSeed(
 
     ShopPurchasePending = true;
 
-    ShopSave.Currency.Dew -=
-        Cost;
+    try {
+        ShopSave.Currency.Dew -=
+            TotalCost;
 
-    ShopSave.Statistics.CurrencySpent.Dew +=
-        Cost;
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            TotalCost;
 
-    ShopSave.Statistics.SeedsPurchased++;
+        ShopSave.Statistics.SeedsPurchased +=
+            Amount;
 
-    AddSeed(
-        ShopSave,
-        PlantId
-    );
+        AddSeed(
+            ShopSave,
+            PlantId,
+            Amount
+        );
 
-    DiscoverPlant(
-        ShopSave,
-        PlantId
-    );
-
-    SetShopMessage(
-        "Bought a " +
-        Plant.Name +
-        " seed for " +
-        Cost +
-        " Dew."
-    );
-
-    RenderShop();
+        DiscoverPlant(
+            ShopSave,
+            PlantId
+        );
 
 
-    await SaveGame(
-        ShopSave
-    );
+        SetShopMessage(
+            "Bought " +
+            Amount.toLocaleString() +
+            " " +
+            Plant.Name +
+            (Amount === 1
+                ? " seed for "
+                : " seeds for ") +
+            TotalCost.toLocaleString() +
+            " Dew."
+        );
 
+        RenderShop();
 
-    ShopPurchasePending = false;
-    RenderShop();
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
 }
-
 
 async function BuyGardenExpansion(
     Direction

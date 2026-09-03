@@ -3,6 +3,8 @@ let SelectedSeedId = null;
 let SelectedGardenTool = "Seed";
 
 let MutationCheckPending = false;
+let QuickBuyPurchasePending = false;
+let QuickBuyAmountMode = "One";
 
 const GardenUpdateInterval = 1000;
 
@@ -64,6 +66,7 @@ async function StartGame() {
 
     BindGardenTools();
     BindGardenSelector();
+    BindQuickBuyControls();
     EnsureSelectedSeed();
 
     const InitialMutationResult =
@@ -92,6 +95,7 @@ async function StartGame() {
 function RenderGame() {
     EnsureSelectedSeed();
     RenderCurrency();
+    RenderQuickBuy();
     RenderSeeds();
     RenderTools();
     RenderGardenSelector();
@@ -433,6 +437,454 @@ function RenderTools() {
         ShovelButton.removeAttribute(
             "aria-current"
         );
+    }
+}
+
+
+function BindQuickBuyControls() {
+    const Controls = [
+        [
+            "QuickBuyOneButton",
+            "One"
+        ],
+        [
+            "QuickBuyTwoButton",
+            "Two"
+        ],
+        [
+            "QuickBuyGardenButton",
+            "Garden"
+        ]
+    ];
+
+
+    for (
+        const [ButtonId, Mode]
+        of Controls
+    ) {
+        const Button =
+            document.getElementById(
+                ButtonId
+            );
+
+        Button?.addEventListener(
+            "click",
+            () => {
+                QuickBuyAmountMode =
+                    Mode;
+
+                RenderQuickBuy();
+            }
+        );
+    }
+}
+
+
+function GetQuickBuyAmount() {
+    if (
+        QuickBuyAmountMode ===
+        "Two"
+    ) {
+        return 2;
+    }
+
+    if (
+        QuickBuyAmountMode ===
+        "Garden"
+    ) {
+        return Math.max(
+            1,
+            GameSave.Garden.Width *
+            GameSave.Garden.Height
+        );
+    }
+
+    return 1;
+}
+
+
+function RenderQuickBuy() {
+    const PlantList =
+        document.getElementById(
+            "QuickBuyPlantList"
+        );
+
+    if (PlantList === null) {
+        return;
+    }
+
+
+    const Amount =
+        GetQuickBuyAmount();
+
+    const OneButton =
+        document.getElementById(
+            "QuickBuyOneButton"
+        );
+
+    const TwoButton =
+        document.getElementById(
+            "QuickBuyTwoButton"
+        );
+
+    const GardenButton =
+        document.getElementById(
+            "QuickBuyGardenButton"
+        );
+
+
+    const AmountButtons = [
+        [OneButton, "One", 1],
+        [TwoButton, "Two", 2],
+        [
+            GardenButton,
+            "Garden",
+            Math.max(
+                1,
+                GameSave.Garden.Width *
+                GameSave.Garden.Height
+            )
+        ]
+    ];
+
+
+    for (
+        const [Button, Mode, ButtonAmount]
+        of AmountButtons
+    ) {
+        if (Button === null) {
+            continue;
+        }
+
+        Button.textContent =
+            "×" +
+            ButtonAmount.toLocaleString();
+
+        Button.disabled =
+            QuickBuyPurchasePending;
+
+        if (
+            QuickBuyAmountMode ===
+            Mode
+        ) {
+            Button.setAttribute(
+                "aria-current",
+                "true"
+            );
+        } else {
+            Button.removeAttribute(
+                "aria-current"
+            );
+        }
+    }
+
+
+    PlantList.replaceChildren();
+
+
+    const AvailablePlants =
+        Object.values(Plants)
+            .filter(
+                Plant => {
+                    if (
+                        !IsPlantAvailableInShop(
+                            GameSave,
+                            Plant
+                        )
+                    ) {
+                        return false;
+                    }
+
+                    const Cost =
+                        GetPlantShopCost(
+                            GameSave,
+                            Plant.Id
+                        );
+
+                    return (
+                        Cost !== null &&
+                        GameSave.Currency.Dew >=
+                            Cost * Amount
+                    );
+                }
+            )
+            .sort(
+                (A, B) =>
+                    A.Id - B.Id
+            );
+
+
+    if (
+        AvailablePlants.length === 0
+    ) {
+        const EmptyMessage =
+            document.createElement(
+                "p"
+            );
+
+        EmptyMessage.className =
+            "QuickBuyEmpty";
+
+        EmptyMessage.textContent =
+            Amount === 1
+                ? "You can't afford any available seeds."
+                : "You can't afford this many of any available seed.";
+
+        PlantList.appendChild(
+            EmptyMessage
+        );
+
+        return;
+    }
+
+
+    for (
+        const Plant
+        of AvailablePlants
+    ) {
+        PlantList.appendChild(
+            CreateQuickBuyPlantButton(
+                Plant,
+                Amount
+            )
+        );
+    }
+}
+
+
+function CreateQuickBuyPlantButton(
+    Plant,
+    Amount
+) {
+    const UnitCost =
+        GetPlantShopCost(
+            GameSave,
+            Plant.Id
+        );
+
+    const TotalCost =
+        UnitCost * Amount;
+
+
+    const Button =
+        document.createElement(
+            "button"
+        );
+
+    Button.className =
+        "PlantTile QuickBuyPlantButton";
+
+    Button.type = "button";
+
+    Button.disabled =
+        QuickBuyPurchasePending;
+
+    Button.title =
+        "Buy " +
+        Amount.toLocaleString() +
+        (Amount === 1
+            ? " seed of "
+            : " seeds of ") +
+        Plant.Name +
+        " for " +
+        TotalCost.toLocaleString() +
+        " Dew";
+
+
+    const Name =
+        document.createElement(
+            "span"
+        );
+
+    Name.className =
+        "QuickBuyPlantName";
+
+    Name.textContent =
+        Plant.Name;
+
+
+    const Visual =
+        document.createElement(
+            "span"
+        );
+
+    Visual.className =
+        "QuickBuyPlantVisual";
+
+
+    const MatureImage =
+        GetPlantMatureImageSource(
+            Plant
+        );
+
+
+    if (MatureImage === null) {
+        const Missing =
+            document.createElement(
+                "span"
+            );
+
+        Missing.className =
+            "QuickBuyPlantMissing";
+
+        Missing.textContent =
+            "No image";
+
+        Visual.appendChild(
+            Missing
+        );
+    } else {
+        const Image =
+            document.createElement(
+                "img"
+            );
+
+        Image.className =
+            "PlantSprite";
+
+        Image.src =
+            MatureImage;
+
+        Image.alt =
+            Plant.Name;
+
+        Visual.appendChild(
+            Image
+        );
+    }
+
+
+    Button.append(
+        Name,
+        Visual
+    );
+
+
+    Button.addEventListener(
+        "click",
+        () => {
+            BuyQuickBuyPlantSeed(
+                Plant.Id
+            );
+        }
+    );
+
+
+    return Button;
+}
+
+
+async function BuyQuickBuyPlantSeed(
+    PlantId
+) {
+    if (QuickBuyPurchasePending) {
+        return;
+    }
+
+
+    const Plant =
+        GetPlantById(
+            PlantId
+        );
+
+    if (
+        Plant === null ||
+        !IsPlantAvailableInShop(
+            GameSave,
+            Plant
+        )
+    ) {
+        return;
+    }
+
+
+    const Amount =
+        GetQuickBuyAmount();
+
+    const UnitCost =
+        GetPlantShopCost(
+            GameSave,
+            PlantId
+        );
+
+    if (UnitCost === null) {
+        SetGardenMessage(
+            "That seed doesn't have a purchasable recipe yet."
+        );
+
+        return;
+    }
+
+
+    const TotalCost =
+        UnitCost * Amount;
+
+    if (
+        GameSave.Currency.Dew <
+        TotalCost
+    ) {
+        SetGardenMessage(
+            "You don't have enough Dew for " +
+            Amount.toLocaleString() +
+            (Amount === 1
+                ? " seed of "
+                : " seeds of ") +
+            Plant.Name +
+            "."
+        );
+
+        RenderQuickBuy();
+
+        return;
+    }
+
+
+    QuickBuyPurchasePending = true;
+
+    try {
+        GameSave.Currency.Dew -=
+            TotalCost;
+
+        GameSave.Statistics.CurrencySpent.Dew +=
+            TotalCost;
+
+        GameSave.Statistics.SeedsPurchased +=
+            Amount;
+
+        AddSeed(
+            GameSave,
+            PlantId,
+            Amount
+        );
+
+        DiscoverPlant(
+            GameSave,
+            PlantId
+        );
+
+
+        SetGardenMessage(
+            "Bought " +
+            Amount.toLocaleString() +
+            " " +
+            Plant.Name +
+            (Amount === 1
+                ? " seed for "
+                : " seeds for ") +
+            TotalCost.toLocaleString() +
+            " Dew."
+        );
+
+        RenderGame();
+
+        await SaveGame(
+            GameSave
+        );
+    } finally {
+        QuickBuyPurchasePending =
+            false;
+
+        RenderGame();
     }
 }
 
