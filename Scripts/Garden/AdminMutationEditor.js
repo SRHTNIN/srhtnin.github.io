@@ -74,6 +74,13 @@ function BindAdminMutationEditor() {
     );
 
     document.getElementById(
+        "AdminMutationDuplicateButton"
+    ).addEventListener(
+        "click",
+        DuplicateAdminMutation
+    );
+
+    document.getElementById(
         "AdminMutationResizeButton"
     ).addEventListener(
         "click",
@@ -342,6 +349,7 @@ async function LoadAdminMutationData(
     PopulateAdminMutationPlantControls();
     RenderAdminMutationRelationChecklists();
     RenderAdminMutationSelect();
+    RenderAdminMutationDuplicateSelect();
 
     const Keys =
         GetSortedAdminMutationKeys();
@@ -447,6 +455,70 @@ function RenderAdminMutationSelect() {
         Select.appendChild(
             Option
         );
+    }
+}
+
+
+function RenderAdminMutationDuplicateSelect() {
+    const Select =
+        document.getElementById(
+            "AdminMutationDuplicateSelect"
+        );
+
+    if (Select === null) {
+        return;
+    }
+
+    const PreviousValue =
+        Select.value;
+
+    Select.replaceChildren();
+
+    for (
+        const MutationKey
+        of GetSortedAdminMutationKeys()
+    ) {
+        const Mutation =
+            AdminMutationCatalogue[
+                MutationKey
+            ];
+
+        const Option =
+            document.createElement(
+                "option"
+            );
+
+        Option.value =
+            MutationKey;
+
+        Option.textContent =
+            String(
+                Mutation.Id
+            ).padStart(
+                3,
+                "0"
+            ) +
+            " — " +
+            Mutation.Name +
+            (
+                Mutation.Archived === true
+                    ? " (archived)"
+                    : ""
+            );
+
+        Select.appendChild(
+            Option
+        );
+    }
+
+    if (
+        PreviousValue !== "" &&
+        AdminMutationCatalogue[
+            PreviousValue
+        ] !== undefined
+    ) {
+        Select.value =
+            PreviousValue;
     }
 }
 
@@ -745,6 +817,164 @@ function LoadAdminMutationIntoForm(
     UpdateAdminMutationFailureVisibility();
     UpdateAdminMutationCooldownHint();
     RenderAdminMutationJsonPreview();
+}
+
+
+function DuplicateAdminMutation() {
+    const SourceMutationKey =
+        document.getElementById(
+            "AdminMutationDuplicateSelect"
+        ).value;
+
+    const SourceMutation =
+        AdminMutationCatalogue[
+            SourceMutationKey
+        ];
+
+    if (SourceMutation === undefined) {
+        SetAdminMutationMessage(
+            "Choose a mutation to duplicate."
+        );
+
+        return;
+    }
+
+    AdminMutationEditingKey = null;
+
+    document.getElementById(
+        "AdminMutationSelect"
+    ).value = "";
+
+    SetAdminMutationField(
+        "AdminMutationId",
+        GetNextAdminMutationId()
+    );
+
+    SetAdminMutationField(
+        "AdminMutationKey",
+        ""
+    );
+
+    SetAdminMutationField(
+        "AdminMutationName",
+        ""
+    );
+
+    SetAdminMutationField(
+        "AdminMutationDescription",
+        SourceMutation.Description ?? ""
+    );
+
+    SetAdminMutationField(
+        "AdminMutationHint",
+        SourceMutation.Hint ?? ""
+    );
+
+    SetAdminMutationField(
+        "AdminMutationPriority",
+        Number(
+            SourceMutation.Priority ?? 0
+        )
+    );
+
+    SetAdminMutationField(
+        "AdminMutationChance",
+        Number(
+            SourceMutation.Chance ?? 1
+        ) * 100
+    );
+
+    SetAdminMutationDurationFields(
+        Number(
+            SourceMutation.Cooldown ?? 0
+        )
+    );
+
+    SetAdminMutationField(
+        "AdminMutationRotation",
+        SourceMutation.Rotation ??
+        "None"
+    );
+
+    document.getElementById(
+        "AdminMutationAllowImmature"
+    ).checked =
+        SourceMutation.AllowImmature === true;
+
+    AdminMutationPattern =
+        CloneAdminMutationMatrix(
+            SourceMutation.Pattern,
+            "Any"
+        );
+
+    if (
+        AdminMutationPattern.length === 0
+    ) {
+        AdminMutationPattern = [
+            ["Any"]
+        ];
+    }
+
+    AdminMutationResult =
+        NormalizeAdminMutationMatrix(
+            SourceMutation.Success,
+            AdminMutationPattern[0]
+                .length,
+            AdminMutationPattern.length,
+            "Keep"
+        );
+
+    SetAdminMutationField(
+        "AdminMutationWidth",
+        AdminMutationPattern[0]
+            .length
+    );
+
+    SetAdminMutationField(
+        "AdminMutationHeight",
+        AdminMutationPattern.length
+    );
+
+    LoadAdminMutationFailure(
+        CloneAdminMutationValue(
+            SourceMutation.Failure
+        )
+    );
+
+    SetAdminMutationRelations(
+        CloneAdminMutationValue(
+            SourceMutation.Relations ?? {}
+        )
+    );
+
+    document.getElementById(
+        "AdminMutationId"
+    ).readOnly = false;
+
+    document.getElementById(
+        "AdminMutationKey"
+    ).readOnly = false;
+
+    document.getElementById(
+        "AdminMutationArchiveNote"
+    ).hidden = true;
+
+    AdminMutationSelectedCell = null;
+    HideAdminMutationCellEditor();
+    RenderAdminMutationGrids();
+    UpdateAdminMutationFailureVisibility();
+    UpdateAdminMutationCooldownHint();
+    RenderAdminMutationJsonPreview();
+
+    document.getElementById(
+        "AdminMutationName"
+    ).focus();
+
+    SetAdminMutationMessage(
+        "Duplicated " +
+        SourceMutation.Name +
+        ". Give the new mutation a name and Mutation Key before saving."
+    );
 }
 
 

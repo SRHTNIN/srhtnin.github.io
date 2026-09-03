@@ -48,6 +48,20 @@ $PageSection = "Admin";
                     >
                         New mutation
                     </button>
+
+                    <label for="AdminMutationDuplicateSelect">
+                        Duplicate existing
+                    </label>
+
+                    <select id="AdminMutationDuplicateSelect"></select>
+
+                    <button
+                        id="AdminMutationDuplicateButton"
+                        class="ActionButton AdminInlineButton"
+                        type="button"
+                    >
+                        Duplicate
+                    </button>
                 </div>
 
                 <form
