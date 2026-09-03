@@ -185,11 +185,11 @@ $PageSection = "Garden";
                         </button>
 
                         <button
-                            id="QuickBuyTwoButton"
+                            id="QuickBuyTenButton"
                             class="QuickBuyAmountButton"
                             type="button"
                         >
-                            ×2
+                            ×10
                         </button>
 
                         <button
