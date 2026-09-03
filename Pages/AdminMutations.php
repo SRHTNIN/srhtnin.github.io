@@ -98,6 +98,18 @@ $PageSection = "Admin";
                             ></textarea>
                         </label>
 
+                        <label class="AdminEditorField AdminEditorWideField">
+                            <span>Hint</span>
+                            <textarea
+                                id="AdminMutationHint"
+                                rows="3"
+                                placeholder="Optional hint shown by the Mutation Hints upgrade."
+                            ></textarea>
+                            <small>
+                                Optional. Leave blank if this mutation should not have a hint.
+                            </small>
+                        </label>
+
                         <label class="AdminEditorField">
                             <span>Priority</span>
                             <input

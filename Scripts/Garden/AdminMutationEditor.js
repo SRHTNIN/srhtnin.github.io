@@ -627,6 +627,11 @@ function LoadAdminMutationIntoForm(
     );
 
     SetAdminMutationField(
+        "AdminMutationHint",
+        Mutation.Hint ?? ""
+    );
+
+    SetAdminMutationField(
         "AdminMutationPriority",
         Number(
             Mutation.Priority ?? 0
@@ -746,6 +751,11 @@ function StartNewAdminMutation() {
 
     SetAdminMutationField(
         "AdminMutationDescription",
+        ""
+    );
+
+    SetAdminMutationField(
+        "AdminMutationHint",
         ""
     );
 
@@ -1989,6 +1999,11 @@ function GetAdminMutationFormData() {
         Description:
             document.getElementById(
                 "AdminMutationDescription"
+            ).value.trim(),
+
+        Hint:
+            document.getElementById(
+                "AdminMutationHint"
             ).value.trim(),
 
         Priority: Number(
