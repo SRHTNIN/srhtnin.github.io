@@ -556,14 +556,20 @@ function RenderGarden() {
     );
 
     const GardenBorderColours = [
-        "var(--Lavender)",
-        "var(--Mauve)",
+        "var(--Rosewater)",
+        "var(--Flamingo)",
         "var(--Pink)",
-        "var(--Blue)",
-        "var(--Teal)",
+        "var(--Mauve)",
+        "var(--Red)",
+        "var(--Maroon)",
         "var(--Peach)",
         "var(--Yellow)",
-        "var(--Green)"
+        "var(--Green)",
+        "var(--Teal)",
+        "var(--Sky)",
+        "var(--Sapphire)",
+        "var(--Blue)",
+        "var(--Lavender)"
     ];
 
     GardenPanel.style.setProperty(
