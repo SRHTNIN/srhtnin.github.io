@@ -111,7 +111,10 @@ $PageSection = "Garden";
             </div>
 
             <div class="GardenLayout">
-                <section id="Plots">
+                <section
+                    id="Plots"
+                    class="Panel GardenPlotsPanel"
+                >
                     <h2>Plots</h2>
 
                     <div

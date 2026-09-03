@@ -2,7 +2,7 @@ const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
 const MutationHintsUpgradeCost = 1500;
-const NewGardenBaseCost = 30000;
+const NewGardenBaseCost = 15000;
 const NewGardenCostMultiplier = 1.5;
 const NewGardenCostRounding = 1000;
 

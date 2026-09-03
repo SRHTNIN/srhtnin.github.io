@@ -545,6 +545,11 @@ function RenderGarden() {
             "GardenGrid"
         );
 
+    const GardenPanel =
+        document.getElementById(
+            "Plots"
+        );
+
     GardenGrid.style.setProperty(
         "--GardenWidth",
         GameSave.Garden.Width
@@ -561,7 +566,7 @@ function RenderGarden() {
         "var(--Green)"
     ];
 
-    GardenGrid.style.setProperty(
+    GardenPanel.style.setProperty(
         "--GardenBorderColour",
         GardenBorderColours[
             GameSave.ActiveGardenIndex %

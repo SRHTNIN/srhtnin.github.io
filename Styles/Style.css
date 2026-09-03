@@ -359,14 +359,20 @@ input, button, textarea, select {
     align-items: start;
 }
 
+.GardenPlotsPanel {
+    padding: 0.75rem;
+    border-color: var(--GardenBorderColour, var(--Lavender));
+}
+
+.GardenPlotsPanel h2 {
+    margin-bottom: 0.75rem;
+}
+
 .GardenGrid {
     --GardenWidth: 3;
     display: grid;
     grid-template-columns: repeat( var(--GardenWidth), minmax(0, 1fr) );
     gap: 0.5rem;
-    padding: 0.75rem;
-    background-color: var(--Mantle);
-    border: 4px solid var(--GardenBorderColour, var(--Lavender));
 }
 
 .GardenPlot {
