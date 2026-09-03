@@ -124,6 +124,7 @@ function RenderGardenUpgrades() {
         CreateGardenExpansionCard(
             "Row"
         ),
+        CreateNewGardenCard(),
         CreatePlantInformationUpgradeCard(),
         CreateGardenOverviewUpgradeCard(),
         CreateMutationHintsUpgradeCard()
@@ -211,6 +212,10 @@ function CreateGardenExpansionCard(
 
     Details.append(
         CreateShopStat(
+            "Garden",
+            ShopSave.Garden.Name
+        ),
+        CreateShopStat(
             "Current size",
             ShopSave.Garden.Width +
                 "×" +
@@ -258,6 +263,115 @@ function CreateGardenExpansionCard(
                 Direction
             );
         }
+    );
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
+}
+
+
+function CreateNewGardenCard() {
+    const Cost =
+        GetNewGardenCost(
+            ShopSave
+        );
+
+    const GardensOwned =
+        ShopSave.Gardens.length;
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Buy new Garden";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Buy another independent 3×3 Garden. New Gardens can be named and expanded separately.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Gardens owned",
+            GardensOwned.toLocaleString()
+        ),
+        CreateShopStat(
+            "New Garden size",
+            "3×3 (9 plots)"
+        ),
+        CreateShopStat(
+            "Price scaling",
+            "+50% per Garden"
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    BuyButton.textContent =
+        "Buy - " +
+        Cost.toLocaleString() +
+        " Dew";
+
+    BuyButton.disabled =
+        ShopSave.Currency.Dew < Cost ||
+        ShopPurchasePending;
+
+    BuyButton.addEventListener(
+        "click",
+        BuyNewGarden
     );
 
 
@@ -1174,6 +1288,60 @@ async function BuyGardenExpansion(
             "×" +
             ShopSave.Garden.Height +
             "."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyNewGarden() {
+    if (ShopPurchasePending) {
+        return;
+    }
+
+
+    const Cost =
+        GetNewGardenCost(
+            ShopSave
+        );
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for a new Garden."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        AddNewGarden(
+            ShopSave
+        );
+
+        SetShopMessage(
+            "Bought a new 3×3 Garden for " +
+            Cost.toLocaleString() +
+            " Dew. It is now your active Garden."
         );
 
         RenderShop();

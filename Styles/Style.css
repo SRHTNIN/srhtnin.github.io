@@ -313,6 +313,45 @@ input, button, textarea, select {
     image-rendering: auto;
 }
 
+.GardenSelectorPanel {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) 3rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: var(--Mantle);
+    border: 3px solid var(--Surface2);
+}
+
+.GardenSelectorButton {
+    width: 100%;
+    min-width: 0;
+    padding-right: 0;
+    padding-left: 0;
+    font-size: 1.25rem;
+}
+
+.GardenNameInput {
+    width: 100%;
+    min-width: 0;
+    padding: 0.6rem 0.75rem;
+    color: var(--Text);
+    background-color: var(--Surface0);
+    border: 3px solid var(--Surface2);
+    border-radius: 0;
+    text-align: center;
+    box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.GardenNameInput:hover {
+    border-color: var(--Sky);
+}
+
+.GardenNameInput:focus {
+    outline: 3px solid var(--Yellow);
+    outline-offset: 3px;
+}
+
 .GardenLayout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;
@@ -327,7 +366,7 @@ input, button, textarea, select {
     gap: 0.5rem;
     padding: 0.75rem;
     background-color: var(--Mantle);
-    border: 4px solid var(--Lavender);
+    border: 4px solid var(--GardenBorderColour, var(--Lavender));
 }
 
 .GardenPlot {

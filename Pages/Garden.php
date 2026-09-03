@@ -78,6 +78,38 @@ $PageSection = "Garden";
                 </div>
             </div>
 
+            <div
+                id="GardenSelector"
+                class="GardenSelectorPanel"
+            >
+                <button
+                    id="PreviousGardenButton"
+                    class="ActionButton GardenSelectorButton"
+                    type="button"
+                    aria-label="Previous Garden"
+                >
+                    &lt;
+                </button>
+
+                <input
+                    id="GardenNameInput"
+                    class="GardenNameInput"
+                    type="text"
+                    maxlength="32"
+                    value="Garden"
+                    aria-label="Garden name"
+                >
+
+                <button
+                    id="NextGardenButton"
+                    class="ActionButton GardenSelectorButton"
+                    type="button"
+                    aria-label="Next Garden"
+                >
+                    &gt;
+                </button>
+            </div>
+
             <div class="GardenLayout">
                 <section id="Plots">
                     <h2>Plots</h2>

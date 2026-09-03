@@ -27,10 +27,11 @@ async function StartGame() {
     GameSave = await LoadGame();
 
     BindGardenTools();
+    BindGardenSelector();
     EnsureSelectedSeed();
 
     const InitialMutationResult =
-        CheckGardenMutations(
+        CheckAllGardenMutations(
             GameSave
         );
 
@@ -57,9 +58,232 @@ function RenderGame() {
     RenderCurrency();
     RenderSeeds();
     RenderTools();
+    RenderGardenSelector();
     RenderGarden();
     RenderNextHarvest();
     RenderGardenOverview();
+}
+
+
+function BindGardenSelector() {
+    const PreviousButton =
+        document.getElementById(
+            "PreviousGardenButton"
+        );
+
+    const NextButton =
+        document.getElementById(
+            "NextGardenButton"
+        );
+
+    const NameInput =
+        document.getElementById(
+            "GardenNameInput"
+        );
+
+
+    PreviousButton?.addEventListener(
+        "click",
+        () => {
+            SwitchGarden(-1);
+        }
+    );
+
+    NextButton?.addEventListener(
+        "click",
+        () => {
+            SwitchGarden(1);
+        }
+    );
+
+    NameInput?.addEventListener(
+        "change",
+        async () => {
+            const GardenIndex =
+                GameSave.ActiveGardenIndex;
+
+            const GardenName =
+                RenameGarden(
+                    GameSave,
+                    GardenIndex,
+                    NameInput.value
+                );
+
+            NameInput.value =
+                GardenName;
+
+            SetGardenMessage(
+                "Garden renamed to " +
+                GardenName +
+                "."
+            );
+
+            await SaveGame(
+                GameSave
+            );
+        }
+    );
+
+    NameInput?.addEventListener(
+        "keydown",
+        Event => {
+            if (Event.key !== "Enter") {
+                return;
+            }
+
+            Event.preventDefault();
+            NameInput.blur();
+        }
+    );
+}
+
+
+async function SwitchGarden(
+    Direction
+) {
+    const GardenCount =
+        GameSave.Gardens.length;
+
+    if (GardenCount <= 1) {
+        return;
+    }
+
+    const NewIndex =
+        GameSave.ActiveGardenIndex +
+        Direction;
+
+    if (
+        NewIndex < 0 ||
+        NewIndex >= GardenCount
+    ) {
+        return;
+    }
+
+    SetActiveGardenIndex(
+        GameSave,
+        NewIndex
+    );
+
+    const MutationResult =
+        CheckGardenMutations(
+            GameSave
+        );
+
+    RenderGame();
+
+    SetGardenMessage(
+        "Switched to " +
+        GameSave.Garden.Name +
+        "."
+    );
+
+    await SaveGame(
+        GameSave
+    );
+
+    if (MutationResult.Attempted) {
+        RenderGame();
+    }
+}
+
+
+function RenderGardenSelector() {
+    const PreviousButton =
+        document.getElementById(
+            "PreviousGardenButton"
+        );
+
+    const NextButton =
+        document.getElementById(
+            "NextGardenButton"
+        );
+
+    const NameInput =
+        document.getElementById(
+            "GardenNameInput"
+        );
+
+    if (
+        PreviousButton === null ||
+        NextButton === null ||
+        NameInput === null
+    ) {
+        return;
+    }
+
+    const GardenCount =
+        GameSave.Gardens.length;
+
+    const GardenIndex =
+        GameSave.ActiveGardenIndex;
+
+    PreviousButton.disabled =
+        GardenIndex <= 0;
+
+    NextButton.disabled =
+        GardenIndex >=
+        GardenCount - 1;
+
+    if (
+        document.activeElement !==
+        NameInput
+    ) {
+        NameInput.value =
+            GameSave.Garden.Name;
+    }
+
+    NameInput.title =
+        "Garden " +
+        (GardenIndex + 1) +
+        " of " +
+        GardenCount;
+}
+
+
+function CheckAllGardenMutations(
+    SaveData
+) {
+    const OriginalGardenIndex =
+        SaveData.ActiveGardenIndex;
+
+    const Result = {
+        Attempted: false,
+        Changed: false
+    };
+
+
+    for (
+        let GardenIndex = 0;
+        GardenIndex <
+            SaveData.Gardens.length;
+        GardenIndex++
+    ) {
+        SetActiveGardenIndex(
+            SaveData,
+            GardenIndex
+        );
+
+        const GardenResult =
+            CheckGardenMutations(
+                SaveData
+            );
+
+        Result.Attempted =
+            Result.Attempted ||
+            GardenResult.Attempted;
+
+        Result.Changed =
+            Result.Changed ||
+            GardenResult.Changed;
+    }
+
+
+    SetActiveGardenIndex(
+        SaveData,
+        OriginalGardenIndex
+    );
+
+    return Result;
 }
 
 
@@ -324,6 +548,25 @@ function RenderGarden() {
     GardenGrid.style.setProperty(
         "--GardenWidth",
         GameSave.Garden.Width
+    );
+
+    const GardenBorderColours = [
+        "var(--Lavender)",
+        "var(--Mauve)",
+        "var(--Pink)",
+        "var(--Blue)",
+        "var(--Teal)",
+        "var(--Peach)",
+        "var(--Yellow)",
+        "var(--Green)"
+    ];
+
+    GardenGrid.style.setProperty(
+        "--GardenBorderColour",
+        GardenBorderColours[
+            GameSave.ActiveGardenIndex %
+            GardenBorderColours.length
+        ]
     );
 
     GardenGrid.replaceChildren();
@@ -954,7 +1197,7 @@ async function GardenTick() {
 
     try {
         const MutationResult =
-            CheckGardenMutations(
+            CheckAllGardenMutations(
                 GameSave
             );
 

@@ -10,6 +10,357 @@ const StartingSeeds = {
 };
 
 
+const DefaultGardenName = "Garden";
+const MaximumGardenNameLength = 32;
+const StartingGardenWidth = 3;
+const StartingGardenHeight = 3;
+
+
+function CreateGardenData(
+    Name = DefaultGardenName
+) {
+    return {
+        Name: NormalizeGardenName(
+            Name
+        ),
+        Width: StartingGardenWidth,
+        Height: StartingGardenHeight,
+        Plots: Array(
+            StartingGardenWidth *
+            StartingGardenHeight
+        ).fill(null),
+        MutationCooldowns: {}
+    };
+}
+
+
+function NormalizeGardenName(
+    Value
+) {
+    if (
+        typeof Value !== "string"
+    ) {
+        return DefaultGardenName;
+    }
+
+    const Name = Value
+        .trim()
+        .slice(
+            0,
+            MaximumGardenNameLength
+        );
+
+    return Name.length > 0
+        ? Name
+        : DefaultGardenName;
+}
+
+
+function NormalizeGardenData(
+    Garden,
+    LegacyMutationCooldowns = null
+) {
+    if (
+        Garden === null ||
+        typeof Garden !== "object" ||
+        Array.isArray(Garden)
+    ) {
+        Garden = CreateGardenData();
+    }
+
+    Garden.Name = NormalizeGardenName(
+        Garden.Name
+    );
+
+    Garden.Width = Math.max(
+        1,
+        Math.floor(
+            Number(
+                Garden.Width ??
+                StartingGardenWidth
+            ) || StartingGardenWidth
+        )
+    );
+
+    Garden.Height = Math.max(
+        1,
+        Math.floor(
+            Number(
+                Garden.Height ??
+                StartingGardenHeight
+            ) || StartingGardenHeight
+        )
+    );
+
+    if (!Array.isArray(Garden.Plots)) {
+        Garden.Plots = [];
+    }
+
+
+    for (
+        let PlotIndex = 0;
+        PlotIndex < Garden.Plots.length;
+        PlotIndex++
+    ) {
+        const Plot =
+            Garden.Plots[PlotIndex];
+
+        if (Plot === null) {
+            continue;
+        }
+
+        if (
+            typeof Plot !== "object" ||
+            Array.isArray(Plot)
+        ) {
+            Garden.Plots[PlotIndex] = null;
+            continue;
+        }
+
+        if (
+            Plot.Plant === "Rose"
+        ) {
+            Plot.Plant = "RedRose";
+        }
+
+        if (
+            typeof Plot.Plant ===
+            "number"
+        ) {
+            const PlantKey =
+                ResolvePlantKeyById(
+                    Plot.Plant
+                );
+
+            if (PlantKey !== null) {
+                Plot.Plant = PlantKey;
+            }
+        }
+
+        Plot.PlantedAt = Number(
+            Plot.PlantedAt ??
+            Date.now()
+        );
+
+        delete Plot.VisualVariant;
+        delete Plot.AddedTags;
+    }
+
+
+    const RequiredPlots =
+        Garden.Width *
+        Garden.Height;
+
+    while (
+        Garden.Plots.length <
+        RequiredPlots
+    ) {
+        Garden.Plots.push(null);
+    }
+
+    if (
+        Garden.Plots.length >
+        RequiredPlots
+    ) {
+        Garden.Plots.length =
+            RequiredPlots;
+    }
+
+
+    if (
+        Garden.MutationCooldowns ===
+            undefined &&
+        LegacyMutationCooldowns !== null &&
+        typeof LegacyMutationCooldowns ===
+            "object" &&
+        !Array.isArray(
+            LegacyMutationCooldowns
+        )
+    ) {
+        Garden.MutationCooldowns =
+            LegacyMutationCooldowns;
+    }
+
+    if (
+        Garden.MutationCooldowns === null ||
+        typeof Garden.MutationCooldowns !==
+            "object" ||
+        Array.isArray(
+            Garden.MutationCooldowns
+        )
+    ) {
+        Garden.MutationCooldowns = {};
+    }
+
+
+    return Garden;
+}
+
+
+function GetActiveGarden(
+    SaveData
+) {
+    if (
+        !Array.isArray(
+            SaveData.Gardens
+        ) ||
+        SaveData.Gardens.length === 0
+    ) {
+        SaveData.Gardens = [
+            CreateGardenData()
+        ];
+    }
+
+    const GardenIndex = Math.min(
+        SaveData.Gardens.length - 1,
+        Math.max(
+            0,
+            Math.floor(
+                Number(
+                    SaveData.ActiveGardenIndex ??
+                    0
+                ) || 0
+            )
+        )
+    );
+
+    SaveData.ActiveGardenIndex =
+        GardenIndex;
+
+    return SaveData.Gardens[
+        GardenIndex
+    ];
+}
+
+
+function SetActiveGardenIndex(
+    SaveData,
+    GardenIndex
+) {
+    if (
+        !Array.isArray(
+            SaveData.Gardens
+        ) ||
+        SaveData.Gardens.length === 0
+    ) {
+        return false;
+    }
+
+    const NormalizedIndex = Math.min(
+        SaveData.Gardens.length - 1,
+        Math.max(
+            0,
+            Math.floor(
+                Number(
+                    GardenIndex
+                ) || 0
+            )
+        )
+    );
+
+    const Changed =
+        SaveData.ActiveGardenIndex !==
+        NormalizedIndex;
+
+    SaveData.ActiveGardenIndex =
+        NormalizedIndex;
+
+    return Changed;
+}
+
+
+function RenameGarden(
+    SaveData,
+    GardenIndex,
+    Name
+) {
+    if (
+        !Array.isArray(
+            SaveData.Gardens
+        ) ||
+        SaveData.Gardens[GardenIndex] ===
+            undefined
+    ) {
+        return DefaultGardenName;
+    }
+
+    const NormalizedName =
+        NormalizeGardenName(
+            Name
+        );
+
+    SaveData.Gardens[
+        GardenIndex
+    ].Name = NormalizedName;
+
+    return NormalizedName;
+}
+
+
+function DefineActiveGardenAliases(
+    SaveData
+) {
+    delete SaveData.Garden;
+    delete SaveData.MutationCooldowns;
+
+    Object.defineProperty(
+        SaveData,
+        "Garden",
+        {
+            configurable: true,
+            enumerable: false,
+
+            get() {
+                return GetActiveGarden(
+                    SaveData
+                );
+            },
+
+            set(Value) {
+                const GardenIndex =
+                    SaveData.ActiveGardenIndex ??
+                    0;
+
+                SaveData.Gardens[
+                    GardenIndex
+                ] = NormalizeGardenData(
+                    Value
+                );
+            }
+        }
+    );
+
+    Object.defineProperty(
+        SaveData,
+        "MutationCooldowns",
+        {
+            configurable: true,
+            enumerable: false,
+
+            get() {
+                return GetActiveGarden(
+                    SaveData
+                ).MutationCooldowns;
+            },
+
+            set(Value) {
+                const Garden =
+                    GetActiveGarden(
+                        SaveData
+                    );
+
+                Garden.MutationCooldowns =
+                    Value !== null &&
+                    typeof Value === "object" &&
+                    !Array.isArray(Value)
+                        ? Value
+                        : {};
+            }
+        }
+    );
+}
+
+
 function CreateNewSave() {
     const SeedInventory = {};
     const StartingPlants = [];
@@ -40,8 +391,8 @@ function CreateNewSave() {
     }
 
 
-    return {
-        Version: 2,
+    return NormalizeSaveData({
+        Version: 3,
         Revision: 0,
         LastSavedAt: Date.now(),
 
@@ -83,19 +434,17 @@ function CreateNewSave() {
             ShowReadyPlots: true
         },
 
-        Garden: {
-            Width: 3,
-            Height: 3,
-            Plots: Array(9).fill(null)
-        },
+        Gardens: [
+            CreateGardenData()
+        ],
+
+        ActiveGardenIndex: 0,
 
         Discoveries: {
             Plants: StartingPlants,
             Mutations: []
-        },
-
-        MutationCooldowns: {}
-    };
+        }
+    });
 }
 
 
@@ -106,7 +455,7 @@ function NormalizeSaveData(
         Number(
             SaveData.Version ?? 1
         ),
-        2
+        3
     );
 
     SaveData.Revision = Number(
@@ -301,100 +650,48 @@ function NormalizeSaveData(
         false;
 
 
-    SaveData.Garden ??= {
-        Width: 3,
-        Height: 3,
-        Plots: []
-    };
+    const LegacyGarden =
+        SaveData.Garden ??
+        null;
 
-    SaveData.Garden.Width = Math.max(
-        1,
-        Math.floor(
-            Number(
-                SaveData.Garden.Width ?? 3
-            ) || 3
-        )
-    );
+    const LegacyMutationCooldowns =
+        SaveData.MutationCooldowns ??
+        null;
 
-    SaveData.Garden.Height = Math.max(
-        1,
-        Math.floor(
-            Number(
-                SaveData.Garden.Height ?? 3
-            ) || 3
-        )
-    );
-
-    SaveData.Garden.Plots ??= [];
-
-
-    for (
-        let PlotIndex = 0;
-        PlotIndex <
-            SaveData.Garden.Plots.length;
-        PlotIndex++
-    ) {
-        const Plot =
-            SaveData.Garden.Plots[
-                PlotIndex
-            ];
-
-        if (Plot === null) {
-            continue;
-        }
-
-        if (
-            Plot.Plant === "Rose"
-        ) {
-            Plot.Plant =
-                "RedRose";
-        }
-
-        if (
-            typeof Plot.Plant ===
-            "number"
-        ) {
-            const PlantKey =
-                ResolvePlantKeyById(
-                    Plot.Plant
-                );
-
-            if (PlantKey !== null) {
-                Plot.Plant = PlantKey;
-            }
-        }
-
-        Plot.PlantedAt = Number(
-            Plot.PlantedAt ??
-            Date.now()
-        );
-
-        delete Plot.VisualVariant;
-        delete Plot.AddedTags;
-    }
-
-
-    const RequiredPlots =
-        SaveData.Garden.Width *
-        SaveData.Garden.Height;
-
-    while (
-        SaveData.Garden.Plots.length <
-        RequiredPlots
-    ) {
-        SaveData.Garden.Plots.push(null);
-    }
 
     if (
-        SaveData.Garden.Plots.length >
-        RequiredPlots
+        !Array.isArray(
+            SaveData.Gardens
+        ) ||
+        SaveData.Gardens.length === 0
     ) {
-        SaveData.Garden.Plots.length =
-            RequiredPlots;
+        SaveData.Gardens = [
+            LegacyGarden ??
+            CreateGardenData()
+        ];
     }
 
 
-    SaveData.MutationCooldowns ??= {};
+    SaveData.Gardens =
+        SaveData.Gardens.map(
+            (Garden, GardenIndex) =>
+                NormalizeGardenData(
+                    Garden,
+                    GardenIndex === 0
+                        ? LegacyMutationCooldowns
+                        : null
+                )
+        );
+
+
+    SetActiveGardenIndex(
+        SaveData,
+        SaveData.ActiveGardenIndex ?? 0
+    );
+
+    DefineActiveGardenAliases(
+        SaveData
+    );
 
 
     return SaveData;
