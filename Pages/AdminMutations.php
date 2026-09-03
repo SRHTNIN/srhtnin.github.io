@@ -132,17 +132,53 @@ $PageSection = "Admin";
                             >
                         </label>
 
-                        <label class="AdminEditorField">
-                            <span>Cooldown (ms)</span>
+                        <div class="AdminEditorField">
+                            <span>Cooldown</span>
+
+                            <div class="AdminDurationInputs">
+                                <label>
+                                    <span>Hours</span>
+                                    <input
+                                        id="AdminMutationCooldownHours"
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+
+                                <label>
+                                    <span>Minutes</span>
+                                    <input
+                                        id="AdminMutationCooldownMinutes"
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+
+                                <label>
+                                    <span>Seconds</span>
+                                    <input
+                                        id="AdminMutationCooldownSeconds"
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+                            </div>
+
                             <input
                                 id="AdminMutationCooldown"
-                                type="number"
-                                min="0"
-                                step="1000"
-                                required
+                                type="hidden"
                             >
+
                             <small id="AdminMutationCooldownHint"></small>
-                        </label>
+                        </div>
 
                         <label class="AdminEditorField">
                             <span>Rotation</span>

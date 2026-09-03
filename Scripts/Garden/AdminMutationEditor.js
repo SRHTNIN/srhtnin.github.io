@@ -175,12 +175,34 @@ function BindAdminMutationEditor() {
         RenderAdminMutationJsonPreview
     );
 
-    document.getElementById(
-        "AdminMutationCooldown"
-    ).addEventListener(
-        "input",
-        UpdateAdminMutationCooldownHint
-    );
+    for (
+        const ElementId
+        of [
+            "AdminMutationCooldownHours",
+            "AdminMutationCooldownMinutes",
+            "AdminMutationCooldownSeconds"
+        ]
+    ) {
+        document.getElementById(
+            ElementId
+        ).addEventListener(
+            "input",
+            () => {
+                SyncAdminMutationCooldown();
+                RenderAdminMutationJsonPreview();
+            }
+        );
+
+        document.getElementById(
+            ElementId
+        ).addEventListener(
+            "change",
+            () => {
+                SyncAdminMutationCooldown();
+                RenderAdminMutationJsonPreview();
+            }
+        );
+    }
 }
 
 
@@ -645,8 +667,7 @@ function LoadAdminMutationIntoForm(
         ) * 100
     );
 
-    SetAdminMutationField(
-        "AdminMutationCooldown",
+    SetAdminMutationDurationFields(
         Number(
             Mutation.Cooldown ?? 0
         )
@@ -769,8 +790,7 @@ function StartNewAdminMutation() {
         100
     );
 
-    SetAdminMutationField(
-        "AdminMutationCooldown",
+    SetAdminMutationDurationFields(
         120000
     );
 
@@ -1403,21 +1423,11 @@ function GetAdminPlantName(
 function GetAdminMutationPlantImage(
     PlantKey
 ) {
-    const Images =
-        PlantImages[
+    return GetPlantMatureImageSource(
+        AdminMutationPlantCatalogue[
             PlantKey
-        ] ?? [];
-
-    if (
-        !Array.isArray(Images) ||
-        Images.length === 0
-    ) {
-        return null;
-    }
-
-    return Images[
-        Images.length - 1
-    ];
+        ] ?? PlantKey
+    );
 }
 
 
@@ -2179,6 +2189,101 @@ function RenderAdminMutationJsonPreview() {
 }
 
 
+function SetAdminMutationDurationFields(
+    Milliseconds
+) {
+    Milliseconds = Math.max(
+        0,
+        Number(Milliseconds) || 0
+    );
+
+    const TotalSeconds =
+        Math.round(
+            Milliseconds / 1000
+        );
+
+    SetAdminMutationField(
+        "AdminMutationCooldownHours",
+        Math.floor(
+            TotalSeconds / 3600
+        )
+    );
+
+    SetAdminMutationField(
+        "AdminMutationCooldownMinutes",
+        Math.floor(
+            (TotalSeconds % 3600) / 60
+        )
+    );
+
+    SetAdminMutationField(
+        "AdminMutationCooldownSeconds",
+        TotalSeconds % 60
+    );
+
+    SetAdminMutationField(
+        "AdminMutationCooldown",
+        TotalSeconds * 1000
+    );
+
+    UpdateAdminMutationCooldownHint();
+}
+
+
+function SyncAdminMutationCooldown() {
+    const Hours = Number(
+        document.getElementById(
+            "AdminMutationCooldownHours"
+        ).value
+    );
+
+    const Minutes = Number(
+        document.getElementById(
+            "AdminMutationCooldownMinutes"
+        ).value
+    );
+
+    const Seconds = Number(
+        document.getElementById(
+            "AdminMutationCooldownSeconds"
+        ).value
+    );
+
+    const Values = [
+        Hours,
+        Minutes,
+        Seconds
+    ];
+
+    if (
+        Values.some(
+            Value =>
+                !Number.isFinite(Value)
+        )
+    ) {
+        SetAdminMutationField(
+            "AdminMutationCooldown",
+            ""
+        );
+
+        UpdateAdminMutationCooldownHint();
+        return;
+    }
+
+    const Milliseconds =
+        Math.max(0, Hours) * 3600000 +
+        Math.max(0, Minutes) * 60000 +
+        Math.max(0, Seconds) * 1000;
+
+    SetAdminMutationField(
+        "AdminMutationCooldown",
+        Milliseconds
+    );
+
+    UpdateAdminMutationCooldownHint();
+}
+
+
 function UpdateAdminMutationCooldownHint() {
     const Cooldown = Number(
         document.getElementById(
@@ -2190,73 +2295,9 @@ function UpdateAdminMutationCooldownHint() {
         "AdminMutationCooldownHint"
     ).textContent =
         Number.isFinite(Cooldown)
-            ? FormatAdminMutationDuration(
-                Cooldown
-            )
+            ? Cooldown.toLocaleString() +
+                " ms stored"
             : "";
-}
-
-
-function FormatAdminMutationDuration(
-    Milliseconds
-) {
-    Milliseconds = Math.max(
-        0,
-        Number(Milliseconds)
-    );
-
-    if (Milliseconds < 1000) {
-        return Milliseconds + "ms";
-    }
-
-    const TotalSeconds =
-        Math.round(
-            Milliseconds /
-            1000
-        );
-
-    const Hours =
-        Math.floor(
-            TotalSeconds /
-            3600
-        );
-
-    const Minutes =
-        Math.floor(
-            (
-                TotalSeconds %
-                3600
-            ) /
-            60
-        );
-
-    const Seconds =
-        TotalSeconds % 60;
-
-    const Parts = [];
-
-    if (Hours > 0) {
-        Parts.push(
-            Hours + "h"
-        );
-    }
-
-    if (Minutes > 0) {
-        Parts.push(
-            Minutes + "m"
-        );
-    }
-
-    if (
-        Seconds > 0 ||
-        Parts.length === 0
-    ) {
-        Parts.push(
-            Seconds + "s"
-        );
-    }
-
-    return Parts.join(" ");
 }
 
 

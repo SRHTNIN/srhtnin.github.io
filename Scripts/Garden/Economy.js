@@ -269,6 +269,14 @@ function GetPlantShopCost(
         Plant.Shop?.ShopPlant ===
         true
     ) {
+        if (
+            Plant.Shop.BaseCost === null ||
+            Plant.Shop.BaseCost === undefined ||
+            Plant.Shop.BaseCost === ""
+        ) {
+            return null;
+        }
+
         const BaseCost = Number(
             Plant.Shop.BaseCost
         );
@@ -599,6 +607,35 @@ function GetMutationTimeFee(
 }
 
 
+function GetPlantHarvestMultiplier(
+    PlantId
+) {
+    const Plant =
+        typeof PlantId === "object" &&
+        PlantId !== null
+            ? PlantId
+            : GetPlantById(
+                PlantId
+            );
+
+    if (Plant === null) {
+        return 1.5;
+    }
+
+    const Multiplier = Number(
+        Plant.HarvestMultiplier ??
+        1.5
+    );
+
+    return (
+        Number.isFinite(Multiplier) &&
+        Multiplier >= 0
+    )
+        ? Multiplier
+        : 1.5;
+}
+
+
 function GetPlantHarvestReward(
     SaveData,
     PlantId
@@ -614,7 +651,10 @@ function GetPlantHarvestReward(
     }
 
     return Math.ceil(
-        Cost * 1.5
+        Cost *
+        GetPlantHarvestMultiplier(
+            PlantId
+        )
     );
 }
 
@@ -699,3 +739,289 @@ function FormatDewPerHour(
         " Dew"
     );
 }
+
+function GetCataloguePlantById(
+    PlantId,
+    PlantCatalogue = Plants
+) {
+    PlantId = Number(PlantId);
+
+    for (
+        const Plant
+        of Object.values(
+            PlantCatalogue
+        )
+    ) {
+        if (Number(Plant.Id) === PlantId) {
+            return Plant;
+        }
+    }
+
+    return null;
+}
+
+
+function GetCataloguePlantCostInfo(
+    PlantId,
+    PlantCatalogue = Plants,
+    MutationCatalogue = MutationSets,
+    Cache = new Map(),
+    Visiting = new Set()
+) {
+    PlantId = Number(PlantId);
+
+    if (Cache.has(PlantId)) {
+        return Cache.get(PlantId);
+    }
+
+    const Plant =
+        GetCataloguePlantById(
+            PlantId,
+            PlantCatalogue
+        );
+
+    if (Plant === null) {
+        return null;
+    }
+
+    if (Plant.Shop?.ShopPlant === true) {
+        if (
+            Plant.Shop.BaseCost === null ||
+            Plant.Shop.BaseCost === undefined ||
+            Plant.Shop.BaseCost === ""
+        ) {
+            return null;
+        }
+
+        const BaseCost = Number(
+            Plant.Shop.BaseCost
+        );
+
+        if (
+            !Number.isFinite(BaseCost) ||
+            BaseCost < 0
+        ) {
+            return null;
+        }
+
+        const Info = {
+            Cost: Math.ceil(BaseCost),
+            SourceType: "Base",
+            SourceMutation: null
+        };
+
+        Cache.set(PlantId, Info);
+        return Info;
+    }
+
+    if (Visiting.has(PlantId)) {
+        return null;
+    }
+
+    Visiting.add(PlantId);
+
+    let CheapestInfo = null;
+
+    for (
+        const [MutationKey, Mutation]
+        of Object.entries(
+            MutationCatalogue
+        )
+    ) {
+        if (Mutation.Archived === true) {
+            continue;
+        }
+
+        if (
+            !Mutation.Relations
+                ?.PlantsCreated
+                ?.includes(PlantId)
+        ) {
+            continue;
+        }
+
+        const IngredientCost =
+            GetCatalogueMutationIngredientCost(
+                Mutation,
+                PlantCatalogue,
+                MutationCatalogue,
+                Cache,
+                Visiting
+            );
+
+        if (IngredientCost === null) {
+            continue;
+        }
+
+        const Cost =
+            IngredientCost +
+            GetMutationTimeFee(
+                Mutation
+            );
+
+        if (
+            CheapestInfo === null ||
+            Cost < CheapestInfo.Cost
+        ) {
+            CheapestInfo = {
+                Cost: Cost,
+                SourceType: "Mutation",
+                SourceMutation: {
+                    Id: Number(
+                        Mutation.Id
+                    ),
+                    MutationKey: MutationKey,
+                    Name:
+                        Mutation.Name ??
+                        MutationKey
+                }
+            };
+        }
+    }
+
+    Visiting.delete(PlantId);
+    Cache.set(PlantId, CheapestInfo);
+
+    return CheapestInfo;
+}
+
+
+function GetCatalogueMutationIngredientCost(
+    Mutation,
+    PlantCatalogue,
+    MutationCatalogue,
+    Cache,
+    Visiting
+) {
+    let TotalCost = 0;
+
+    for (const Row of Mutation.Pattern ?? []) {
+        for (const Matcher of Row) {
+            if (
+                Matcher === null ||
+                Matcher === "Empty" ||
+                Matcher === "Any"
+            ) {
+                continue;
+            }
+
+            const MatcherCost =
+                GetCatalogueMatcherSeedCost(
+                    Matcher,
+                    PlantCatalogue,
+                    MutationCatalogue,
+                    Cache,
+                    Visiting
+                );
+
+            if (MatcherCost === null) {
+                return null;
+            }
+
+            TotalCost += MatcherCost;
+        }
+    }
+
+    return TotalCost;
+}
+
+
+function GetCatalogueMatcherSeedCost(
+    Matcher,
+    PlantCatalogue,
+    MutationCatalogue,
+    Cache,
+    Visiting
+) {
+    if (typeof Matcher === "string") {
+        const Plant =
+            PlantCatalogue[Matcher];
+
+        if (
+            Plant === undefined ||
+            Plant.Archived === true
+        ) {
+            return null;
+        }
+
+        return GetCataloguePlantCostInfo(
+            Plant.Id,
+            PlantCatalogue,
+            MutationCatalogue,
+            Cache,
+            Visiting
+        )?.Cost ?? null;
+    }
+
+    if (
+        typeof Matcher !== "object" ||
+        Matcher === null
+    ) {
+        return null;
+    }
+
+    if (typeof Matcher.Plant === "string") {
+        const Plant =
+            PlantCatalogue[Matcher.Plant];
+
+        if (
+            Plant === undefined ||
+            Plant.Archived === true
+        ) {
+            return null;
+        }
+
+        return GetCataloguePlantCostInfo(
+            Plant.Id,
+            PlantCatalogue,
+            MutationCatalogue,
+            Cache,
+            Visiting
+        )?.Cost ?? null;
+    }
+
+    let CheapestCost = null;
+
+    for (
+        const Plant
+        of Object.values(
+            PlantCatalogue
+        )
+    ) {
+        if (Plant.Archived === true) {
+            continue;
+        }
+
+        if (
+            !DoesPlantMatchRecipeMatcher(
+                Plant,
+                Matcher
+            )
+        ) {
+            continue;
+        }
+
+        const Cost =
+            GetCataloguePlantCostInfo(
+                Plant.Id,
+                PlantCatalogue,
+                MutationCatalogue,
+                Cache,
+                Visiting
+            )?.Cost ?? null;
+
+        if (Cost === null) {
+            continue;
+        }
+
+        if (
+            CheapestCost === null ||
+            Cost < CheapestCost
+        ) {
+            CheapestCost = Cost;
+        }
+    }
+
+    return CheapestCost;
+}
+

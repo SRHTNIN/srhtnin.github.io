@@ -178,20 +178,13 @@ function CreatePlantEncyclopediaVisual(
         "PlantTile PlantEncyclopediaVisual";
 
 
-    const PlantKey =
-        GetPlantKeyById(
-            Plant.Id
+    const MatureImage =
+        GetPlantMatureImageSource(
+            Plant
         );
 
-    const Images =
-        PlantKey === null
-            ? []
-            : PlantImages[
-                PlantKey
-            ] ?? [];
 
-
-    if (Images.length === 0) {
+    if (MatureImage === null) {
         const Missing =
             document.createElement(
                 "span"
@@ -220,9 +213,7 @@ function CreatePlantEncyclopediaVisual(
         "PlantSprite";
 
     Image.src =
-        Images[
-            Images.length - 1
-        ];
+        MatureImage;
 
     Image.alt =
         Plant.Name;

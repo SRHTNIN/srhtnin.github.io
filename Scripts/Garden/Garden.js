@@ -1303,9 +1303,9 @@ function GetPlantImages(
     Plot,
     Plant
 ) {
-    return PlantImages[
-        Plot.Plant
-    ] ?? [];
+    return GetPlantImageSources(
+        Plant ?? Plot.Plant
+    );
 }
 
 

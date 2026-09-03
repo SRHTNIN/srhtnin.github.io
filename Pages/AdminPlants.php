@@ -80,7 +80,7 @@ $PageSection = "Admin";
                                 required
                             >
                             <small>
-                                Used by saves, recipes and the sprite folder.
+                                Used by saves, recipes and repository sprite fallbacks.
                             </small>
                         </label>
 
@@ -118,17 +118,69 @@ $PageSection = "Admin";
                             </small>
                         </label>
 
-                        <label class="AdminEditorField">
-                            <span>Growth time (ms)</span>
+                        <div class="AdminEditorField">
+                            <span>Growth time</span>
+
+                            <div class="AdminDurationInputs">
+                                <label>
+                                    <span>Hours</span>
+                                    <input
+                                        id="AdminPlantGrowthHours"
+                                        type="number"
+                                        min="0"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+
+                                <label>
+                                    <span>Minutes</span>
+                                    <input
+                                        id="AdminPlantGrowthMinutes"
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+
+                                <label>
+                                    <span>Seconds</span>
+                                    <input
+                                        id="AdminPlantGrowthSeconds"
+                                        type="number"
+                                        min="0"
+                                        max="59"
+                                        step="1"
+                                        required
+                                    >
+                                </label>
+                            </div>
+
                             <input
                                 id="AdminPlantGrowthTime"
                                 name="GrowthTime"
+                                type="hidden"
+                            >
+
+                            <small id="AdminPlantGrowthTimeHint"></small>
+                        </div>
+
+                        <label class="AdminEditorField">
+                            <span>Harvest multiplier</span>
+                            <input
+                                id="AdminPlantHarvestMultiplier"
+                                name="HarvestMultiplier"
                                 type="number"
                                 min="0"
-                                step="1000"
+                                max="9999.9999"
+                                step="0.0001"
                                 required
                             >
-                            <small id="AdminPlantGrowthTimeHint"></small>
+                            <small>
+                                Defaults to 1.5. Reward is seed cost × this multiplier.
+                            </small>
                         </label>
 
                         <label class="AdminEditorField">
@@ -189,6 +241,78 @@ $PageSection = "Admin";
                                 </p>
                             </div>
                         </div>
+
+                        <div class="AdminPlantEconomyPreview">
+                            <h3>Economy</h3>
+
+                            <dl>
+                                <div>
+                                    <dt>Seed cost</dt>
+                                    <dd id="AdminPlantEconomyCost">Unavailable</dd>
+                                </div>
+                                <div>
+                                    <dt>Harvest multiplier</dt>
+                                    <dd id="AdminPlantEconomyMultiplier">1.5×</dd>
+                                </div>
+                                <div>
+                                    <dt>Harvest reward</dt>
+                                    <dd id="AdminPlantEconomyReward">Unavailable</dd>
+                                </div>
+                                <div>
+                                    <dt>Net profit</dt>
+                                    <dd id="AdminPlantEconomyProfit">Unavailable</dd>
+                                </div>
+                                <div>
+                                    <dt>Growth time</dt>
+                                    <dd id="AdminPlantEconomyGrowth">Unavailable</dd>
+                                </div>
+                                <div>
+                                    <dt>DPH</dt>
+                                    <dd id="AdminPlantEconomyDph">Unavailable</dd>
+                                </div>
+                                <div class="AdminPlantEconomySource">
+                                    <dt>Price source</dt>
+                                    <dd id="AdminPlantEconomySource">Unavailable</dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="AdminPlantImagesSection">
+                        <h2>Sprites</h2>
+
+                        <p>
+                            Optional. You can save a plant with no sprites and add them later.
+                            Upload PNG files named by stage, such as
+                            <code>1.png</code>, <code>2.png</code>, <code>3.png</code>.
+                        </p>
+
+                        <div class="AdminPlantImageUpload">
+                            <input
+                                id="AdminPlantImageFiles"
+                                type="file"
+                                accept="image/png,.png"
+                                multiple
+                            >
+
+                            <button
+                                id="AdminPlantImageUploadButton"
+                                class="ActionButton AdminInlineButton"
+                                type="button"
+                            >
+                                Upload selected sprites
+                            </button>
+                        </div>
+
+                        <p
+                            id="AdminPlantImageNote"
+                            class="AdminPlantImageNote"
+                        ></p>
+
+                        <div
+                            id="AdminPlantImageList"
+                            class="AdminPlantImageList"
+                        ></div>
                     </div>
 
                     <div class="AdminEditorActions">
@@ -219,7 +343,9 @@ $PageSection = "Admin";
 
         <script src="/Scripts/Garden/PlantImages.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
+        <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Economy.js"></script>
         <script src="/Scripts/Garden/AdminPlantEditor.js"></script>
     </body>
 </html>

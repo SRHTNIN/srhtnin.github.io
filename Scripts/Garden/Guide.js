@@ -28,13 +28,17 @@ function RenderGuideRecipePlants() {
         const Plant =
             Plants[PlantKey];
 
-        const Images =
-            PlantImages[PlantKey] ?? [];
+        const MatureImage =
+            Plant === undefined
+                ? null
+                : GetPlantMatureImageSource(
+                    Plant
+                );
 
 
         if (
             Plant === undefined ||
-            Images.length === 0
+            MatureImage === null
         ) {
             continue;
         }
@@ -49,9 +53,7 @@ function RenderGuideRecipePlants() {
             "PlantSprite GuideRecipeImage";
 
         Image.src =
-            Images[
-                Images.length - 1
-            ];
+            MatureImage;
 
         Image.alt = "";
 

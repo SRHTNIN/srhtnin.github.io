@@ -1,6 +1,8 @@
 let AdminPlantCatalogue = {};
+let AdminPlantMutationCatalogue = {};
 let AdminPlantEditingKey = null;
 let AdminPlantSavePending = false;
+let AdminPlantImagePending = false;
 
 
 async function StartAdminPlantEditor() {
@@ -75,7 +77,7 @@ function BindAdminPlantEditor() {
             "AdminPlantId",
             "AdminPlantKey",
             "AdminPlantName",
-            "AdminPlantGrowthTime",
+            "AdminPlantHarvestMultiplier",
             "AdminPlantShopPlant",
             "AdminPlantBaseCost"
         ]
@@ -95,11 +97,50 @@ function BindAdminPlantEditor() {
         );
     }
 
+    for (
+        const ElementId
+        of [
+            "AdminPlantGrowthHours",
+            "AdminPlantGrowthMinutes",
+            "AdminPlantGrowthSeconds"
+        ]
+    ) {
+        document.getElementById(
+            ElementId
+        ).addEventListener(
+            "input",
+            () => {
+                SyncAdminPlantGrowthTime();
+                RenderAdminPlantPreview();
+            }
+        );
+
+        document.getElementById(
+            ElementId
+        ).addEventListener(
+            "change",
+            () => {
+                SyncAdminPlantGrowthTime();
+                RenderAdminPlantPreview();
+            }
+        );
+    }
+
     document.getElementById(
         "AdminPlantShopPlant"
     ).addEventListener(
         "change",
-        UpdateAdminPlantShopFields
+        () => {
+            UpdateAdminPlantShopFields();
+            RenderAdminPlantPreview();
+        }
+    );
+
+    document.getElementById(
+        "AdminPlantImageUploadButton"
+    ).addEventListener(
+        "click",
+        UploadAdminPlantImages
     );
 }
 
@@ -167,6 +208,47 @@ async function AdminPlantRequest(
 }
 
 
+async function AdminPlantMutationRequest() {
+    const SaveKey =
+        localStorage.getItem(
+            SaveKeyName
+        );
+
+    const Response = await fetch(
+        ApiUrl +
+        "/AdminMutations.php",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+                SaveKey: SaveKey,
+                Action: "List"
+            })
+        }
+    );
+
+    const Result =
+        await Response.json();
+
+    if (
+        !Response.ok ||
+        Result.Success !== true
+    ) {
+        throw new Error(
+            Result.Error ??
+            "Couldn't load mutations for the Plant editor."
+        );
+    }
+
+    return Result;
+}
+
+
 async function LoadAdminPlants(
     PreferredPlantKey = null
 ) {
@@ -174,16 +256,27 @@ async function LoadAdminPlants(
         "Loading plants..."
     );
 
-    const Result =
-        await AdminPlantRequest(
+    const [
+        PlantResult,
+        MutationResult
+    ] = await Promise.all([
+        AdminPlantRequest(
             "List"
-        );
+        ),
+        AdminPlantMutationRequest()
+    ]);
 
     AdminPlantCatalogue =
-        Result.Plants ?? {};
+        PlantResult.Plants ?? {};
+
+    AdminPlantMutationCatalogue =
+        MutationResult.Mutations ?? {};
 
     Plants =
         AdminPlantCatalogue;
+
+    MutationSets =
+        AdminPlantMutationCatalogue;
 
     RenderAdminPlantSelect();
 
@@ -331,10 +424,17 @@ function LoadAdminPlantIntoForm(
             : ""
     );
 
-    SetAdminPlantField(
-        "AdminPlantGrowthTime",
+    SetAdminPlantDurationFields(
         Number(
             Plant.GrowthTime ?? 0
+        )
+    );
+
+    SetAdminPlantField(
+        "AdminPlantHarvestMultiplier",
+        Number(
+            Plant.HarvestMultiplier ??
+            1.5
         )
     );
 
@@ -407,9 +507,13 @@ function StartNewAdminPlant() {
         ""
     );
 
-    SetAdminPlantField(
-        "AdminPlantGrowthTime",
+    SetAdminPlantDurationFields(
         3600000
+    );
+
+    SetAdminPlantField(
+        "AdminPlantHarvestMultiplier",
+        1.5
     );
 
     document.getElementById(
@@ -583,6 +687,12 @@ function GetAdminPlantFormData() {
             ).value
         ),
 
+        HarvestMultiplier: Number(
+            document.getElementById(
+                "AdminPlantHarvestMultiplier"
+            ).value
+        ),
+
         Effects:
             ParseAdminPlantEffects(),
 
@@ -705,15 +815,14 @@ function RenderAdminPlantPreview() {
 
     Tile.replaceChildren();
 
-    const Images =
-        PlantImages[
-            PlantKey
-        ] ?? [];
+    const MatureImage =
+        GetPlantMatureImageSource(
+            AdminPlantCatalogue[
+                PlantKey
+            ] ?? PlantKey
+        );
 
-    if (
-        Array.isArray(Images) &&
-        Images.length > 0
-    ) {
+    if (MatureImage !== null) {
         const Image =
             document.createElement(
                 "img"
@@ -723,9 +832,7 @@ function RenderAdminPlantPreview() {
             "PlantSprite";
 
         Image.src =
-            Images[
-                Images.length - 1
-            ];
+            MatureImage;
 
         Image.alt = Name;
 
@@ -772,10 +879,768 @@ function RenderAdminPlantPreview() {
         "AdminPlantGrowthTimeHint"
     ).textContent =
         Number.isFinite(GrowthTime)
+            ? GrowthTime.toLocaleString() +
+                " ms stored"
+            : "";
+
+    RenderAdminPlantEconomyPreview();
+    RenderAdminPlantImageManager();
+}
+
+
+function SetAdminPlantDurationFields(
+    Milliseconds
+) {
+    Milliseconds = Math.max(
+        0,
+        Number(Milliseconds) || 0
+    );
+
+    const TotalSeconds =
+        Math.round(
+            Milliseconds / 1000
+        );
+
+    SetAdminPlantField(
+        "AdminPlantGrowthHours",
+        Math.floor(
+            TotalSeconds / 3600
+        )
+    );
+
+    SetAdminPlantField(
+        "AdminPlantGrowthMinutes",
+        Math.floor(
+            (TotalSeconds % 3600) / 60
+        )
+    );
+
+    SetAdminPlantField(
+        "AdminPlantGrowthSeconds",
+        TotalSeconds % 60
+    );
+
+    SetAdminPlantField(
+        "AdminPlantGrowthTime",
+        TotalSeconds * 1000
+    );
+}
+
+
+function SyncAdminPlantGrowthTime() {
+    const Hours = Number(
+        document.getElementById(
+            "AdminPlantGrowthHours"
+        ).value
+    );
+
+    const Minutes = Number(
+        document.getElementById(
+            "AdminPlantGrowthMinutes"
+        ).value
+    );
+
+    const Seconds = Number(
+        document.getElementById(
+            "AdminPlantGrowthSeconds"
+        ).value
+    );
+
+    const Values = [
+        Hours,
+        Minutes,
+        Seconds
+    ];
+
+    if (
+        Values.some(
+            Value =>
+                !Number.isFinite(Value)
+        )
+    ) {
+        SetAdminPlantField(
+            "AdminPlantGrowthTime",
+            ""
+        );
+
+        return;
+    }
+
+    SetAdminPlantField(
+        "AdminPlantGrowthTime",
+        Math.max(0, Hours) * 3600000 +
+        Math.max(0, Minutes) * 60000 +
+        Math.max(0, Seconds) * 1000
+    );
+}
+
+
+function GetAdminPlantPreviewDefinition() {
+    const PlantId = Number(
+        document.getElementById(
+            "AdminPlantId"
+        ).value
+    );
+
+    const PlantKey =
+        document.getElementById(
+            "AdminPlantKey"
+        ).value.trim();
+
+    const Existing =
+        AdminPlantCatalogue[
+            PlantKey
+        ] ?? {};
+
+    const ShopPlant =
+        document.getElementById(
+            "AdminPlantShopPlant"
+        ).checked;
+
+    const BaseCostValue =
+        document.getElementById(
+            "AdminPlantBaseCost"
+        ).value;
+
+    return {
+        ...Existing,
+        Id: PlantId,
+        Name:
+            document.getElementById(
+                "AdminPlantName"
+            ).value.trim() ||
+            "New plant",
+        Tags: ParseAdminPlantTags(),
+        GrowthTime: Number(
+            document.getElementById(
+                "AdminPlantGrowthTime"
+            ).value
+        ),
+        HarvestMultiplier: Number(
+            document.getElementById(
+                "AdminPlantHarvestMultiplier"
+            ).value
+        ),
+        Shop: {
+            ShopPlant: ShopPlant,
+            BaseCost:
+                ShopPlant &&
+                BaseCostValue !== ""
+                    ? Number(BaseCostValue)
+                    : null
+        }
+    };
+}
+
+
+function RenderAdminPlantEconomyPreview() {
+    const Plant =
+        GetAdminPlantPreviewDefinition();
+
+    const PlantKey =
+        document.getElementById(
+            "AdminPlantKey"
+        ).value.trim();
+
+    const PreviewCatalogue = {
+        ...AdminPlantCatalogue,
+        [
+            PlantKey ||
+            "__AdminPlantPreview"
+        ]: Plant
+    };
+
+    const CostInfo =
+        Number.isFinite(Plant.Id) &&
+        Plant.Id > 0
+            ? GetCataloguePlantCostInfo(
+                Plant.Id,
+                PreviewCatalogue,
+                AdminPlantMutationCatalogue
+            )
+            : null;
+
+    const Multiplier =
+        GetPlantHarvestMultiplier(
+            Plant
+        );
+
+    const GrowthTime = Number(
+        Plant.GrowthTime
+    );
+
+    const Cost =
+        CostInfo?.Cost ?? null;
+
+    const Reward =
+        Cost === null
+            ? null
+            : Math.ceil(
+                Cost * Multiplier
+            );
+
+    const Profit =
+        Cost === null ||
+        Reward === null
+            ? null
+            : Reward - Cost;
+
+    const Dph =
+        Profit === null ||
+        !Number.isFinite(GrowthTime) ||
+        GrowthTime <= 0
+            ? null
+            : Profit * 3600000 /
+                GrowthTime;
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyCost",
+        FormatAdminPlantDew(Cost)
+    );
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyMultiplier",
+        Multiplier.toLocaleString(
+            undefined,
+            {maximumFractionDigits: 4}
+        ) + "×"
+    );
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyReward",
+        FormatAdminPlantDew(Reward)
+    );
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyProfit",
+        FormatAdminPlantDew(Profit)
+    );
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyGrowth",
+        Number.isFinite(GrowthTime)
             ? FormatAdminDuration(
                 GrowthTime
             )
+            : "Unavailable"
+    );
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomyDph",
+        Dph === null
+            ? "Unavailable"
+            : Dph.toLocaleString(
+                undefined,
+                {maximumFractionDigits: 2}
+            ) + " Dew/h"
+    );
+
+    let Source = "Unavailable";
+
+    if (CostInfo?.SourceType === "Base") {
+        Source = "Base seed cost";
+    } else if (
+        CostInfo?.SourceType ===
+            "Mutation"
+    ) {
+        Source =
+            CostInfo.SourceMutation
+                ?.Name ??
+            CostInfo.SourceMutation
+                ?.MutationKey ??
+            "Mutation";
+    }
+
+    SetAdminPlantEconomyText(
+        "AdminPlantEconomySource",
+        Source
+    );
+}
+
+
+function SetAdminPlantEconomyText(
+    ElementId,
+    Value
+) {
+    document.getElementById(
+        ElementId
+    ).textContent = Value;
+}
+
+
+function FormatAdminPlantDew(
+    Value
+) {
+    return (
+        Value === null ||
+        !Number.isFinite(Value)
+    )
+        ? "Unavailable"
+        : Math.ceil(Value)
+            .toLocaleString() +
+            " Dew";
+}
+
+
+function RenderAdminPlantImageManager() {
+    const List =
+        document.getElementById(
+            "AdminPlantImageList"
+        );
+
+    const Note =
+        document.getElementById(
+            "AdminPlantImageNote"
+        );
+
+    const UploadButton =
+        document.getElementById(
+            "AdminPlantImageUploadButton"
+        );
+
+    const FileInput =
+        document.getElementById(
+            "AdminPlantImageFiles"
+        );
+
+    if (
+        List === null ||
+        Note === null ||
+        UploadButton === null ||
+        FileInput === null
+    ) {
+        return;
+    }
+
+    List.replaceChildren();
+
+    const Plant =
+        AdminPlantEditingKey === null
+            ? null
+            : AdminPlantCatalogue[
+                AdminPlantEditingKey
+            ] ?? null;
+
+    const CanEdit =
+        Plant !== null &&
+        !AdminPlantImagePending;
+
+    UploadButton.disabled =
+        !CanEdit;
+
+    FileInput.disabled =
+        !CanEdit;
+
+    if (Plant === null) {
+        Note.textContent =
+            "Save the plant first, then upload sprites whenever you have them.";
+        return;
+    }
+
+    const StaticImages =
+        Array.isArray(
+            PlantImages[
+                AdminPlantEditingKey
+            ]
+        )
+            ? PlantImages[
+                AdminPlantEditingKey
+            ]
+            : [];
+
+    const ApiStages =
+        Array.isArray(
+            Plant.ImageStages
+        )
+            ? [...Plant.ImageStages]
+                .sort(
+                    (A, B) =>
+                        Number(A.Stage) -
+                        Number(B.Stage)
+                )
+            : [];
+
+    const FallbackText =
+        StaticImages.length > 0
+            ? " Repository fallback: " +
+                StaticImages.length +
+                " stage" +
+                (
+                    StaticImages.length === 1
+                        ? "."
+                        : "s."
+                )
             : "";
+
+    if (ApiStages.length === 0) {
+        Note.textContent =
+            "No API sprites uploaded." +
+            FallbackText;
+        return;
+    }
+
+    Note.textContent =
+        ApiStages.length +
+        " API sprite" +
+        (
+            ApiStages.length === 1
+                ? " uploaded."
+                : "s uploaded."
+        ) +
+        FallbackText;
+
+    for (const ImageStage of ApiStages) {
+        const Stage = Number(
+            ImageStage.Stage
+        );
+
+        const Row =
+            document.createElement(
+                "div"
+            );
+
+        Row.className =
+            "AdminPlantImageRow";
+
+        const Preview =
+            document.createElement(
+                "div"
+            );
+
+        Preview.className =
+            "PlantTile AdminPlantImagePreview";
+
+        const Image =
+            document.createElement(
+                "img"
+            );
+
+        Image.className =
+            "PlantSprite";
+
+        Image.src =
+            GetAdminPlantApiImageUrl(
+                Plant.Id,
+                Stage,
+                ImageStage.Revision
+            );
+
+        Image.alt =
+            Plant.Name +
+            " stage " +
+            Stage;
+
+        Preview.appendChild(Image);
+
+        const Label =
+            document.createElement(
+                "strong"
+            );
+
+        Label.textContent =
+            "Stage " + Stage;
+
+        const RemoveButton =
+            document.createElement(
+                "button"
+            );
+
+        RemoveButton.type = "button";
+        RemoveButton.className =
+            "ActionButton AdminInlineButton AdminPlantImageRemoveButton";
+        RemoveButton.textContent =
+            "Remove";
+        RemoveButton.disabled =
+            AdminPlantImagePending;
+
+        RemoveButton.addEventListener(
+            "click",
+            () =>
+                DeleteAdminPlantImage(
+                    Plant.Id,
+                    Stage
+                )
+        );
+
+        Row.append(
+            Preview,
+            Label,
+            RemoveButton
+        );
+
+        List.appendChild(Row);
+    }
+}
+
+
+function GetAdminPlantApiImageUrl(
+    PlantId,
+    Stage,
+    Revision = 0
+) {
+    const Query =
+        new URLSearchParams({
+            PlantId: String(PlantId),
+            Stage: String(Stage),
+            v: String(Revision ?? 0)
+        });
+
+    return ApiUrl +
+        "/PlantImage.php?" +
+        Query.toString();
+}
+
+
+async function UploadAdminPlantImages() {
+    if (
+        AdminPlantImagePending ||
+        AdminPlantEditingKey === null
+    ) {
+        return;
+    }
+
+    const Plant =
+        AdminPlantCatalogue[
+            AdminPlantEditingKey
+        ];
+
+    if (Plant === undefined) {
+        return;
+    }
+
+    const FileInput =
+        document.getElementById(
+            "AdminPlantImageFiles"
+        );
+
+    const Files =
+        Array.from(
+            FileInput.files ?? []
+        );
+
+    if (Files.length === 0) {
+        SetAdminPlantMessage(
+            "Choose one or more PNG sprites first."
+        );
+        return;
+    }
+
+    const Stages = new Set();
+    const Uploads = [];
+
+    try {
+        for (const File of Files) {
+            const Match =
+                /^(\\d+)\\.png$/i.exec(
+                    File.name
+                );
+
+            if (Match === null) {
+                throw new Error(
+                    "Sprite filenames must be stage numbers such as 1.png or 3.png."
+                );
+            }
+
+            const Stage = Number(
+                Match[1]
+            );
+
+            if (
+                !Number.isInteger(Stage) ||
+                Stage < 1 ||
+                Stage > 255
+            ) {
+                throw new Error(
+                    "Sprite stages must be between 1 and 255."
+                );
+            }
+
+            if (Stages.has(Stage)) {
+                throw new Error(
+                    "Stage " +
+                    Stage +
+                    " was selected more than once."
+                );
+            }
+
+            Stages.add(Stage);
+
+            Uploads.push({
+                Stage: Stage,
+                File: File
+            });
+        }
+    } catch (Error) {
+        SetAdminPlantMessage(
+            Error.message
+        );
+        return;
+    }
+
+    AdminPlantImagePending = true;
+    RenderAdminPlantImageManager();
+
+    SetAdminPlantMessage(
+        "Uploading sprites..."
+    );
+
+    try {
+        for (const Upload of Uploads) {
+            const DataBase64 =
+                await ReadAdminPlantFileBase64(
+                    Upload.File
+                );
+
+            await AdminPlantRequest(
+                "UploadImage",
+                {
+                    PlantId: Plant.Id,
+                    Stage: Upload.Stage,
+                    MimeType: "image/png",
+                    DataBase64: DataBase64
+                }
+            );
+        }
+
+        FileInput.value = "";
+
+        localStorage.removeItem(
+            "SarahtoninGardenContent"
+        );
+
+        await LoadAdminPlants(
+            AdminPlantEditingKey
+        );
+
+        SetAdminPlantMessage(
+            Uploads.length === 1
+                ? "Sprite uploaded."
+                : Uploads.length +
+                    " sprites uploaded."
+        );
+    } catch (Error) {
+        console.error(
+            "Couldn't upload plant sprites:",
+            Error
+        );
+
+        SetAdminPlantMessage(
+            Error.message ??
+            "Couldn't upload plant sprites."
+        );
+    } finally {
+        AdminPlantImagePending = false;
+        RenderAdminPlantImageManager();
+    }
+}
+
+
+function ReadAdminPlantFileBase64(
+    File
+) {
+    return new Promise(
+        (Resolve, Reject) => {
+            const Reader =
+                new FileReader();
+
+            Reader.addEventListener(
+                "load",
+                () => {
+                    const Result =
+                        String(
+                            Reader.result ??
+                            ""
+                        );
+
+                    const CommaIndex =
+                        Result.indexOf(",");
+
+                    if (CommaIndex < 0) {
+                        Reject(
+                            new Error(
+                                "Couldn't read sprite file."
+                            )
+                        );
+                        return;
+                    }
+
+                    Resolve(
+                        Result.slice(
+                            CommaIndex + 1
+                        )
+                    );
+                }
+            );
+
+            Reader.addEventListener(
+                "error",
+                () =>
+                    Reject(
+                        new Error(
+                            "Couldn't read sprite file."
+                        )
+                    )
+            );
+
+            Reader.readAsDataURL(File);
+        }
+    );
+}
+
+
+async function DeleteAdminPlantImage(
+    PlantId,
+    Stage
+) {
+    if (AdminPlantImagePending) {
+        return;
+    }
+
+    AdminPlantImagePending = true;
+    RenderAdminPlantImageManager();
+
+    SetAdminPlantMessage(
+        "Removing stage " +
+        Stage +
+        " sprite..."
+    );
+
+    try {
+        await AdminPlantRequest(
+            "DeleteImage",
+            {
+                PlantId: PlantId,
+                Stage: Stage
+            }
+        );
+
+        localStorage.removeItem(
+            "SarahtoninGardenContent"
+        );
+
+        await LoadAdminPlants(
+            AdminPlantEditingKey
+        );
+
+        SetAdminPlantMessage(
+            "Stage " +
+            Stage +
+            " sprite removed."
+        );
+    } catch (Error) {
+        console.error(
+            "Couldn't remove plant sprite:",
+            Error
+        );
+
+        SetAdminPlantMessage(
+            Error.message ??
+            "Couldn't remove plant sprite."
+        );
+    } finally {
+        AdminPlantImagePending = false;
+        RenderAdminPlantImageManager();
+    }
 }
 
 

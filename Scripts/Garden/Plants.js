@@ -48,3 +48,140 @@ async function FetchPlantsFromApi() {
 
     return Result.Plants;
 }
+
+function GetPlantImageSources(
+    PlantOrKey
+) {
+    const PlantKey =
+        typeof PlantOrKey === "string"
+            ? PlantOrKey
+            : Object.entries(
+                Plants
+            ).find(
+                ([, Candidate]) =>
+                    Candidate ===
+                        PlantOrKey ||
+                    Number(Candidate?.Id) ===
+                        Number(PlantOrKey?.Id)
+            )?.[0] ?? null;
+
+    const Plant =
+        typeof PlantOrKey === "string"
+            ? Plants[PlantOrKey]
+            : PlantOrKey;
+
+    const StaticImages =
+        PlantKey !== null &&
+        typeof PlantKey === "string" &&
+        Array.isArray(
+            PlantImages[PlantKey]
+        )
+            ? PlantImages[PlantKey]
+            : [];
+
+    const ApiStages =
+        Array.isArray(
+            Plant?.ImageStages
+        )
+            ? Plant.ImageStages
+            : [];
+
+    let HighestStage =
+        StaticImages.length;
+
+    for (const ImageStage of ApiStages) {
+        const Stage = Number(
+            typeof ImageStage === "object" &&
+            ImageStage !== null
+                ? ImageStage.Stage
+                : ImageStage
+        );
+
+        if (
+            Number.isInteger(Stage) &&
+            Stage > HighestStage
+        ) {
+            HighestStage = Stage;
+        }
+    }
+
+    const Images =
+        Array.from(
+            {length: HighestStage},
+            (_, Index) =>
+                StaticImages[Index] ?? null
+        );
+
+    if (Plant === undefined || Plant === null) {
+        return Images;
+    }
+
+    for (const ImageStage of ApiStages) {
+        const Stage = Number(
+            typeof ImageStage === "object" &&
+            ImageStage !== null
+                ? ImageStage.Stage
+                : ImageStage
+        );
+
+        if (
+            !Number.isInteger(Stage) ||
+            Stage < 1
+        ) {
+            continue;
+        }
+
+        const Revision =
+            typeof ImageStage === "object" &&
+            ImageStage !== null
+                ? Number(
+                    ImageStage.Revision ?? 0
+                )
+                : 0;
+
+        const Query =
+            new URLSearchParams({
+                PlantId: String(Plant.Id),
+                Stage: String(Stage),
+                v: String(
+                    Number.isFinite(Revision)
+                        ? Revision
+                        : 0
+                )
+            });
+
+        Images[Stage - 1] =
+            ApiUrl +
+            "/PlantImage.php?" +
+            Query.toString();
+    }
+
+    return Images;
+}
+
+
+function GetPlantMatureImageSource(
+    PlantOrKey
+) {
+    const Images =
+        GetPlantImageSources(
+            PlantOrKey
+        );
+
+    for (
+        let Index = Images.length - 1;
+        Index >= 0;
+        Index--
+    ) {
+        if (
+            typeof Images[Index] ===
+                "string" &&
+            Images[Index].length > 0
+        ) {
+            return Images[Index];
+        }
+    }
+
+    return null;
+}
+

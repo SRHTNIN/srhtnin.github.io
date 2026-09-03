@@ -1051,11 +1051,13 @@ function CreateMutationPlantCell(
         "PlantTile GuideRecipeCell GuideRecipePlant";
 
 
-    const Images =
-        PlantImages[PlantKey] ?? [];
+    const MatureImage =
+        GetPlantMatureImageSource(
+            Plant
+        );
 
 
-    if (Images.length > 0) {
+    if (MatureImage !== null) {
         const Image =
             document.createElement(
                 "img"
@@ -1065,9 +1067,7 @@ function CreateMutationPlantCell(
             "PlantSprite GuideRecipeImage";
 
         Image.src =
-            Images[
-                Images.length - 1
-            ];
+            MatureImage;
 
         Image.alt =
             "";
