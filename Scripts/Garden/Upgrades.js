@@ -1,7 +1,7 @@
 const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
-const MutationHintsUpgradeCost = 1000;
+const MutationHintsUpgradeCost = 1500;
 
 
 function GetGardenColumnUpgradeCost(
