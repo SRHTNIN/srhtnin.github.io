@@ -448,8 +448,8 @@ function BindQuickBuyControls() {
             "One"
         ],
         [
-            "QuickBuyTwoButton",
-            "Two"
+            "QuickBuyTenButton",
+            "Ten"
         ],
         [
             "QuickBuyGardenButton",
@@ -483,7 +483,7 @@ function BindQuickBuyControls() {
 function GetQuickBuyAmount() {
     if (
         QuickBuyAmountMode ===
-        "Two"
+        "Ten"
     ) {
         return 10;
     }
@@ -522,9 +522,9 @@ function RenderQuickBuy() {
             "QuickBuyOneButton"
         );
 
-    const TwoButton =
+    const TenButton =
         document.getElementById(
-            "QuickBuyTwoButton"
+            "QuickBuyTenButton"
         );
 
     const GardenButton =
@@ -535,7 +535,7 @@ function RenderQuickBuy() {
 
     const AmountButtons = [
         [OneButton, "One", 1],
-        [TwoButton, "Two", 2],
+        [TenButton, "Ten", 10],
         [
             GardenButton,
             "Garden",
