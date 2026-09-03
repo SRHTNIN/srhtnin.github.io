@@ -44,29 +44,62 @@ $PageSection = "Shop";
                 id="PermanentUpgrades"
                 class="ShopSection"
             >
-                <h2>Permanent upgrades</h2>
-
-                <p>
-                    Expand your active Garden, buy additional Gardens,
-                    or unlock information and quality-of-life features.
-                </p>
+                <h2 class="ShopSectionHeading">
+                    <button
+                        id="PermanentUpgradesToggle"
+                        class="ShopSectionToggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="PermanentUpgradesContent"
+                    >
+                        <span class="ShopSectionArrow" aria-hidden="true">&gt;</span>
+                        <span>Permanent upgrades</span>
+                    </button>
+                </h2>
 
                 <div
-                    id="ShopGardenUpgradeList"
-                    class="ShopSeedList"
-                ></div>
+                    id="PermanentUpgradesContent"
+                    class="ShopSectionContent"
+                    hidden
+                >
+                    <p>
+                        Expand your active Garden, buy additional Gardens,
+                        or unlock information and quality-of-life features.
+                    </p>
+
+                    <div
+                        id="ShopGardenUpgradeList"
+                        class="ShopSeedList"
+                    ></div>
+                </div>
             </section>
 
             <section
                 id="Seeds"
                 class="ShopSection"
             >
-                <h2>Seeds</h2>
+                <h2 class="ShopSectionHeading">
+                    <button
+                        id="SeedsToggle"
+                        class="ShopSectionToggle"
+                        type="button"
+                        aria-expanded="true"
+                        aria-controls="SeedsContent"
+                    >
+                        <span class="ShopSectionArrow" aria-hidden="true">&gt;</span>
+                        <span>Seeds</span>
+                    </button>
+                </h2>
 
                 <div
-                    id="ShopSeedList"
-                    class="ShopSeedList"
-                ></div>
+                    id="SeedsContent"
+                    class="ShopSectionContent"
+                >
+                    <div
+                        id="ShopSeedList"
+                        class="ShopSeedList"
+                    ></div>
+                </div>
             </section>
 
             <p id="ShopMessage" class="PageMessage">

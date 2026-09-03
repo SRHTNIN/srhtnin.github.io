@@ -21,7 +21,66 @@ async function StartShop() {
 
     ShopSave = await LoadGame();
 
+    BindShopSectionToggles();
     RenderShop();
+}
+
+
+function BindShopSectionToggles() {
+    BindShopSectionToggle(
+        "PermanentUpgradesToggle",
+        "PermanentUpgradesContent"
+    );
+
+    BindShopSectionToggle(
+        "SeedsToggle",
+        "SeedsContent"
+    );
+}
+
+
+function BindShopSectionToggle(
+    ToggleId,
+    ContentId
+) {
+    const Toggle =
+        document.getElementById(
+            ToggleId
+        );
+
+    const Content =
+        document.getElementById(
+            ContentId
+        );
+
+    if (
+        Toggle === null ||
+        Content === null
+    ) {
+        return;
+    }
+
+    Toggle.addEventListener(
+        "click",
+        () => {
+            const IsExpanded =
+                Toggle.getAttribute(
+                    "aria-expanded"
+                ) === "true";
+
+            const NewExpanded =
+                !IsExpanded;
+
+            Toggle.setAttribute(
+                "aria-expanded",
+                String(NewExpanded)
+            );
+
+            Content.hidden =
+                !NewExpanded;
+
+        }
+    );
 }
 
 
@@ -413,7 +472,12 @@ function CreatePlantInformationUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader";
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
 
 
     const Name =
@@ -529,7 +593,12 @@ function CreateGardenOverviewUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader";
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
 
 
     const Name =
@@ -645,7 +714,12 @@ function CreateGardenEconomyUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader";
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
 
 
     const Name =
@@ -759,7 +833,12 @@ function CreateMutationHintsUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader";
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
 
 
     const Name =

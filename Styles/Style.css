@@ -1126,6 +1126,48 @@ input, button, textarea, select {
     margin-top: 1.5rem;
 }
 
+.ShopSectionHeading {
+    margin-bottom: 0.75rem;
+}
+
+.ShopSectionToggle {
+    display: flex;
+    width: 100%;
+    gap: 0.55rem;
+    align-items: center;
+    padding: 0;
+    cursor: pointer;
+    color: var(--Text);
+    background: none;
+    border: 0;
+    font-size: inherit;
+    text-align: left;
+}
+
+.ShopSectionToggle:hover {
+    color: var(--Sky);
+}
+
+.ShopSectionToggle:focus-visible {
+    outline: 3px solid var(--Yellow);
+    outline-offset: 3px;
+}
+
+.ShopSectionArrow {
+    width: 1ch;
+    flex: 0 0 1ch;
+    color: var(--Overlay2);
+    transform-origin: center;
+}
+
+.ShopSectionToggle[aria-expanded="true"] .ShopSectionArrow {
+    transform: rotate(90deg);
+}
+
+.ShopSectionContent[hidden] {
+    display: none;
+}
+
 .ShopSeedList {
     display: grid;
     grid-template-columns: repeat( auto-fit, minmax(15rem, 1fr) );
@@ -1151,6 +1193,11 @@ input, button, textarea, select {
 
 .ShopItemHeader h3 {
     margin: 0;
+}
+
+.ShopItemHeaderOwned {
+    color: var(--Overlay1);
+    border-bottom-color: var(--Surface1);
 }
 
 .ShopItemBody {

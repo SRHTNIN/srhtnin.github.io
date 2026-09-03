@@ -48,6 +48,20 @@ $PageSection = "Admin";
                     >
                         New plant
                     </button>
+
+                    <label for="AdminPlantDuplicateSelect">
+                        Duplicate existing
+                    </label>
+
+                    <select id="AdminPlantDuplicateSelect"></select>
+
+                    <button
+                        id="AdminPlantDuplicateButton"
+                        class="ActionButton AdminInlineButton"
+                        type="button"
+                    >
+                        Duplicate
+                    </button>
                 </div>
 
                 <form

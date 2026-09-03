@@ -65,6 +65,13 @@ function BindAdminPlantEditor() {
     );
 
     document.getElementById(
+        "AdminPlantDuplicateButton"
+    ).addEventListener(
+        "click",
+        DuplicateAdminPlant
+    );
+
+    document.getElementById(
         "AdminPlantForm"
     ).addEventListener(
         "submit",
@@ -279,6 +286,7 @@ async function LoadAdminPlants(
         AdminPlantMutationCatalogue;
 
     RenderAdminPlantSelect();
+    RenderAdminPlantDuplicateSelect();
 
     const Keys =
         GetSortedAdminPlantKeys();
@@ -372,6 +380,70 @@ function RenderAdminPlantSelect() {
         Select.appendChild(
             Option
         );
+    }
+}
+
+
+function RenderAdminPlantDuplicateSelect() {
+    const Select =
+        document.getElementById(
+            "AdminPlantDuplicateSelect"
+        );
+
+    if (Select === null) {
+        return;
+    }
+
+    const PreviousValue =
+        Select.value;
+
+    Select.replaceChildren();
+
+    for (
+        const PlantKey
+        of GetSortedAdminPlantKeys()
+    ) {
+        const Plant =
+            AdminPlantCatalogue[
+                PlantKey
+            ];
+
+        const Option =
+            document.createElement(
+                "option"
+            );
+
+        Option.value =
+            PlantKey;
+
+        Option.textContent =
+            String(
+                Plant.Id
+            ).padStart(
+                3,
+                "0"
+            ) +
+            " — " +
+            Plant.Name +
+            (
+                Plant.Archived === true
+                    ? " (archived)"
+                    : ""
+            );
+
+        Select.appendChild(
+            Option
+        );
+    }
+
+    if (
+        PreviousValue !== "" &&
+        AdminPlantCatalogue[
+            PreviousValue
+        ] !== undefined
+    ) {
+        Select.value =
+            PreviousValue;
     }
 }
 
@@ -472,6 +544,123 @@ function LoadAdminPlantIntoForm(
 
     UpdateAdminPlantShopFields();
     RenderAdminPlantPreview();
+}
+
+
+function DuplicateAdminPlant() {
+    const SourcePlantKey =
+        document.getElementById(
+            "AdminPlantDuplicateSelect"
+        ).value;
+
+    const SourcePlant =
+        AdminPlantCatalogue[
+            SourcePlantKey
+        ];
+
+    if (SourcePlant === undefined) {
+        SetAdminPlantMessage(
+            "Choose a plant to duplicate."
+        );
+
+        return;
+    }
+
+    AdminPlantEditingKey = null;
+
+    document.getElementById(
+        "AdminPlantSelect"
+    ).value = "";
+
+    SetAdminPlantField(
+        "AdminPlantId",
+        GetNextAdminPlantId()
+    );
+
+    SetAdminPlantField(
+        "AdminPlantKey",
+        ""
+    );
+
+    SetAdminPlantField(
+        "AdminPlantName",
+        ""
+    );
+
+    SetAdminPlantField(
+        "AdminPlantDescription",
+        SourcePlant.Description ?? ""
+    );
+
+    SetAdminPlantField(
+        "AdminPlantTags",
+        Array.isArray(
+            SourcePlant.Tags
+        )
+            ? SourcePlant.Tags.join(
+                ", "
+            )
+            : ""
+    );
+
+    SetAdminPlantDurationFields(
+        Number(
+            SourcePlant.GrowthTime ??
+            0
+        )
+    );
+
+    SetAdminPlantField(
+        "AdminPlantHarvestMultiplier",
+        Number(
+            SourcePlant.HarvestMultiplier ??
+            1.5
+        )
+    );
+
+    document.getElementById(
+        "AdminPlantShopPlant"
+    ).checked =
+        SourcePlant.Shop?.ShopPlant === true;
+
+    SetAdminPlantField(
+        "AdminPlantBaseCost",
+        SourcePlant.Shop?.BaseCost ?? ""
+    );
+
+    SetAdminPlantField(
+        "AdminPlantEffects",
+        JSON.stringify(
+            SourcePlant.Effects ?? {},
+            null,
+            4
+        )
+    );
+
+    document.getElementById(
+        "AdminPlantId"
+    ).readOnly = false;
+
+    document.getElementById(
+        "AdminPlantKey"
+    ).readOnly = false;
+
+    document.getElementById(
+        "AdminPlantArchiveNote"
+    ).hidden = true;
+
+    UpdateAdminPlantShopFields();
+    RenderAdminPlantPreview();
+
+    document.getElementById(
+        "AdminPlantName"
+    ).focus();
+
+    SetAdminPlantMessage(
+        "Duplicated " +
+        SourcePlant.Name +
+        ". Give the new plant a name and Plant Key before saving. Sprites are not copied."
+    );
 }
 
 
