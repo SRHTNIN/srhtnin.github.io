@@ -185,7 +185,7 @@ $PageSection = "Garden";
                         </button>
 
                         <button
-                            id="QuickBuyTenButton"
+                            id="QuickBuyTwoButton"
                             class="QuickBuyAmountButton"
                             type="button"
                         >

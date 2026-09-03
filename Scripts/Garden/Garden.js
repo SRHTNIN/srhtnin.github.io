@@ -483,7 +483,7 @@ function BindQuickBuyControls() {
 function GetQuickBuyAmount() {
     if (
         QuickBuyAmountMode ===
-        "Ten"
+        "Two"
     ) {
         return 10;
     }
