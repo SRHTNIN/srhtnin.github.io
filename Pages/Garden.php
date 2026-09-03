@@ -17,63 +17,117 @@ $PageSection = "Garden";
         <main class="MainContainer">
             <h1>Garden</h1>
 
-            <div class="StatusPanel">
-                <div class="GardenStatusLine">
-                    <strong>Dew:</strong>
-                    <span id="DewAmount">0</span>
+            <div
+                id="GardenInfoPanel"
+                class="StatusPanel GardenInfoPanel"
+            >
+                <div class="GardenInfoRow GardenInfoTopRow">
+                    <div class="GardenInfoSection GardenInfoPrimarySection">
+                        <div class="GardenStatusLine">
+                            <strong>Dew:</strong>
+                            <span id="DewAmount">0</span>
+                        </div>
+
+                        <div
+                            id="NextHarvestLine"
+                            class="GardenStatusLine"
+                        >
+                            <strong>Next harvest:</strong>
+                            <span id="NextHarvest">Nothing planted</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="GardenInfoSection GardenInfoReservedSection"
+                        aria-hidden="true"
+                    ></div>
                 </div>
 
                 <div
-                    id="NextHarvestLine"
-                    class="GardenStatusLine"
-                >
-                    <strong>Next harvest:</strong>
-                    <span id="NextHarvest">Nothing planted</span>
-                </div>
-
-                <div
-                    id="GardenOverviewDetails"
-                    class="GardenOverviewDetails"
+                    id="GardenInfoDetailRow"
+                    class="GardenInfoRow GardenInfoDetailRow"
                     hidden
                 >
                     <div
-                        id="GardenSizeOverviewLine"
-                        class="GardenStatusLine"
+                        id="GardenOverviewSection"
+                        class="GardenInfoSection GardenOverviewSection"
                     >
-                        <strong>Garden size:</strong>
-                        <span id="GardenSizeOverview">3×3 (9)</span>
+                        <div
+                            id="GardenOverviewDetails"
+                            class="GardenOverviewDetails"
+                            hidden
+                        >
+                            <div
+                                id="GardenSizeOverviewLine"
+                                class="GardenStatusLine"
+                            >
+                                <strong>Garden size:</strong>
+                                <span id="GardenSizeOverview">3×3 (9)</span>
+                            </div>
+
+                            <div
+                                id="EmptyPlotsOverviewLine"
+                                class="GardenStatusLine"
+                            >
+                                <strong>Empty plots:</strong>
+                                <span id="EmptyPlotsOverview">9/9</span>
+                            </div>
+
+                            <div
+                                id="PlantedPlotsOverviewLine"
+                                class="GardenStatusLine"
+                            >
+                                <strong>Planted plots:</strong>
+                                <span id="PlantedPlotsOverview">0/9</span>
+                            </div>
+
+                            <div
+                                id="GrowingPlotsOverviewLine"
+                                class="GardenStatusLine"
+                            >
+                                <strong>Growing:</strong>
+                                <span id="GrowingPlotsOverview">0/9</span>
+                            </div>
+
+                            <div
+                                id="ReadyPlotsOverviewLine"
+                                class="GardenStatusLine"
+                            >
+                                <strong>Ready to harvest:</strong>
+                                <span id="ReadyPlotsOverview">0/9</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div
-                        id="EmptyPlotsOverviewLine"
-                        class="GardenStatusLine"
+                        id="GardenEconomySection"
+                        class="GardenInfoSection GardenEconomySection"
                     >
-                        <strong>Empty plots:</strong>
-                        <span id="EmptyPlotsOverview">9/9</span>
-                    </div>
+                        <div
+                            id="GardenEconomyDetails"
+                            class="GardenEconomyDetails"
+                            hidden
+                        >
+                            <div class="GardenStatusLine">
+                                <strong>Dew invested:</strong>
+                                <span id="GardenDewInvested">0</span>
+                            </div>
 
-                    <div
-                        id="PlantedPlotsOverviewLine"
-                        class="GardenStatusLine"
-                    >
-                        <strong>Planted plots:</strong>
-                        <span id="PlantedPlotsOverview">0/9</span>
-                    </div>
+                            <div class="GardenStatusLine">
+                                <strong>Harvest value:</strong>
+                                <span id="GardenHarvestValue">0</span>
+                            </div>
 
-                    <div
-                        id="GrowingPlotsOverviewLine"
-                        class="GardenStatusLine"
-                    >
-                        <strong>Growing:</strong>
-                        <span id="GrowingPlotsOverview">0/9</span>
-                    </div>
+                            <div class="GardenStatusLine">
+                                <strong>Net profit:</strong>
+                                <span id="GardenNetProfit">0</span>
+                            </div>
 
-                    <div
-                        id="ReadyPlotsOverviewLine"
-                        class="GardenStatusLine"
-                    >
-                        <strong>Ready to harvest:</strong>
-                        <span id="ReadyPlotsOverview">0/9</span>
+                            <div class="GardenStatusLine">
+                                <strong>Farm DPH:</strong>
+                                <span id="GardenDewPerHour">0 Dew</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -127,6 +127,7 @@ function RenderGardenUpgrades() {
         CreateNewGardenCard(),
         CreatePlantInformationUpgradeCard(),
         CreateGardenOverviewUpgradeCard(),
+        CreateGardenEconomyUpgradeCard(),
         CreateMutationHintsUpgradeCard()
     );
 }
@@ -603,6 +604,120 @@ function CreateGardenOverviewUpgradeCard() {
         BuyButton.addEventListener(
             "click",
             BuyGardenOverviewUpgrade
+        );
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
+}
+
+
+function CreateGardenEconomyUpgradeCard() {
+    const Cost =
+        GetGardenEconomyUpgradeCost();
+
+    const IsOwned =
+        HasGardenEconomyUpgrade(
+            ShopSave
+        );
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Garden economy";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Add live economy information for the active Garden: Dew invested, total harvest value, net profit after replanting, and Farm DPH.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Garden economics",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            "Scope",
+            "Active Garden"
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            BuyGardenEconomyUpgrade
         );
     }
 
@@ -1449,6 +1564,64 @@ async function BuyGardenOverviewUpgrade() {
             "Bought Garden overview for " +
             Cost.toLocaleString() +
             " Dew. All overview lines are now visible."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyGardenEconomyUpgrade() {
+    if (
+        ShopPurchasePending ||
+        HasGardenEconomyUpgrade(
+            ShopSave
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetGardenEconomyUpgradeCost();
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for Garden economy."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockGardenEconomy(
+            ShopSave
+        );
+
+
+        SetShopMessage(
+            "Bought Garden economy for " +
+            Cost.toLocaleString() +
+            " Dew. Economy information is now visible on the Garden page."
         );
 
         RenderShop();

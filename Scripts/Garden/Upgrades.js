@@ -1,6 +1,7 @@
 const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
+const GardenEconomyUpgradeCost = 1000;
 const MutationHintsUpgradeCost = 1500;
 const NewGardenBaseCost = 15000;
 const NewGardenCostMultiplier = 1.5;
@@ -236,6 +237,32 @@ function UnlockGardenOverview(
         true;
 
     SaveData.Preferences.ShowReadyPlots =
+        true;
+}
+
+
+function HasGardenEconomyUpgrade(
+    SaveData
+) {
+    return (
+        SaveData
+            ?.Upgrades
+            ?.GardenEconomy ===
+        true
+    );
+}
+
+
+function GetGardenEconomyUpgradeCost() {
+    return GardenEconomyUpgradeCost;
+}
+
+
+function UnlockGardenEconomy(
+    SaveData
+) {
+    SaveData.Upgrades ??= {};
+    SaveData.Upgrades.GardenEconomy =
         true;
 }
 

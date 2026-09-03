@@ -717,6 +717,86 @@ function GetPlantDewPerHour(
 }
 
 
+function GetGardenEconomySummary(
+    SaveData,
+    Garden = SaveData?.Garden
+) {
+    if (
+        Garden === null ||
+        Garden === undefined ||
+        !Array.isArray(
+            Garden.Plots
+        )
+    ) {
+        return null;
+    }
+
+
+    let DewInvested = 0;
+    let HarvestValue = 0;
+    let NetProfit = 0;
+    let DewPerHour = 0;
+
+
+    for (
+        const Plot
+        of Garden.Plots
+    ) {
+        if (Plot === null) {
+            continue;
+        }
+
+        const Plant =
+            Plants[Plot.Plant];
+
+        if (Plant === undefined) {
+            return null;
+        }
+
+        const Cost =
+            GetPlantShopCost(
+                SaveData,
+                Plant.Id
+            );
+
+        const Reward =
+            GetPlantHarvestReward(
+                SaveData,
+                Plant.Id
+            );
+
+        const PlantDewPerHour =
+            GetPlantDewPerHour(
+                SaveData,
+                Plant.Id
+            );
+
+        if (
+            Cost === null ||
+            Reward === null ||
+            PlantDewPerHour === null
+        ) {
+            return null;
+        }
+
+        DewInvested += Cost;
+        HarvestValue += Reward;
+        NetProfit +=
+            Reward - Cost;
+        DewPerHour +=
+            PlantDewPerHour;
+    }
+
+
+    return {
+        DewInvested,
+        HarvestValue,
+        NetProfit,
+        DewPerHour
+    };
+}
+
+
 function FormatDewPerHour(
     DewPerHour
 ) {

@@ -6,6 +6,42 @@ let MutationCheckPending = false;
 
 const GardenUpdateInterval = 1000;
 
+const GardenBorderColours = [
+    "var(--Rosewater)",
+    "var(--Flamingo)",
+    "var(--Pink)",
+    "var(--Mauve)",
+    "var(--Red)",
+    "var(--Maroon)",
+    "var(--Peach)",
+    "var(--Yellow)",
+    "var(--Green)",
+    "var(--Teal)",
+    "var(--Sky)",
+    "var(--Sapphire)",
+    "var(--Blue)",
+    "var(--Lavender)"
+];
+
+
+function GetGardenBorderColour(
+    GardenIndex
+) {
+    const ColourCount =
+        GardenBorderColours.length;
+
+    const NormalizedIndex =
+        (
+            Number(GardenIndex) %
+            ColourCount +
+            ColourCount
+        ) % ColourCount;
+
+    return GardenBorderColours[
+        NormalizedIndex
+    ];
+}
+
 
 async function StartGame() {
     try {
@@ -62,6 +98,8 @@ function RenderGame() {
     RenderGarden();
     RenderNextHarvest();
     RenderGardenOverview();
+    RenderGardenEconomy();
+    RenderGardenInfoLayout();
 }
 
 
@@ -217,12 +255,66 @@ function RenderGardenSelector() {
     const GardenIndex =
         GameSave.ActiveGardenIndex;
 
+    const HasPreviousGarden =
+        GardenIndex > 0;
+
+    const HasNextGarden =
+        GardenIndex <
+        GardenCount - 1;
+
     PreviousButton.disabled =
-        GardenIndex <= 0;
+        !HasPreviousGarden;
 
     NextButton.disabled =
-        GardenIndex >=
-        GardenCount - 1;
+        !HasNextGarden;
+
+
+    PreviousButton.style.setProperty(
+        "--GardenSelectorBorderColour",
+        HasPreviousGarden
+            ? GetGardenBorderColour(
+                GardenIndex - 1
+            )
+            : "var(--Surface2)"
+    );
+
+    NameInput.style.setProperty(
+        "--GardenSelectorBorderColour",
+        GetGardenBorderColour(
+            GardenIndex
+        )
+    );
+
+    NextButton.style.setProperty(
+        "--GardenSelectorBorderColour",
+        HasNextGarden
+            ? GetGardenBorderColour(
+                GardenIndex + 1
+            )
+            : "var(--Surface2)"
+    );
+
+
+    PreviousButton.setAttribute(
+        "aria-label",
+        HasPreviousGarden
+            ? "Previous Garden: " +
+                GameSave.Gardens[
+                    GardenIndex - 1
+                ].Name
+            : "No previous Garden"
+    );
+
+    NextButton.setAttribute(
+        "aria-label",
+        HasNextGarden
+            ? "Next Garden: " +
+                GameSave.Gardens[
+                    GardenIndex + 1
+                ].Name
+            : "No next Garden"
+    );
+
 
     if (
         document.activeElement !==
@@ -555,29 +647,11 @@ function RenderGarden() {
         GameSave.Garden.Width
     );
 
-    const GardenBorderColours = [
-        "var(--Rosewater)",
-        "var(--Flamingo)",
-        "var(--Pink)",
-        "var(--Mauve)",
-        "var(--Red)",
-        "var(--Maroon)",
-        "var(--Peach)",
-        "var(--Yellow)",
-        "var(--Green)",
-        "var(--Teal)",
-        "var(--Sky)",
-        "var(--Sapphire)",
-        "var(--Blue)",
-        "var(--Lavender)"
-    ];
-
     GardenPanel.style.setProperty(
         "--GardenBorderColour",
-        GardenBorderColours[
-            GameSave.ActiveGardenIndex %
-            GardenBorderColours.length
-        ]
+        GetGardenBorderColour(
+            GameSave.ActiveGardenIndex
+        )
     );
 
     GardenGrid.replaceChildren();
@@ -1196,6 +1270,8 @@ async function GardenTick() {
     RenderGarden();
     RenderNextHarvest();
     RenderGardenOverview();
+    RenderGardenEconomy();
+    RenderGardenInfoLayout();
 
 
     if (MutationCheckPending) {
@@ -1769,6 +1845,130 @@ function FormatRemainingTime(
     );
 }
 
+
+function RenderGardenEconomy() {
+    const Details =
+        document.getElementById(
+            "GardenEconomyDetails"
+        );
+
+    if (Details === null) {
+        return;
+    }
+
+
+    if (
+        !HasGardenEconomyUpgrade(
+            GameSave
+        )
+    ) {
+        Details.hidden = true;
+
+        return;
+    }
+
+
+    Details.hidden = false;
+
+    const Summary =
+        GetGardenEconomySummary(
+            GameSave
+        );
+
+    const Values = {
+        GardenDewInvested:
+            Summary === null
+                ? "Unavailable"
+                : Summary.DewInvested
+                    .toLocaleString(),
+
+        GardenHarvestValue:
+            Summary === null
+                ? "Unavailable"
+                : Summary.HarvestValue
+                    .toLocaleString(),
+
+        GardenNetProfit:
+            Summary === null
+                ? "Unavailable"
+                : Summary.NetProfit
+                    .toLocaleString(),
+
+        GardenDewPerHour:
+            Summary === null
+                ? "Unavailable"
+                : FormatDewPerHour(
+                    Summary.DewPerHour
+                )
+    };
+
+
+    for (
+        const [ElementId, Value]
+        of Object.entries(Values)
+    ) {
+        const Element =
+            document.getElementById(
+                ElementId
+            );
+
+        if (Element !== null) {
+            Element.textContent =
+                Value;
+        }
+    }
+}
+
+
+function RenderGardenInfoLayout() {
+    const DetailRow =
+        document.getElementById(
+            "GardenInfoDetailRow"
+        );
+
+    const OverviewSection =
+        document.getElementById(
+            "GardenOverviewSection"
+        );
+
+    const EconomySection =
+        document.getElementById(
+            "GardenEconomySection"
+        );
+
+    if (
+        DetailRow === null ||
+        OverviewSection === null ||
+        EconomySection === null
+    ) {
+        return;
+    }
+
+
+    const HasOverview =
+        HasGardenOverviewUpgrade(
+            GameSave
+        );
+
+    const HasEconomy =
+        HasGardenEconomyUpgrade(
+            GameSave
+        );
+
+    DetailRow.hidden =
+        !HasOverview &&
+        !HasEconomy;
+
+    OverviewSection.classList.toggle(
+        "GardenInfoSectionEmpty",
+        !HasOverview
+    );
+
+    EconomySection.classList.toggle(
+        "GardenInfoSectionEmpty",
+        !HasEconomy
+    );
+}
 
 document.addEventListener(
     "DOMContentLoaded",

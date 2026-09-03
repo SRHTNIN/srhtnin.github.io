@@ -420,6 +420,7 @@ function CreateNewSave() {
             PlotSize: 0,
             PlantInformation: false,
             GardenOverview: false,
+            GardenEconomy: false,
             MutationHints: false
         },
 
@@ -608,6 +609,10 @@ function NormalizeSaveData(
 
     SaveData.Upgrades.GardenOverview =
         SaveData.Upgrades.GardenOverview ===
+        true;
+
+    SaveData.Upgrades.GardenEconomy =
+        SaveData.Upgrades.GardenEconomy ===
         true;
 
     SaveData.Upgrades.MutationHints =

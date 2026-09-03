@@ -83,8 +83,38 @@ body {
     border: 3px solid var(--Surface2);
 }
 
+.GardenInfoPanel {
+    padding: 0;
+}
+
+.GardenInfoRow {
+    display: grid;
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
+}
+
+.GardenInfoRow + .GardenInfoRow {
+    border-top: 3px solid var(--Surface2);
+}
+
+.GardenInfoSection {
+    min-width: 0;
+    padding: 0.75rem 1rem;
+}
+
+.GardenInfoSection + .GardenInfoSection {
+    border-left: 3px solid var(--Surface2);
+}
+
+.GardenInfoReservedSection {
+    min-height: 100%;
+}
+
 .GardenOverviewDetails {
     margin-top: 0.5rem;
+}
+
+.GardenInfoPanel .GardenOverviewDetails {
+    margin-top: 0;
 }
 
 .GardenStatusLine + .GardenStatusLine {
@@ -327,7 +357,17 @@ input, button, textarea, select {
     min-width: 0;
     padding-right: 0;
     padding-left: 0;
-    font-size: 1.25rem;
+    border-color: var(--GardenSelectorBorderColour, var(--Surface2));
+    font-size: 1.5rem;
+}
+
+.GardenSelectorButton:hover:not(:disabled) {
+    border-color: var(--GardenSelectorBorderColour, var(--Surface2));
+}
+
+.GardenSelectorButton:disabled {
+    cursor: default;
+    border-color: var(--Surface2);
 }
 
 .GardenNameInput {
@@ -336,19 +376,43 @@ input, button, textarea, select {
     padding: 0.6rem 0.75rem;
     color: var(--Text);
     background-color: var(--Surface0);
-    border: 3px solid var(--Surface2);
+    border: 3px solid var(--GardenSelectorBorderColour, var(--Surface2));
     border-radius: 0;
+    font-size: 1.5rem;
     text-align: center;
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
 .GardenNameInput:hover {
-    border-color: var(--Sky);
+    border-color: var(--GardenSelectorBorderColour, var(--Surface2));
 }
 
 .GardenNameInput:focus {
     outline: 3px solid var(--Yellow);
     outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+    .GardenInfoTopRow {
+        grid-template-columns: 1fr;
+    }
+
+    .GardenInfoReservedSection {
+        display: none;
+    }
+
+    .GardenInfoDetailRow {
+        grid-template-columns: 1fr;
+    }
+
+    .GardenInfoDetailRow .GardenInfoSection + .GardenInfoSection {
+        border-top: 3px solid var(--Surface2);
+        border-left: 0;
+    }
+
+    .GardenInfoDetailRow .GardenInfoSectionEmpty {
+        display: none;
+    }
 }
 
 .GardenLayout {
