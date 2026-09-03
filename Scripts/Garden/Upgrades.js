@@ -1,6 +1,7 @@
 const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
+const MutationHintsUpgradeCost = 1000;
 
 
 function GetGardenColumnUpgradeCost(
@@ -187,5 +188,31 @@ function UnlockGardenOverview(
         true;
 
     SaveData.Preferences.ShowReadyPlots =
+        true;
+}
+
+
+function HasMutationHintsUpgrade(
+    SaveData
+) {
+    return (
+        SaveData
+            ?.Upgrades
+            ?.MutationHints ===
+        true
+    );
+}
+
+
+function GetMutationHintsUpgradeCost() {
+    return MutationHintsUpgradeCost;
+}
+
+
+function UnlockMutationHints(
+    SaveData
+) {
+    SaveData.Upgrades ??= {};
+    SaveData.Upgrades.MutationHints =
         true;
 }

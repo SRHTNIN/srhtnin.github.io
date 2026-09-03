@@ -1,7 +1,7 @@
 const GameContentCacheName =
     "SarahtoninGardenContent";
 
-const GameContentCacheSchemaVersion = 1;
+const GameContentCacheSchemaVersion = 2;
 
 /*
  * Once content has been checked, page loads for the next

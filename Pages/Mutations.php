@@ -20,7 +20,9 @@ $PageSection = "Mutations";
             <p>
                 Every mutation you discover is recorded here.
                 Once found, its recipe and result stay visible so
-                you can recreate it whenever you want.
+                you can recreate it whenever you want. Mutation
+                hints may also appear here for recipes you are
+                currently capable of discovering.
             </p>
 
             <div
@@ -43,6 +45,7 @@ $PageSection = "Mutations";
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/Upgrades.js"></script>
         <script src="/Scripts/Garden/MutationEncyclopedia.js"></script>
     </body>
 </html>

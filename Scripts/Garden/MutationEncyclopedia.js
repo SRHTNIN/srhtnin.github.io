@@ -31,31 +31,54 @@ function RenderMutationEncyclopedia() {
     List.replaceChildren();
 
 
-    const DiscoveredMutations =
+    const AllMutations =
         Object.values(
             MutationSets
         )
-            .filter(
-                Mutation =>
-                    HasDiscoveredMutation(
-                        MutationEncyclopediaSave,
-                        Mutation.Id
-                    )
-            )
             .sort(
                 (A, B) =>
                     A.Id - B.Id
             );
 
-
-    if (
-        DiscoveredMutations.length === 0
-    ) {
-        SetMutationEncyclopediaMessage(
-            "No mutations discovered yet."
+    const DiscoveredMutations =
+        AllMutations.filter(
+            Mutation =>
+                HasDiscoveredMutation(
+                    MutationEncyclopediaSave,
+                    Mutation.Id
+                )
         );
 
-        return;
+    const AvailableHints =
+        HasMutationHintsUpgrade(
+            MutationEncyclopediaSave
+        )
+            ? AllMutations.filter(
+                Mutation =>
+                    !HasDiscoveredMutation(
+                        MutationEncyclopediaSave,
+                        Mutation.Id
+                    ) &&
+                    HasUsableMutationHint(
+                        Mutation
+                    ) &&
+                    CanAttemptHintedMutation(
+                        Mutation,
+                        MutationEncyclopediaSave
+                    )
+            )
+            : [];
+
+
+    for (
+        const Mutation
+        of AvailableHints
+    ) {
+        List.appendChild(
+            CreateMutationHintCard(
+                Mutation.Hint
+            )
+        );
     }
 
 
@@ -71,13 +94,332 @@ function RenderMutationEncyclopedia() {
     }
 
 
-    SetMutationEncyclopediaMessage(
+    if (
+        DiscoveredMutations.length === 0 &&
+        AvailableHints.length === 0
+    ) {
+        SetMutationEncyclopediaMessage(
+            "No mutations discovered yet."
+        );
+
+        return;
+    }
+
+
+    const MessageParts = [];
+
+    MessageParts.push(
         DiscoveredMutations.length === 1
             ? "1 mutation discovered."
             : DiscoveredMutations.length
                 .toLocaleString() +
                 " mutations discovered."
     );
+
+    if (AvailableHints.length > 0) {
+        MessageParts.push(
+            AvailableHints.length === 1
+                ? "1 hint available."
+                : AvailableHints.length
+                    .toLocaleString() +
+                    " hints available."
+        );
+    }
+
+    SetMutationEncyclopediaMessage(
+        MessageParts.join(
+            " "
+        )
+    );
+}
+
+
+function HasUsableMutationHint(
+    Mutation
+) {
+    return (
+        typeof Mutation.Hint ===
+            "string" &&
+        Mutation.Hint.trim().length > 0
+    );
+}
+
+
+function CanAttemptHintedMutation(
+    Mutation,
+    SaveData
+) {
+    if (
+        !CanMutationPatternFitGarden(
+            Mutation,
+            SaveData
+        )
+    ) {
+        return false;
+    }
+
+
+    if (!Array.isArray(Mutation.Pattern)) {
+        return false;
+    }
+
+
+    return Mutation.Pattern.every(
+        Row =>
+            Array.isArray(Row) &&
+            Row.every(
+                Matcher =>
+                    IsHintMatcherAvailable(
+                        Matcher,
+                        SaveData
+                    )
+            )
+    );
+}
+
+
+function CanMutationPatternFitGarden(
+    Mutation,
+    SaveData
+) {
+    const Pattern =
+        Mutation.Pattern;
+
+    if (
+        !Array.isArray(Pattern) ||
+        Pattern.length === 0
+    ) {
+        return false;
+    }
+
+
+    const PatternHeight =
+        Pattern.length;
+
+    const PatternWidth =
+        Math.max(
+            0,
+            ...Pattern.map(
+                Row =>
+                    Array.isArray(Row)
+                        ? Row.length
+                        : 0
+            )
+        );
+
+    if (PatternWidth === 0) {
+        return false;
+    }
+
+
+    const GardenWidth =
+        Number(
+            SaveData.Garden?.Width ?? 0
+        );
+
+    const GardenHeight =
+        Number(
+            SaveData.Garden?.Height ?? 0
+        );
+
+    const FitsNormally =
+        PatternWidth <= GardenWidth &&
+        PatternHeight <= GardenHeight;
+
+    if (FitsNormally) {
+        return true;
+    }
+
+
+    return (
+        Mutation.Rotation === "Any" &&
+        PatternHeight <= GardenWidth &&
+        PatternWidth <= GardenHeight
+    );
+}
+
+
+function IsHintMatcherAvailable(
+    Matcher,
+    SaveData
+) {
+    if (
+        Matcher === null ||
+        Matcher === "Any" ||
+        Matcher === "Empty"
+    ) {
+        return true;
+    }
+
+
+    if (typeof Matcher === "string") {
+        const Plant =
+            Plants[Matcher];
+
+        return (
+            Plant !== undefined &&
+            HasDiscoveredPlant(
+                SaveData,
+                Plant.Id
+            )
+        );
+    }
+
+
+    if (
+        Matcher === null ||
+        typeof Matcher !== "object" ||
+        Array.isArray(Matcher)
+    ) {
+        return false;
+    }
+
+
+    return Object.entries(
+        Plants
+    ).some(
+        ([PlantKey, Plant]) =>
+            HasDiscoveredPlant(
+                SaveData,
+                Plant.Id
+            ) &&
+            DoesPlantMatchHintMatcher(
+                PlantKey,
+                Plant,
+                Matcher
+            )
+    );
+}
+
+
+function DoesPlantMatchHintMatcher(
+    PlantKey,
+    Plant,
+    Matcher
+) {
+    if (
+        typeof Matcher.Plant ===
+            "string" &&
+        Matcher.Plant !== PlantKey
+    ) {
+        return false;
+    }
+
+
+    const Tags =
+        Array.isArray(Plant.Tags)
+            ? Plant.Tags
+            : [];
+
+
+    if (
+        Array.isArray(
+            Matcher.Tags
+        ) &&
+        !Matcher.Tags.every(
+            Tag =>
+                Tags.includes(Tag)
+        )
+    ) {
+        return false;
+    }
+
+
+    if (
+        Array.isArray(
+            Matcher.TagsAny
+        ) &&
+        Matcher.TagsAny.length > 0 &&
+        !Matcher.TagsAny.some(
+            Tag =>
+                Tags.includes(Tag)
+        )
+    ) {
+        return false;
+    }
+
+
+    if (
+        Array.isArray(
+            Matcher.TagsNot
+        ) &&
+        Matcher.TagsNot.some(
+            Tag =>
+                Tags.includes(Tag)
+        )
+    ) {
+        return false;
+    }
+
+
+    return true;
+}
+
+
+function CreateMutationHintCard(
+    Hint
+) {
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel MutationEncyclopediaCard MutationHintCard";
+
+
+    const Header =
+        document.createElement(
+            "header"
+        );
+
+    Header.className =
+        "MutationEncyclopediaHeader";
+
+
+    const Name =
+        document.createElement(
+            "h2"
+        );
+
+    Name.textContent =
+        "Mutation hint";
+
+    Header.appendChild(Name);
+
+
+    const Body =
+        document.createElement(
+            "div"
+        );
+
+    Body.className =
+        "MutationEncyclopediaBody";
+
+
+    const HintText =
+        document.createElement(
+            "p"
+        );
+
+    HintText.className =
+        "MutationEncyclopediaDescription";
+
+    HintText.textContent =
+        Hint.trim();
+
+    Body.appendChild(
+        HintText
+    );
+
+
+    Card.append(
+        Header,
+        Body
+    );
+
+
+    return Card;
 }
 
 

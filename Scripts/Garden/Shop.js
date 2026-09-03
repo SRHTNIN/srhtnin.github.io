@@ -125,7 +125,8 @@ function RenderGardenUpgrades() {
             "Row"
         ),
         CreatePlantInformationUpgradeCard(),
-        CreateGardenOverviewUpgradeCard()
+        CreateGardenOverviewUpgradeCard(),
+        CreateMutationHintsUpgradeCard()
     );
 }
 
@@ -488,6 +489,120 @@ function CreateGardenOverviewUpgradeCard() {
         BuyButton.addEventListener(
             "click",
             BuyGardenOverviewUpgrade
+        );
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+
+    return Card;
+}
+
+
+function CreateMutationHintsUpgradeCard() {
+    const Cost =
+        GetMutationHintsUpgradeCost();
+
+    const IsOwned =
+        HasMutationHintsUpgrade(
+            ShopSave
+        );
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Mutation hints";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Show subtle hints for undiscovered mutations once you've discovered the plants needed to attempt them. Hints appear in the Mutation encyclopedia without revealing the recipe.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Mutation hints",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            "Requirements",
+            "Required plants discovered"
+        )
+    );
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            BuyMutationHintsUpgrade
         );
     }
 
@@ -1175,6 +1290,64 @@ async function BuyGardenOverviewUpgrade() {
             "Bought Garden overview for " +
             Cost.toLocaleString() +
             " Dew. All overview lines are now visible."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyMutationHintsUpgrade() {
+    if (
+        ShopPurchasePending ||
+        HasMutationHintsUpgrade(
+            ShopSave
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetMutationHintsUpgradeCost();
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for Mutation hints."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockMutationHints(
+            ShopSave
+        );
+
+
+        SetShopMessage(
+            "Bought Mutation hints for " +
+            Cost.toLocaleString() +
+            " Dew. Eligible hints are now visible in the Mutation encyclopedia."
         );
 
         RenderShop();
