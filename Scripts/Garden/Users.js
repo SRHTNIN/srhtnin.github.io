@@ -1,6 +1,25 @@
 const DefaultColourPickerValue = "#000000";
 
 
+function RenderGardenOwnerHeading(
+    Username
+) {
+    const Heading =
+        document.getElementById(
+            "GardenPageHeading"
+        );
+
+    if (Heading === null) {
+        return;
+    }
+
+    Heading.textContent =
+        Username === null
+            ? "Your Garden"
+            : Username + "'s Garden";
+}
+
+
 function IsValidPlayerColour(
     Colour
 ) {
@@ -270,6 +289,10 @@ async function RenderUser() {
 
         UsernameForm.hidden = true;
 
+        RenderGardenOwnerHeading(
+            Profile.Username
+        );
+
         return;
     }
 
@@ -282,6 +305,10 @@ async function RenderUser() {
     );
 
     UsernameForm.hidden = false;
+
+    RenderGardenOwnerHeading(
+        null
+    );
 }
 
 
@@ -316,7 +343,6 @@ async function SubmitUsername(
         "Username set.";
 
     await RenderUser();
-    await RenderLeaderboard();
 }
 
 

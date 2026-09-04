@@ -15,12 +15,46 @@ $PageSection = "Garden";
         <?php require __DIR__ . "/Bits/Navbar.php"; ?>
 
         <main class="MainContainer">
-            <h1>Garden</h1>
+            <h1 id="GardenPageHeading">Your Garden</h1>
 
             <div
+                id="GardenSelector"
+                class="GardenSelectorPanel"
+            >
+                <button
+                    id="PreviousGardenButton"
+                    class="ActionButton GardenSelectorButton"
+                    type="button"
+                    aria-label="Previous Garden"
+                >
+                    &lt;
+                </button>
+
+                <input
+                    id="GardenNameInput"
+                    class="GardenNameInput"
+                    type="text"
+                    maxlength="32"
+                    value="Garden"
+                    aria-label="Garden name"
+                >
+
+                <button
+                    id="NextGardenButton"
+                    class="ActionButton GardenSelectorButton"
+                    type="button"
+                    aria-label="Next Garden"
+                >
+                    &gt;
+                </button>
+            </div>
+
+            <section
                 id="GardenInfoPanel"
                 class="StatusPanel GardenInfoPanel"
             >
+                <h2 class="GardenInfoHeading">Info</h2>
+
                 <div class="GardenInfoRow GardenInfoTopRow">
                     <div class="GardenInfoSection GardenInfoPrimarySection">
                         <div class="GardenStatusLine">
@@ -130,39 +164,7 @@ $PageSection = "Garden";
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div
-                id="GardenSelector"
-                class="GardenSelectorPanel"
-            >
-                <button
-                    id="PreviousGardenButton"
-                    class="ActionButton GardenSelectorButton"
-                    type="button"
-                    aria-label="Previous Garden"
-                >
-                    &lt;
-                </button>
-
-                <input
-                    id="GardenNameInput"
-                    class="GardenNameInput"
-                    type="text"
-                    maxlength="32"
-                    value="Garden"
-                    aria-label="Garden name"
-                >
-
-                <button
-                    id="NextGardenButton"
-                    class="ActionButton GardenSelectorButton"
-                    type="button"
-                    aria-label="Next Garden"
-                >
-                    &gt;
-                </button>
-            </div>
+            </section>
 
             <section
                 id="QuickBuy"
@@ -208,45 +210,48 @@ $PageSection = "Garden";
                 ></div>
             </section>
 
-            <div class="GardenLayout">
-                <section
-                    id="Plots"
-                    class="Panel GardenPlotsPanel"
-                >
-                    <h2>Plots</h2>
+            <section
+                id="Tools"
+                class="Panel GardenToolsPanel"
+            >
+                <h2>Tools</h2>
 
+                <div class="ToolList">
+                    <button
+                        id="ShovelToolButton"
+                        class="ActionButton ToolButton ToolButtonShovel"
+                        type="button"
+                    >
+                        Shovel
+                    </button>
+                </div>
+            </section>
+
+            <section
+                id="Seeds"
+                class="Panel GardenInventoryPanel"
+            >
+                <h2>Inventory</h2>
+
+                <div
+                    id="SeedList"
+                    class="SeedList"
+                ></div>
+            </section>
+
+            <section
+                id="Plots"
+                class="Panel GardenPlotsPanel"
+            >
+                <h2>Plots</h2>
+
+                <div class="GardenGridViewport">
                     <div
                         id="GardenGrid"
                         class="GardenGrid"
                     ></div>
-                </section>
-
-                <section
-                    id="Seeds"
-                    class="Panel SeedPanel"
-                >
-                    <h2>Seeds</h2>
-
-                    <div
-                        id="SeedList"
-                        class="SeedList"
-                    ></div>
-
-                    <h3 class="GardenToolHeading">
-                        Tools
-                    </h3>
-
-                    <div class="ToolList">
-                        <button
-                            id="ShovelToolButton"
-                            class="ActionButton ToolButton ToolButtonShovel"
-                            type="button"
-                        >
-                            Shovel
-                        </button>
-                    </div>
-                </section>
-            </div>
+                </div>
+            </section>
 
             <p id="GardenMessage" class="PageMessage">
                 Select a seed, then choose an empty plot.
@@ -287,34 +292,6 @@ $PageSection = "Garden";
                 </form>
             </section>
 
-            <section
-                id="Leaderboard"
-                class="Panel Leaderboard"
-            >
-                <h2>Leaderboard</h2>
-
-                <div class="LeaderboardTableContainer">
-                    <table class="LeaderboardTable">
-                        <thead>
-                            <tr>
-                                <th class="LeaderboardRankColumn">
-                                    #
-                                </th>
-
-                                <th>
-                                    Username
-                                </th>
-
-                                <th class="LeaderboardDewColumn">
-                                    Dew
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="LeaderboardBody"></tbody>
-                    </table>
-                </div>
-            </section>
         </main>
 
         <script src="/Scripts/Garden/PlantImages.js"></script>
@@ -326,7 +303,6 @@ $PageSection = "Garden";
         <script src="/Scripts/Garden/Upgrades.js"></script>
         <script src="/Scripts/Garden/MutationEngine.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
-        <script src="/Scripts/Garden/Leaderboard.js"></script>
         <script src="/Scripts/Garden/Garden.js"></script>
     </body>
 </html>

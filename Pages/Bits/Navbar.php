@@ -1,32 +1,64 @@
 <?php
 
 $NavbarPages = [
-    "Home" => "/",
-    "Sarahtonin" => "/Pages/Sarahtonin.html",
-    "Garden" => "/Pages/Garden.html",
-    "Shop" => "/Pages/Shop.html",
-    "Plants" => "/Pages/Plants.html",
-    "Mutations" => "/Pages/Mutations.html",
-    "Guide" => "/Pages/Guide.html",
-    "Profile" => "/Pages/Profile.html"
+    "Home" => [
+        "Href" => "/",
+        "Icon" => "Home.png"
+    ],
+    "Sarahtonin" => [
+        "Href" => "/Pages/Sarahtonin.html",
+        "Icon" => "Sarahtonin.png"
+    ],
+    "Garden" => [
+        "Href" => "/Pages/Garden.html",
+        "Icon" => "Garden.png"
+    ],
+    "Shop" => [
+        "Href" => "/Pages/Shop.html",
+        "Icon" => "Shop.png"
+    ],
+    "Plants" => [
+        "Href" => "/Pages/Plants.html",
+        "Icon" => "Plants.png"
+    ],
+    "Mutations" => [
+        "Href" => "/Pages/Mutations.html",
+        "Icon" => "Mutations.png"
+    ],
+    "Guide" => [
+        "Href" => "/Pages/Guide.html",
+        "Icon" => "Guide.png"
+    ],
+    "Profile" => [
+        "Href" => "/Pages/Profile.html",
+        "Icon" => "Profile.png"
+    ],
+    "Social" => [
+        "Href" => "/Pages/Social.html",
+        "Icon" => "Social.png"
+    ]
 ];
 
 ?>
 
 <nav class="Navbar" aria-label="Main navigation">
-    <?php foreach ($NavbarPages as $NavbarPage => $NavbarHref): ?>
+    <?php foreach ($NavbarPages as $NavbarPage => $NavbarData): ?>
         <a
             class="NavbarLink"
-            href="<?= htmlspecialchars($NavbarHref, ENT_QUOTES, "UTF-8") ?>"
+            href="<?= htmlspecialchars($NavbarData["Href"], ENT_QUOTES, "UTF-8") ?>"
             aria-label="<?= htmlspecialchars($NavbarPage, ENT_QUOTES, "UTF-8") ?>"
             title="<?= htmlspecialchars($NavbarPage, ENT_QUOTES, "UTF-8") ?>"
             <?= ($PageSection ?? $PageTitle ?? "") === $NavbarPage ? 'aria-current="page"' : "" ?>
         >
             <img
                 class="NavbarIcon"
-                src="/Assets/Img/<?= rawurlencode($NavbarPage) ?>.png"
+                src="/Assets/Img/<?= rawurlencode($NavbarData["Icon"]) ?>"
                 alt=""
             >
+
+            <span class="NavbarText">
+                <?= htmlspecialchars($NavbarPage, ENT_QUOTES, "UTF-8") ?>
+            </span>
         </a>
     <?php endforeach; ?>
 
@@ -44,6 +76,10 @@ $NavbarPages = [
             src="/Assets/Img/Icon.png"
             alt=""
         >
+
+        <span class="NavbarText">
+            Admin
+        </span>
     </a>
 </nav>
 

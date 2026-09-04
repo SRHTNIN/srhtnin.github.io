@@ -88,7 +88,6 @@ async function StartGame() {
     );
 
     await RenderUser();
-    await RenderLeaderboard();
 }
 
 

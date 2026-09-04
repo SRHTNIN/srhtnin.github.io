@@ -1,8 +1,14 @@
-async function RenderLeaderboard() {
+async function RenderLeaderboard(
+    CurrentUsername = null
+) {
     const Body =
         document.getElementById(
             "LeaderboardBody"
         );
+
+    if (Body === null) {
+        return;
+    }
 
     try {
         const Response = await fetch(
@@ -53,13 +59,16 @@ async function RenderLeaderboard() {
         }
 
 
-        const UsernameDisplay =
-            document.getElementById(
-                "UsernameDisplay"
-            );
+        if (CurrentUsername === null) {
+            const UsernameDisplay =
+                document.getElementById(
+                    "UsernameDisplay"
+                );
 
-        const CurrentUsername =
-            UsernameDisplay?.textContent;
+            CurrentUsername =
+                UsernameDisplay?.textContent ??
+                null;
+        }
 
 
         for (

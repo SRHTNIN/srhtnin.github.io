@@ -87,6 +87,12 @@ body {
     padding: 0;
 }
 
+.GardenInfoHeading {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border-bottom: 3px solid var(--Surface2);
+}
+
 .GardenInfoRow {
     display: grid;
     grid-template-columns: repeat( 2, minmax(0, 1fr) );
@@ -300,11 +306,12 @@ input, button, textarea, select {
 }
 
 .NavbarLink {
-    display: block;
-    width: 4rem;
+    display: flex;
+    width: 12rem;
     height: 4rem;
     padding: 0;
-    line-height: 0;
+    align-items: center;
+    line-height: 1;
     text-decoration: none;
     overflow: hidden;
     background-color: var(--Mantle);
@@ -336,10 +343,22 @@ input, button, textarea, select {
 
 .NavbarIcon {
     display: block;
-    width: 100%;
-    height: 100%;
+    flex: 0 0 4rem;
+    width: 4rem;
+    height: 4rem;
     object-fit: fill;
     image-rendering: auto;
+}
+
+.NavbarText {
+    min-width: 0;
+    padding: 0 0.8rem;
+    overflow: hidden;
+    color: var(--Text);
+    font-size: 1.25rem;
+    line-height: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .GardenSelectorPanel {
@@ -549,25 +568,44 @@ input, button, textarea, select {
     border: 3px solid var(--Surface2);
 }
 
-.GardenLayout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 12rem;
-    gap: 1rem;
-    align-items: start;
+.GardenToolsPanel,
+.GardenInventoryPanel,
+.GardenPlotsPanel {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+}
+
+.GardenToolsPanel h2,
+.GardenInventoryPanel h2,
+.GardenPlotsPanel h2 {
+    margin-bottom: 0.75rem;
+}
+
+.GardenToolsPanel .ToolList,
+.GardenInventoryPanel .SeedList {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.GardenToolsPanel .ToolButton,
+.GardenInventoryPanel .SeedButton {
+    width: auto;
 }
 
 .GardenPlotsPanel {
-    padding: 0.75rem;
     border-color: var(--GardenBorderColour, var(--Lavender));
 }
 
-.GardenPlotsPanel h2 {
-    margin-bottom: 0.75rem;
+.GardenGridViewport {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .GardenGrid {
     --GardenWidth: 3;
     display: grid;
+    width: 100%;
     grid-template-columns: repeat( var(--GardenWidth), minmax(0, 1fr) );
     gap: 0.5rem;
 }
@@ -658,17 +696,8 @@ input, button, textarea, select {
     --GrowthColour: var(--Yellow);
 }
 
-.SeedPanel {
-    padding: 0.75rem;
-}
-
-.SeedPanel h2 {
-    margin-bottom: 0.75rem;
-}
-
 .SeedList {
     display: flex;
-    flex-direction: column;
     gap: 0.5rem;
 }
 
@@ -687,7 +716,6 @@ input, button, textarea, select {
 
 .ToolList {
     display: flex;
-    flex-direction: column;
     gap: 0.5rem;
 }
 
@@ -1060,35 +1088,35 @@ input, button, textarea, select {
     }
 
     .NavbarLink {
-        flex: 0 0 3.5rem;
+        flex: 0 0 9.5rem;
+        width: 9.5rem;
+        height: 3.5rem;
+    }
+
+    .NavbarIcon {
+        flex-basis: 3.5rem;
         width: 3.5rem;
         height: 3.5rem;
+    }
+
+    .NavbarText {
+        padding: 0 0.6rem;
+        font-size: 1.05rem;
     }
 
     .MainContainer {
         grid-column: 1;
         grid-row: 2;
-    }
-
-    .GardenLayout {
-        grid-template-columns: 1fr;
-    }
-
-    .SeedPanel {
-        grid-row: 1;
-    }
-
-    .SeedList, .ToolList {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .SeedButton, .ToolButton {
-        width: auto;
+        padding: 1rem;
     }
 
     .GardenGrid {
-        grid-row: 2;
+        width: max-content;
+        min-width: 100%;
+        grid-template-columns: repeat(
+            var(--GardenWidth),
+            minmax(4.25rem, 1fr)
+        );
     }
 
     .LeaderboardRankColumn, .LeaderboardRank {
