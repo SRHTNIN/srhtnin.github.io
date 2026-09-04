@@ -231,6 +231,40 @@ $PageSection = "Guide";
                     has it can load the same Garden account and mess stuff up.
                 </p>
             </section>
+
+            <section
+                id="Privacy"
+                class="GuideSection"
+            >
+                <h2>Privacy and your data</h2>
+
+                <p>
+                    The Garden API stores the data needed to keep your
+                    account synchronized, including your Garden save,
+                    username, profile colour, Dew totals, and the time
+                    the server save was last updated. The server identifies
+                    the account using a one-way hash derived from your
+                    Account Key rather than storing the Account Key itself.
+                </p>
+
+                <p>
+                    This browser stores your Account Key and a local copy
+                    of your Garden save so the same account can keep working
+                    between visits. If you set a username, some profile
+                    information and statistics can also appear on the
+                    public leaderboard.
+                </p>
+
+                <p>
+                    The <a href="/Pages/Profile.html#Account">Profile</a>
+                    page lets you export a JSON copy of the account data
+                    stored on the server, or permanently delete the account.
+                    Deleting removes the server account and clears the
+                    Account Key and local save from the browser where you
+                    perform the deletion. Other devices have their own local
+                    browser storage and cannot be cleared remotely.
+                </p>
+            </section>
         </main>
 
         <script src="/Scripts/Garden/PlantImages.js"></script>

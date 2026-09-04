@@ -14,6 +14,16 @@ function StartAccount() {
             "ExportAccountKeyButton"
         );
 
+    const ExportDataButton =
+        document.getElementById(
+            "ExportAccountDataButton"
+        );
+
+    const DeleteAccountButton =
+        document.getElementById(
+            "DeleteAccountButton"
+        );
+
     const ImportForm =
         document.getElementById(
             "ImportAccountForm"
@@ -43,6 +53,16 @@ function StartAccount() {
     ExportButton.addEventListener(
         "click",
         ExportAccountKey
+    );
+
+    ExportDataButton.addEventListener(
+        "click",
+        ExportAccountData
+    );
+
+    DeleteAccountButton.addEventListener(
+        "click",
+        DeleteAccount
     );
 
     ImportForm.addEventListener(
@@ -269,6 +289,231 @@ function ExportAccountKey() {
         Message.textContent =
             "Couldn't export Account Key.";
     }
+}
+
+
+async function ExportAccountData() {
+    const Message =
+        document.getElementById(
+            "AccountDataMessage"
+        );
+
+    const Button =
+        document.getElementById(
+            "ExportAccountDataButton"
+        );
+
+
+    Message.textContent =
+        "Preparing account data...";
+
+    Button.disabled = true;
+
+
+    try {
+        const Result =
+            await RequestAccountData(
+                "Export"
+            );
+
+        if (
+            Result.Exists !== true ||
+            Result.Data === undefined
+        ) {
+            Message.textContent =
+                "No server account data exists to export.";
+
+            return;
+        }
+
+
+        const File =
+            new Blob(
+                [
+                    JSON.stringify(
+                        Result.Data,
+                        null,
+                        4
+                    ) + "\n"
+                ],
+                {
+                    type:
+                        "application/json;charset=utf-8"
+                }
+            );
+
+        const FileUrl =
+            URL.createObjectURL(
+                File
+            );
+
+        const Link =
+            document.createElement(
+                "a"
+            );
+
+        Link.href = FileUrl;
+        Link.download =
+            "SarahtoninGardenAccountData.json";
+
+
+        document.body.appendChild(
+            Link
+        );
+
+        Link.click();
+        Link.remove();
+
+
+        URL.revokeObjectURL(
+            FileUrl
+        );
+
+
+        Message.textContent =
+            "Account data exported.";
+    } catch (Error) {
+        console.error(
+            "Couldn't export account data:",
+            Error
+        );
+
+        Message.textContent =
+            "Couldn't export account data right now.";
+    } finally {
+        Button.disabled = false;
+    }
+}
+
+
+async function DeleteAccount() {
+    const Message =
+        document.getElementById(
+            "AccountDataMessage"
+        );
+
+    const Button =
+        document.getElementById(
+            "DeleteAccountButton"
+        );
+
+
+    const Confirmation =
+        window.prompt(
+            "Permanently delete this Garden account?\n\n" +
+            "The server save and this browser's local " +
+            "Account Key/save will be removed. This cannot " +
+            "be undone.\n\n" +
+            "Type DELETE to continue."
+        );
+
+
+    if (Confirmation !== "DELETE") {
+        Message.textContent =
+            Confirmation === null
+                ? "Account deletion cancelled."
+                : "Account deletion cancelled: type DELETE exactly.";
+
+        return;
+    }
+
+
+    Message.textContent =
+        "Deleting account...";
+
+    Button.disabled = true;
+
+
+    try {
+        await RequestAccountData(
+            "Delete",
+            {
+                Confirm: "DELETE"
+            }
+        );
+
+
+        localStorage.removeItem(
+            LocalSaveName
+        );
+
+        localStorage.removeItem(
+            SaveKeyName
+        );
+
+
+        Message.textContent =
+            "Account deleted. Returning home...";
+
+
+        window.location.replace(
+            "/"
+        );
+    } catch (Error) {
+        console.error(
+            "Couldn't delete account:",
+            Error
+        );
+
+        Message.textContent =
+            "Couldn't delete the account. Nothing was cleared locally.";
+
+        Button.disabled = false;
+    }
+}
+
+
+async function RequestAccountData(
+    Action,
+    ExtraData = {}
+) {
+    const Response =
+        await fetch(
+            ApiUrl + "/AccountData.php",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    SaveKey: GetSaveKey(),
+                    Action: Action,
+                    ...ExtraData
+                })
+            }
+        );
+
+
+    let Result;
+
+    try {
+        Result =
+            await Response.json();
+    } catch (Error) {
+        throw new Error(
+            "Account data API returned an invalid response."
+        );
+    }
+
+
+    if (
+        !Response.ok ||
+        Result.Success !== true
+    ) {
+        throw new Error(
+            Result.Error ??
+            (
+                "Account data API returned HTTP " +
+                Response.status
+            )
+        );
+    }
+
+
+    return Result;
 }
 
 

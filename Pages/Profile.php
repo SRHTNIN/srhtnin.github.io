@@ -320,6 +320,48 @@ $PageTitle = "Profile";
                         ></p>
                     </div>
                 </details>
+
+
+                <h3>Account data</h3>
+
+                <p>
+                    Download a JSON copy of the Garden account
+                    data currently stored on the server. The
+                    Account Key is not included in this export.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="ExportAccountDataButton"
+                        type="button"
+                    >
+                        Export account data
+                    </button>
+                </div>
+
+
+                <h3>Delete account</h3>
+
+                <p class="ProfileDangerText">
+                    Permanently delete this Garden account from
+                    the server and clear its Account Key and save
+                    from this browser. This cannot be undone.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="DeleteAccountButton"
+                        class="ProfileDangerButton"
+                        type="button"
+                    >
+                        Delete account
+                    </button>
+                </div>
+
+                <p
+                    id="AccountDataMessage"
+                    class="ProfileMessage"
+                ></p>
             </section>
 
 

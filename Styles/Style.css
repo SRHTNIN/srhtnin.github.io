@@ -973,6 +973,20 @@ input, button, textarea, select {
     color: var(--Subtext1);
 }
 
+.ProfileDangerText {
+    color: var(--Red);
+}
+
+.ProfileSection .ProfileDangerButton {
+    color: var(--Red);
+    border-color: var(--Red);
+}
+
+.ProfileSection .ProfileDangerButton:hover {
+    color: var(--Red);
+    border-color: var(--Red);
+}
+
 .ProfileStatistics {
     display: flex;
     flex-direction: column;
