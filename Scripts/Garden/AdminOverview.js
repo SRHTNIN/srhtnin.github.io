@@ -1,5 +1,6 @@
 let AdminOverviewPlants = {};
 let AdminOverviewMutations = {};
+let AdminOverviewToggleNumber = 0;
 
 
 async function AdminOverviewRequest(
@@ -206,9 +207,231 @@ function CollectAdminOverviewCreatedPlants() {
 }
 
 
+function GetAdminOverviewPatternPlantKeys(
+    Mutation
+) {
+    const PlantKeys = new Set();
+
+    for (const Row of Mutation.Pattern ?? []) {
+        if (!Array.isArray(Row)) {
+            continue;
+        }
+
+        for (const Cell of Row) {
+            if (
+                typeof Cell === "string" &&
+                AdminOverviewPlants[
+                    Cell
+                ] !== undefined
+            ) {
+                PlantKeys.add(Cell);
+                continue;
+            }
+
+            if (
+                Cell !== null &&
+                typeof Cell === "object" &&
+                !Array.isArray(Cell) &&
+                typeof Cell.Plant === "string" &&
+                AdminOverviewPlants[
+                    Cell.Plant
+                ] !== undefined
+            ) {
+                PlantKeys.add(
+                    Cell.Plant
+                );
+            }
+        }
+    }
+
+    return PlantKeys;
+}
+
+
+function GetAdminOverviewResultPlantKeys(
+    Mutation
+) {
+    const PlantKeys = new Set();
+
+    for (const Row of Mutation.Success ?? []) {
+        if (!Array.isArray(Row)) {
+            continue;
+        }
+
+        for (const Cell of Row) {
+            let PlantKey = null;
+
+            if (typeof Cell === "string") {
+                PlantKey = Cell;
+            } else if (
+                Cell !== null &&
+                typeof Cell === "object" &&
+                !Array.isArray(Cell) &&
+                typeof Cell.Plant === "string"
+            ) {
+                PlantKey = Cell.Plant;
+            }
+
+            if (
+                PlantKey !== null &&
+                !PlantKey.startsWith("$") &&
+                AdminOverviewPlants[
+                    PlantKey
+                ] !== undefined
+            ) {
+                PlantKeys.add(PlantKey);
+            }
+        }
+    }
+
+    return PlantKeys;
+}
+
+
+function HasAdminOverviewMissingRelations(
+    Mutation,
+    RelationName,
+    ExpectedPlantKeys
+) {
+    const RelationValues =
+        Mutation.Relations?.[
+            RelationName
+        ];
+
+    if (
+        !Array.isArray(RelationValues) ||
+        RelationValues.length === 0
+    ) {
+        return true;
+    }
+
+    const RelationIds =
+        new Set(
+            RelationValues.map(
+                Value => Number(Value)
+            )
+        );
+
+    for (const PlantKey of ExpectedPlantKeys) {
+        const PlantId = Number(
+            AdminOverviewPlants[
+                PlantKey
+            ]?.Id
+        );
+
+        if (
+            Number.isInteger(PlantId) &&
+            !RelationIds.has(PlantId)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+function HasAdminOverviewSuccessChange(
+    Mutation
+) {
+    if (!Array.isArray(Mutation.Success)) {
+        return true;
+    }
+
+    for (const Row of Mutation.Success) {
+        if (!Array.isArray(Row)) {
+            return true;
+        }
+
+        for (const Cell of Row) {
+            if (
+                Cell !== null &&
+                Cell !== "Keep"
+            ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+function CreateAdminOverviewNestedToggle(
+    Label,
+    NestedList
+) {
+    AdminOverviewToggleNumber++;
+
+    const ContentId =
+        "AdminOverviewNested" +
+        AdminOverviewToggleNumber;
+
+    NestedList.id = ContentId;
+    NestedList.hidden = true;
+
+    const Toggle =
+        document.createElement("button");
+
+    Toggle.className =
+        "ShopSectionToggle";
+    Toggle.type = "button";
+    Toggle.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+    Toggle.setAttribute(
+        "aria-controls",
+        ContentId
+    );
+
+    const Arrow =
+        document.createElement("span");
+
+    Arrow.className =
+        "ShopSectionArrow";
+    Arrow.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+    Arrow.textContent = ">";
+
+    const Text =
+        document.createElement("span");
+
+    Text.textContent = Label;
+
+    Toggle.append(
+        Arrow,
+        Text
+    );
+
+    Toggle.addEventListener(
+        "click",
+        () => {
+            const IsExpanded =
+                Toggle.getAttribute(
+                    "aria-expanded"
+                ) === "true";
+
+            Toggle.setAttribute(
+                "aria-expanded",
+                String(!IsExpanded)
+            );
+
+            NestedList.hidden =
+                IsExpanded;
+        }
+    );
+
+    return Toggle;
+}
+
+
 function CreateAdminOverviewIssueList(
     Items,
-    NestedValues = null
+    NestedValues = null,
+    CollapseNested = false
 ) {
     const List =
         document.createElement("ul");
@@ -220,31 +443,52 @@ function CreateAdminOverviewIssueList(
         const ListItem =
             document.createElement("li");
 
-        const Label =
-            document.createElement("span");
-
-        Label.textContent = Item.Label;
-        ListItem.appendChild(Label);
-
         const Nested =
             NestedValues?.(Item) ?? [];
 
-        if (Nested.length > 0) {
-            const NestedList =
-                document.createElement("ul");
-
-            for (const Value of Nested) {
-                const NestedItem =
-                    document.createElement("li");
-
-                NestedItem.textContent =
-                    Value;
-                NestedList.appendChild(
-                    NestedItem
+        if (Nested.length === 0) {
+            const Label =
+                document.createElement(
+                    "span"
                 );
-            }
 
-            ListItem.appendChild(
+            Label.textContent = Item.Label;
+            ListItem.appendChild(Label);
+            List.appendChild(ListItem);
+            continue;
+        }
+
+        const NestedList =
+            document.createElement("ul");
+
+        for (const Value of Nested) {
+            const NestedItem =
+                document.createElement("li");
+
+            NestedItem.textContent =
+                Value;
+            NestedList.appendChild(
+                NestedItem
+            );
+        }
+
+        if (CollapseNested) {
+            ListItem.append(
+                CreateAdminOverviewNestedToggle(
+                    Item.Label,
+                    NestedList
+                ),
+                NestedList
+            );
+        } else {
+            const Label =
+                document.createElement(
+                    "span"
+                );
+
+            Label.textContent = Item.Label;
+            ListItem.append(
+                Label,
                 NestedList
             );
         }
@@ -260,7 +504,8 @@ function RenderAdminOverviewSection(
     ContainerId,
     Title,
     Items,
-    NestedValues = null
+    NestedValues = null,
+    CollapseNested = false
 ) {
     const Container =
         document.getElementById(
@@ -289,13 +534,16 @@ function RenderAdminOverviewSection(
     Container.appendChild(
         CreateAdminOverviewIssueList(
             Items,
-            NestedValues
+            NestedValues,
+            CollapseNested
         )
     );
 }
 
 
 function RenderAdminOverview() {
+    AdminOverviewToggleNumber = 0;
+
     const CreatedPlants =
         CollectAdminOverviewCreatedPlants();
 
@@ -315,12 +563,18 @@ function RenderAdminOverview() {
             );
 
     const MissingSprites = [];
+    const PlantNoDescription = [];
+    const PlantNoTags = [];
     const NoWaysToObtain = [];
 
     for (
         const [PlantKey, Plant]
         of PlantEntries
     ) {
+        const Label =
+            Plant.Name?.trim() ||
+            PlantKey;
+
         const Missing =
             GetAdminOverviewMissingSprites(
                 PlantKey,
@@ -329,9 +583,27 @@ function RenderAdminOverview() {
 
         if (Missing.length > 0) {
             MissingSprites.push({
-                Label:
-                    Plant.Name ?? PlantKey,
+                Label: Label,
                 Missing: Missing
+            });
+        }
+
+        if (
+            typeof Plant.Description !==
+                "string" ||
+            Plant.Description.trim() === ""
+        ) {
+            PlantNoDescription.push({
+                Label: Label
+            });
+        }
+
+        if (
+            !Array.isArray(Plant.Tags) ||
+            Plant.Tags.length === 0
+        ) {
+            PlantNoTags.push({
+                Label: Label
             });
         }
 
@@ -340,8 +612,7 @@ function RenderAdminOverview() {
             !CreatedPlants.has(PlantKey)
         ) {
             NoWaysToObtain.push({
-                Label:
-                    Plant.Name ?? PlantKey
+                Label: Label
             });
         }
     }
@@ -363,6 +634,10 @@ function RenderAdminOverview() {
 
     const NoDescription = [];
     const NoHint = [];
+    const MissingParents = [];
+    const MissingChildren = [];
+    const NoChance = [];
+    const NoSuccessChange = [];
 
     for (
         const [MutationKey, Mutation]
@@ -391,13 +666,70 @@ function RenderAdminOverview() {
                 Label: Label
             });
         }
+
+        if (
+            HasAdminOverviewMissingRelations(
+                Mutation,
+                "PlantsUsed",
+                GetAdminOverviewPatternPlantKeys(
+                    Mutation
+                )
+            )
+        ) {
+            MissingParents.push({
+                Label: Label
+            });
+        }
+
+        if (
+            HasAdminOverviewMissingRelations(
+                Mutation,
+                "PlantsCreated",
+                GetAdminOverviewResultPlantKeys(
+                    Mutation
+                )
+            )
+        ) {
+            MissingChildren.push({
+                Label: Label
+            });
+        }
+
+        if (Number(Mutation.Chance) === 0) {
+            NoChance.push({
+                Label: Label
+            });
+        }
+
+        if (
+            !HasAdminOverviewSuccessChange(
+                Mutation
+            )
+        ) {
+            NoSuccessChange.push({
+                Label: Label
+            });
+        }
     }
 
     RenderAdminOverviewSection(
         "AdminOverviewMissingSprites",
         "Missing sprites",
         MissingSprites,
-        Item => Item.Missing
+        Item => Item.Missing,
+        true
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewPlantNoDescription",
+        "No description",
+        PlantNoDescription
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewPlantNoTags",
+        "No tags",
+        PlantNoTags
     );
 
     RenderAdminOverviewSection(
@@ -416,6 +748,30 @@ function RenderAdminOverview() {
         "AdminOverviewNoHint",
         "No hint",
         NoHint
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewMissingParents",
+        "Missing parents",
+        MissingParents
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewMissingChildren",
+        "Missing children",
+        MissingChildren
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewNoChance",
+        "No chance",
+        NoChance
+    );
+
+    RenderAdminOverviewSection(
+        "AdminOverviewNoSuccessChange",
+        "No success change",
+        NoSuccessChange
     );
 }
 

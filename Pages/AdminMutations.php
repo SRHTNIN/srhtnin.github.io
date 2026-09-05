@@ -133,7 +133,6 @@ $PageSection = "Admin";
                             <textarea
                                 id="AdminMutationDescription"
                                 rows="4"
-                                required
                             ></textarea>
                         </label>
 

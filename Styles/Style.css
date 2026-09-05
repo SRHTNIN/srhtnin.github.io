@@ -259,6 +259,14 @@ ul, ol {
     color: var(--Text);
 }
 
+ul > li::marker {
+    content: "▪ ";
+}
+
+ul ul > li::marker {
+    content: "▫ ";
+}
+
 li {
     margin-bottom: 0.5rem;
 }
@@ -1714,6 +1722,10 @@ input, button, textarea, select {
     padding: 0;
     color: var(--Subtext1);
     list-style: none;
+}
+
+.MutationHintList > li::marker {
+    content: "";
 }
 
 .MutationHintList li + li {

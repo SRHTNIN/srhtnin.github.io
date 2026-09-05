@@ -140,7 +140,6 @@ $PageSection = "Admin";
                                 id="AdminPlantDescription"
                                 name="Description"
                                 rows="4"
-                                required
                             ></textarea>
                         </label>
 

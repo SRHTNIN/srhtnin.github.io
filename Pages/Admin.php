@@ -95,6 +95,8 @@ $PageSection = "Admin";
                         <section>
                             <h2>Plants</h2>
                             <div id="AdminOverviewMissingSprites"></div>
+                            <div id="AdminOverviewPlantNoDescription"></div>
+                            <div id="AdminOverviewPlantNoTags"></div>
                             <div id="AdminOverviewNoObtain"></div>
                         </section>
 
@@ -102,6 +104,10 @@ $PageSection = "Admin";
                             <h2>Mutations</h2>
                             <div id="AdminOverviewNoDescription"></div>
                             <div id="AdminOverviewNoHint"></div>
+                            <div id="AdminOverviewMissingParents"></div>
+                            <div id="AdminOverviewMissingChildren"></div>
+                            <div id="AdminOverviewNoChance"></div>
+                            <div id="AdminOverviewNoSuccessChange"></div>
                         </section>
                     </div>
                 </section>
