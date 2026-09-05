@@ -24,6 +24,33 @@ $PageSection = "Plants";
             </p>
 
             <div
+                class="CatalogueControls"
+                aria-label="Plant search and sorting"
+            >
+                <input
+                    id="PlantEncyclopediaSearchInput"
+                    type="search"
+                    placeholder="Search plants..."
+                    aria-label="Search plants"
+                    autocomplete="off"
+                >
+
+                <select
+                    id="PlantEncyclopediaSortSelect"
+                    aria-label="Sort plants"
+                >
+                    <option value="IdAsc">ID</option>
+                    <option value="NameAsc">Name A-Z</option>
+                    <option value="GrowthAsc">Growth short-long</option>
+                    <option value="GrowthDesc">Growth long-short</option>
+                    <option value="RewardAsc">Reward low-high</option>
+                    <option value="RewardDesc">Reward high-low</option>
+                    <option value="DphDesc">DPH high-low</option>
+                    <option value="DphAsc">DPH low-high</option>
+                </select>
+            </div>
+
+            <div
                 id="PlantEncyclopediaList"
                 class="PlantEncyclopediaList"
             ></div>

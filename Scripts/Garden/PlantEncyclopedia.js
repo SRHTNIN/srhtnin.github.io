@@ -1,4 +1,6 @@
 let PlantEncyclopediaSave;
+let PlantEncyclopediaSearchQuery = "";
+let PlantEncyclopediaSortMode = "IdAsc";
 
 
 async function StartPlantEncyclopedia() {
@@ -7,6 +9,7 @@ async function StartPlantEncyclopedia() {
         PlantEncyclopediaSave =
             await LoadGame();
 
+        BindPlantEncyclopediaControls();
         RenderPlantEncyclopedia();
     } catch (Error) {
         console.error(
@@ -16,6 +19,51 @@ async function StartPlantEncyclopedia() {
 
         SetPlantEncyclopediaMessage(
             "Couldn't load your discovered plants."
+        );
+    }
+}
+
+
+function BindPlantEncyclopediaControls() {
+    const SearchInput =
+        document.getElementById(
+            "PlantEncyclopediaSearchInput"
+        );
+
+    const SortSelect =
+        document.getElementById(
+            "PlantEncyclopediaSortSelect"
+        );
+
+
+    if (SearchInput !== null) {
+        SearchInput.value =
+            PlantEncyclopediaSearchQuery;
+
+        SearchInput.addEventListener(
+            "input",
+            () => {
+                PlantEncyclopediaSearchQuery =
+                    SearchInput.value;
+
+                RenderPlantEncyclopedia();
+            }
+        );
+    }
+
+
+    if (SortSelect !== null) {
+        SortSelect.value =
+            PlantEncyclopediaSortMode;
+
+        SortSelect.addEventListener(
+            "change",
+            () => {
+                PlantEncyclopediaSortMode =
+                    SortSelect.value;
+
+                RenderPlantEncyclopedia();
+            }
         );
     }
 }
@@ -38,16 +86,28 @@ function RenderPlantEncyclopedia() {
                         PlantEncyclopediaSave,
                         Plant.Id
                     )
+            );
+
+    const SearchQuery =
+        PlantEncyclopediaSearchQuery
+            .trim()
+            .toLocaleLowerCase();
+
+    const VisiblePlants =
+        DiscoveredPlants
+            .filter(
+                Plant =>
+                    DoesPlantEncyclopediaMatchSearch(
+                        Plant,
+                        SearchQuery
+                    )
             )
             .sort(
-                (A, B) =>
-                    A.Id - B.Id
+                ComparePlantEncyclopediaPlants
             );
 
 
-    if (
-        DiscoveredPlants.length === 0
-    ) {
+    if (DiscoveredPlants.length === 0) {
         SetPlantEncyclopediaMessage(
             "No plants discovered yet."
         );
@@ -56,15 +116,39 @@ function RenderPlantEncyclopedia() {
     }
 
 
+    if (VisiblePlants.length === 0) {
+        SetPlantEncyclopediaMessage(
+            "No discovered plants match your search."
+        );
+
+        return;
+    }
+
+
     for (
         const Plant
-        of DiscoveredPlants
+        of VisiblePlants
     ) {
         List.appendChild(
             CreatePlantEncyclopediaCard(
                 Plant
             )
         );
+    }
+
+
+    if (SearchQuery.length > 0) {
+        SetPlantEncyclopediaMessage(
+            "Showing " +
+            VisiblePlants.length
+                .toLocaleString() +
+            " of " +
+            DiscoveredPlants.length
+                .toLocaleString() +
+            " discovered plants."
+        );
+
+        return;
     }
 
 
@@ -75,6 +159,190 @@ function RenderPlantEncyclopedia() {
                 .toLocaleString() +
                 " plants discovered."
     );
+}
+
+
+function DoesPlantEncyclopediaMatchSearch(
+    Plant,
+    SearchQuery
+) {
+    if (SearchQuery.length === 0) {
+        return true;
+    }
+
+    const SearchParts = [
+        Plant.Id,
+        Plant.Name,
+        Plant.Description,
+        ...(Array.isArray(Plant.Tags)
+            ? Plant.Tags
+            : [])
+    ];
+
+    for (
+        const Mutation
+        of GetPlantRelatedMutations(
+            Plant.Id,
+            "PlantsCreated"
+        ).concat(
+            GetPlantRelatedMutations(
+                Plant.Id,
+                "PlantsUsed"
+            )
+        )
+    ) {
+        if (
+            HasDiscoveredMutation(
+                PlantEncyclopediaSave,
+                Mutation.Id
+            )
+        ) {
+            SearchParts.push(
+                Mutation.Name
+            );
+        }
+    }
+
+    return SearchParts
+        .filter(
+            Value =>
+                Value !== null &&
+                Value !== undefined
+        )
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(
+            SearchQuery
+        );
+}
+
+
+function ComparePlantEncyclopediaPlants(
+    A,
+    B
+) {
+    switch (PlantEncyclopediaSortMode) {
+        case "NameAsc":
+            return String(A.Name ?? "")
+                .localeCompare(
+                    String(B.Name ?? ""),
+                    undefined,
+                    {sensitivity: "base"}
+                ) || A.Id - B.Id;
+
+        case "GrowthAsc":
+            return ComparePlantEncyclopediaNumbers(
+                A.GrowthTime,
+                B.GrowthTime,
+                1
+            ) || A.Id - B.Id;
+
+        case "GrowthDesc":
+            return ComparePlantEncyclopediaNumbers(
+                A.GrowthTime,
+                B.GrowthTime,
+                -1
+            ) || A.Id - B.Id;
+
+        case "RewardAsc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantHarvestReward(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantHarvestReward(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                1
+            ) || A.Id - B.Id;
+
+        case "RewardDesc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantHarvestReward(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantHarvestReward(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                -1
+            ) || A.Id - B.Id;
+
+        case "DphAsc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantDewPerHour(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantDewPerHour(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                1
+            ) || A.Id - B.Id;
+
+        case "DphDesc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantDewPerHour(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantDewPerHour(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                -1
+            ) || A.Id - B.Id;
+
+        case "IdAsc":
+        default:
+            return A.Id - B.Id;
+    }
+}
+
+
+function ComparePlantEncyclopediaNumbers(
+    A,
+    B,
+    Direction
+) {
+    const MissingA =
+        A === null ||
+        A === undefined ||
+        A === "";
+
+    const MissingB =
+        B === null ||
+        B === undefined ||
+        B === "";
+
+    const NumberA = Number(A);
+    const NumberB = Number(B);
+
+    const ValidA =
+        !MissingA &&
+        Number.isFinite(NumberA);
+
+    const ValidB =
+        !MissingB &&
+        Number.isFinite(NumberB);
+
+    if (!ValidA && !ValidB) {
+        return 0;
+    }
+
+    if (!ValidA) {
+        return 1;
+    }
+
+    if (!ValidB) {
+        return -1;
+    }
+
+    return (NumberA - NumberB) *
+        Direction;
 }
 
 

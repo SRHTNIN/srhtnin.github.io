@@ -96,6 +96,37 @@ $PageSection = "Shop";
                     class="ShopSectionContent"
                 >
                     <div
+                        class="CatalogueControls"
+                        aria-label="Seed search and sorting"
+                    >
+                        <input
+                            id="ShopSeedSearchInput"
+                            type="search"
+                            placeholder="Search plants..."
+                            aria-label="Search plants"
+                            autocomplete="off"
+                        >
+
+                        <select
+                            id="ShopSeedSortSelect"
+                            aria-label="Sort seeds"
+                        >
+                            <option value="IdAsc">ID</option>
+                            <option value="NameAsc">Name A-Z</option>
+                            <option value="PriceAsc">Price low-high</option>
+                            <option value="PriceDesc">Price high-low</option>
+                            <option value="GrowthAsc">Growth short-long</option>
+                            <option value="GrowthDesc">Growth long-short</option>
+                            <option value="RewardAsc">Reward low-high</option>
+                            <option value="RewardDesc">Reward high-low</option>
+                            <option value="DphDesc">DPH high-low</option>
+                            <option value="DphAsc">DPH low-high</option>
+                            <option value="InventoryDesc">Inventory high-low</option>
+                            <option value="InventoryAsc">Inventory low-high</option>
+                        </select>
+                    </div>
+
+                    <div
                         id="ShopSeedList"
                         class="ShopSeedList"
                     ></div>

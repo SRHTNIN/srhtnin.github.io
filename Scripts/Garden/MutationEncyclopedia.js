@@ -1,4 +1,6 @@
 let MutationEncyclopediaSave;
+let MutationEncyclopediaSearchQuery = "";
+let MutationEncyclopediaSortMode = "IdAsc";
 
 
 async function StartMutationEncyclopedia() {
@@ -8,6 +10,7 @@ async function StartMutationEncyclopedia() {
         MutationEncyclopediaSave =
             await LoadGame();
 
+        BindMutationEncyclopediaControls();
         RenderMutationEncyclopedia();
     } catch (Error) {
         console.error(
@@ -17,6 +20,51 @@ async function StartMutationEncyclopedia() {
 
         SetMutationEncyclopediaMessage(
             "Couldn't load your discovered mutations."
+        );
+    }
+}
+
+
+function BindMutationEncyclopediaControls() {
+    const SearchInput =
+        document.getElementById(
+            "MutationEncyclopediaSearchInput"
+        );
+
+    const SortSelect =
+        document.getElementById(
+            "MutationEncyclopediaSortSelect"
+        );
+
+
+    if (SearchInput !== null) {
+        SearchInput.value =
+            MutationEncyclopediaSearchQuery;
+
+        SearchInput.addEventListener(
+            "input",
+            () => {
+                MutationEncyclopediaSearchQuery =
+                    SearchInput.value;
+
+                RenderMutationEncyclopedia();
+            }
+        );
+    }
+
+
+    if (SortSelect !== null) {
+        SortSelect.value =
+            MutationEncyclopediaSortMode;
+
+        SortSelect.addEventListener(
+            "change",
+            () => {
+                MutationEncyclopediaSortMode =
+                    SortSelect.value;
+
+                RenderMutationEncyclopedia();
+            }
         );
     }
 }
@@ -69,10 +117,37 @@ function RenderMutationEncyclopedia() {
             )
             : [];
 
+    const SearchQuery =
+        MutationEncyclopediaSearchQuery
+            .trim()
+            .toLocaleLowerCase();
+
+    const VisibleHints =
+        AvailableHints.filter(
+            Mutation =>
+                DoesMutationHintMatchSearch(
+                    Mutation,
+                    SearchQuery
+                )
+        );
+
+    const VisibleMutations =
+        DiscoveredMutations
+            .filter(
+                Mutation =>
+                    DoesMutationEncyclopediaMatchSearch(
+                        Mutation,
+                        SearchQuery
+                    )
+            )
+            .sort(
+                CompareMutationEncyclopediaMutations
+            );
+
 
     for (
         const Mutation
-        of AvailableHints
+        of VisibleHints
     ) {
         List.appendChild(
             CreateMutationHintCard(
@@ -84,7 +159,7 @@ function RenderMutationEncyclopedia() {
 
     for (
         const Mutation
-        of DiscoveredMutations
+        of VisibleMutations
     ) {
         List.appendChild(
             CreateMutationEncyclopediaCard(
@@ -106,24 +181,60 @@ function RenderMutationEncyclopedia() {
     }
 
 
+    if (
+        VisibleMutations.length === 0 &&
+        VisibleHints.length === 0
+    ) {
+        SetMutationEncyclopediaMessage(
+            "No mutations or hints match your search."
+        );
+
+        return;
+    }
+
+
     const MessageParts = [];
 
-    MessageParts.push(
-        DiscoveredMutations.length === 1
-            ? "1 mutation discovered."
-            : DiscoveredMutations.length
-                .toLocaleString() +
-                " mutations discovered."
-    );
-
-    if (AvailableHints.length > 0) {
+    if (SearchQuery.length > 0) {
         MessageParts.push(
-            AvailableHints.length === 1
-                ? "1 hint available."
-                : AvailableHints.length
-                    .toLocaleString() +
-                    " hints available."
+            "Showing " +
+            VisibleMutations.length
+                .toLocaleString() +
+            " of " +
+            DiscoveredMutations.length
+                .toLocaleString() +
+            " discovered mutations."
         );
+
+        if (AvailableHints.length > 0) {
+            MessageParts.push(
+                "Showing " +
+                VisibleHints.length
+                    .toLocaleString() +
+                " of " +
+                AvailableHints.length
+                    .toLocaleString() +
+                " available hints."
+            );
+        }
+    } else {
+        MessageParts.push(
+            DiscoveredMutations.length === 1
+                ? "1 mutation discovered."
+                : DiscoveredMutations.length
+                    .toLocaleString() +
+                    " mutations discovered."
+        );
+
+        if (AvailableHints.length > 0) {
+            MessageParts.push(
+                AvailableHints.length === 1
+                    ? "1 hint available."
+                    : AvailableHints.length
+                        .toLocaleString() +
+                        " hints available."
+            );
+        }
     }
 
     SetMutationEncyclopediaMessage(
@@ -131,6 +242,183 @@ function RenderMutationEncyclopedia() {
             " "
         )
     );
+}
+
+
+function DoesMutationHintMatchSearch(
+    Mutation,
+    SearchQuery
+) {
+    if (SearchQuery.length === 0) {
+        return true;
+    }
+
+    return String(
+        Mutation.Hint ?? ""
+    )
+        .toLocaleLowerCase()
+        .includes(
+            SearchQuery
+        );
+}
+
+
+function DoesMutationEncyclopediaMatchSearch(
+    Mutation,
+    SearchQuery
+) {
+    if (SearchQuery.length === 0) {
+        return true;
+    }
+
+    const SearchParts = [
+        Mutation.Id,
+        Mutation.Name,
+        Mutation.Description,
+        Mutation.Hint,
+        FormatMutationChance(
+            Mutation.Chance
+        ),
+        FormatMutationEncyclopediaTime(
+            Mutation.Cooldown
+        ),
+        Mutation.Rotation
+    ];
+
+    const RelationPlantIds = [
+        ...(Mutation.Relations
+            ?.PlantsUsed ?? []),
+        ...(Mutation.Relations
+            ?.PlantsCreated ?? [])
+    ];
+
+    for (
+        const PlantId
+        of RelationPlantIds
+    ) {
+        if (
+            !HasDiscoveredPlant(
+                MutationEncyclopediaSave,
+                PlantId
+            )
+        ) {
+            continue;
+        }
+
+        const Plant =
+            GetPlantById(
+                PlantId
+            );
+
+        if (Plant !== null) {
+            SearchParts.push(
+                Plant.Name
+            );
+        }
+    }
+
+    return SearchParts
+        .filter(
+            Value =>
+                Value !== null &&
+                Value !== undefined
+        )
+        .join(" ")
+        .toLocaleLowerCase()
+        .includes(
+            SearchQuery
+        );
+}
+
+
+function CompareMutationEncyclopediaMutations(
+    A,
+    B
+) {
+    switch (MutationEncyclopediaSortMode) {
+        case "NameAsc":
+            return String(A.Name ?? "")
+                .localeCompare(
+                    String(B.Name ?? ""),
+                    undefined,
+                    {sensitivity: "base"}
+                ) || A.Id - B.Id;
+
+        case "ChanceAsc":
+            return CompareMutationEncyclopediaNumbers(
+                A.Chance,
+                B.Chance,
+                1
+            ) || A.Id - B.Id;
+
+        case "ChanceDesc":
+            return CompareMutationEncyclopediaNumbers(
+                A.Chance,
+                B.Chance,
+                -1
+            ) || A.Id - B.Id;
+
+        case "CooldownAsc":
+            return CompareMutationEncyclopediaNumbers(
+                A.Cooldown,
+                B.Cooldown,
+                1
+            ) || A.Id - B.Id;
+
+        case "CooldownDesc":
+            return CompareMutationEncyclopediaNumbers(
+                A.Cooldown,
+                B.Cooldown,
+                -1
+            ) || A.Id - B.Id;
+
+        case "IdAsc":
+        default:
+            return A.Id - B.Id;
+    }
+}
+
+
+function CompareMutationEncyclopediaNumbers(
+    A,
+    B,
+    Direction
+) {
+    const MissingA =
+        A === null ||
+        A === undefined ||
+        A === "";
+
+    const MissingB =
+        B === null ||
+        B === undefined ||
+        B === "";
+
+    const NumberA = Number(A);
+    const NumberB = Number(B);
+
+    const ValidA =
+        !MissingA &&
+        Number.isFinite(NumberA);
+
+    const ValidB =
+        !MissingB &&
+        Number.isFinite(NumberB);
+
+    if (!ValidA && !ValidB) {
+        return 0;
+    }
+
+    if (!ValidA) {
+        return 1;
+    }
+
+    if (!ValidB) {
+        return -1;
+    }
+
+    return (NumberA - NumberB) *
+        Direction;
 }
 
 

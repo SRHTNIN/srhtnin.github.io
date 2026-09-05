@@ -26,6 +26,31 @@ $PageSection = "Mutations";
             </p>
 
             <div
+                class="CatalogueControls"
+                aria-label="Mutation search and sorting"
+            >
+                <input
+                    id="MutationEncyclopediaSearchInput"
+                    type="search"
+                    placeholder="Search mutations..."
+                    aria-label="Search mutations"
+                    autocomplete="off"
+                >
+
+                <select
+                    id="MutationEncyclopediaSortSelect"
+                    aria-label="Sort mutations"
+                >
+                    <option value="IdAsc">ID</option>
+                    <option value="NameAsc">Name A-Z</option>
+                    <option value="ChanceDesc">Chance high-low</option>
+                    <option value="ChanceAsc">Chance low-high</option>
+                    <option value="CooldownAsc">Cooldown short-long</option>
+                    <option value="CooldownDesc">Cooldown long-short</option>
+                </select>
+            </div>
+
+            <div
                 id="MutationEncyclopediaList"
                 class="MutationEncyclopediaList"
             ></div>
