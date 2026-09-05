@@ -12,8 +12,8 @@ const StartingSeeds = {
 
 const DefaultGardenName = "Garden";
 const MaximumGardenNameLength = 32;
-const StartingGardenWidth = 3;
-const StartingGardenHeight = 3;
+const StartingGardenWidth = 4;
+const StartingGardenHeight = 4;
 
 
 function CreateGardenData(
