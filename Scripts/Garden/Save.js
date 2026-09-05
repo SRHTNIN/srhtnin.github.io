@@ -15,6 +15,138 @@ const MaximumGardenNameLength = 32;
 const StartingGardenWidth = 4;
 const StartingGardenHeight = 4;
 
+const CurrentSaveVersion = 6;
+
+
+function CreateSimulationRandomState() {
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.getRandomValues ===
+            "function"
+    ) {
+        const Values =
+            new Uint32Array(1);
+
+        crypto.getRandomValues(
+            Values
+        );
+
+        return Values[0] >>> 0;
+    }
+
+    return (
+        Date.now() ^
+        Math.floor(
+            Math.random() *
+            0xFFFFFFFF
+        )
+    ) >>> 0;
+}
+
+
+function GetLegacySimulationRandomState(
+    SaveData
+) {
+    const Source =
+        String(
+            SaveData.LastSavedAt ?? 0
+        ) +
+        ":" +
+        String(
+            SaveData.Revision ?? 0
+        ) +
+        ":" +
+        String(
+            SaveData.Version ?? 0
+        );
+
+    let Hash = 2166136261;
+
+    for (
+        let Index = 0;
+        Index < Source.length;
+        Index++
+    ) {
+        Hash ^= Source.charCodeAt(
+            Index
+        );
+
+        Hash = Math.imul(
+            Hash,
+            16777619
+        );
+    }
+
+    return Hash >>> 0;
+}
+
+
+function GetSavedSimulationTime(
+    SaveData
+) {
+    const Time = Number(
+        SaveData?.Simulation
+            ?.LastProcessedAt
+    );
+
+    return Number.isFinite(Time)
+        ? Time
+        : Date.now();
+}
+
+
+function NormalizeSimulationData(
+    SaveData
+) {
+    const Now = Date.now();
+
+    if (
+        SaveData.Simulation === null ||
+        typeof SaveData.Simulation !==
+            "object" ||
+        Array.isArray(
+            SaveData.Simulation
+        )
+    ) {
+        SaveData.Simulation = {};
+    }
+
+    const LastProcessedAt = Number(
+        SaveData.Simulation
+            .LastProcessedAt ??
+        SaveData.LastSavedAt ??
+        Now
+    );
+
+    SaveData.Simulation.LastProcessedAt =
+        Math.min(
+            Now,
+            Math.max(
+                0,
+                Math.floor(
+                    Number.isFinite(
+                        LastProcessedAt
+                    )
+                        ? LastProcessedAt
+                        : Now
+                )
+            )
+        );
+
+    const RandomState = Number(
+        SaveData.Simulation.RandomState
+    );
+
+    SaveData.Simulation.RandomState =
+        Number.isInteger(RandomState) &&
+        RandomState >= 0 &&
+        RandomState <= 0xFFFFFFFF
+            ? RandomState >>> 0
+            : GetLegacySimulationRandomState(
+                SaveData
+            );
+}
+
 
 function CreateGardenData(
     Name = DefaultGardenName
@@ -392,9 +524,15 @@ function CreateNewSave() {
 
 
     return NormalizeSaveData({
-        Version: 5,
+        Version: CurrentSaveVersion,
         Revision: 0,
         LastSavedAt: Date.now(),
+
+        Simulation: {
+            LastProcessedAt: Date.now(),
+            RandomState:
+                CreateSimulationRandomState()
+        },
 
         Currency: {
             Dew: StartingDew
@@ -470,7 +608,7 @@ function NormalizeSaveData(
         Number(
             SaveData.Version ?? 1
         ),
-        5
+        CurrentSaveVersion
     );
 
     SaveData.Revision = Number(
@@ -480,6 +618,10 @@ function NormalizeSaveData(
     SaveData.LastSavedAt = Number(
         SaveData.LastSavedAt ??
         Date.now()
+    );
+
+    NormalizeSimulationData(
+        SaveData
     );
 
 

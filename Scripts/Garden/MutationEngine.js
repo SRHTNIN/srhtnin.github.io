@@ -2,7 +2,10 @@ const MaxMutationPasses = 100;
 
 
 function CheckGardenMutations(
-    SaveData
+    SaveData,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     SaveData.MutationCooldowns ??= {};
 
@@ -23,13 +26,15 @@ function CheckGardenMutations(
     ) {
         const Candidates =
             FindGardenMutationCandidates(
-                SaveData
+                SaveData,
+                AtTime
             )
                 .filter(
                     Candidate =>
                         !IsMutationCandidateOnCooldown(
                             SaveData,
-                            Candidate
+                            Candidate,
+                            AtTime
                         )
                 )
                 .sort(
@@ -98,7 +103,8 @@ function CheckGardenMutations(
             if (
                 !DoesMutationCandidateStillMatch(
                     SaveData,
-                    Candidate
+                    Candidate,
+                    AtTime
                 )
             ) {
                 continue;
@@ -108,7 +114,8 @@ function CheckGardenMutations(
             if (
                 IsMutationCandidateOnCooldown(
                     SaveData,
-                    Candidate
+                    Candidate,
+                    AtTime
                 )
             ) {
                 continue;
@@ -119,7 +126,8 @@ function CheckGardenMutations(
 
             StartMutationCandidateCooldown(
                 SaveData,
-                Candidate
+                Candidate,
+                AtTime
             );
 
 
@@ -136,7 +144,9 @@ function CheckGardenMutations(
 
 
             const Succeeded =
-                Math.random() < Chance;
+                GetSimulationRandom(
+                    SaveData
+                ) < Chance;
 
 
             if (Succeeded) {
@@ -151,7 +161,8 @@ function CheckGardenMutations(
                     ApplyMutationResult(
                         SaveData,
                         Candidate,
-                        Candidate.Success
+                        Candidate.Success,
+                        AtTime
                     );
 
 
@@ -176,7 +187,8 @@ function CheckGardenMutations(
                 const Changed =
                     ApplyMutationFailure(
                         SaveData,
-                        Candidate
+                        Candidate,
+                        AtTime
                     );
 
 
@@ -226,7 +238,10 @@ function CheckGardenMutations(
 
 
 function FindGardenMutationCandidates(
-    SaveData
+    SaveData,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     const Candidates = [];
 
@@ -283,7 +298,8 @@ function FindGardenMutationCandidates(
                             Mutation,
                             Orientation,
                             OriginX,
-                            OriginY
+                            OriginY,
+                            AtTime
                         );
 
 
@@ -307,7 +323,10 @@ function CreateMutationCandidate(
     Mutation,
     Orientation,
     OriginX,
-    OriginY
+    OriginY,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     const Captures = {};
     const Cells = [];
@@ -357,7 +376,8 @@ function CreateMutationCandidate(
                     Plot,
                     Matcher,
                     Mutation,
-                    Captures
+                    Captures,
+                    AtTime
                 )
             ) {
                 return null;
@@ -399,7 +419,10 @@ function CreateMutationCandidate(
 
 function DoesMutationCandidateStillMatch(
     SaveData,
-    Candidate
+    Candidate,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     const RefreshedCandidate =
         CreateMutationCandidate(
@@ -416,7 +439,8 @@ function DoesMutationCandidateStillMatch(
                     Candidate.Rotation
             },
             Candidate.OriginX,
-            Candidate.OriginY
+            Candidate.OriginY,
+            AtTime
         );
 
 
@@ -437,7 +461,8 @@ function DoesPlotMatchMutationMatcher(
     Plot,
     Matcher,
     Mutation,
-    Captures
+    Captures,
+    AtTime
 ) {
     if (
         Matcher === null ||
@@ -470,7 +495,8 @@ function DoesPlotMatchMutationMatcher(
         true &&
         !IsMutationPlantMature(
             Plot,
-            Plant
+            Plant,
+            AtTime
         )
     ) {
         return false;
@@ -566,7 +592,8 @@ function DoesPlotMatchMutationMatcher(
 
 function IsMutationPlantMature(
     Plot,
-    Plant
+    Plant,
+    AtTime
 ) {
     if (
         Number(
@@ -578,7 +605,7 @@ function IsMutationPlantMature(
 
 
     return (
-        Date.now() -
+        AtTime -
         Number(
             Plot.PlantedAt ?? 0
         ) >=
@@ -589,7 +616,10 @@ function IsMutationPlantMature(
 
 function ApplyMutationFailure(
     SaveData,
-    Candidate
+    Candidate,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     const Failure =
         Candidate.Mutation.Failure ??
@@ -631,7 +661,8 @@ function ApplyMutationFailure(
         return ApplyMutationResult(
             SaveData,
             Candidate,
-            Failure
+            Failure,
+            AtTime
         );
     }
 
@@ -643,7 +674,10 @@ function ApplyMutationFailure(
 function ApplyMutationResult(
     SaveData,
     Candidate,
-    ResultMatrix
+    ResultMatrix,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     if (!Array.isArray(ResultMatrix)) {
         return false;
@@ -706,7 +740,8 @@ function ApplyMutationResult(
             const NewPlot =
                 CreateMutationResultPlot(
                     ResultValue,
-                    Candidate.Captures
+                    Candidate.Captures,
+                    AtTime
                 );
 
 
@@ -749,7 +784,8 @@ function ApplyMutationResult(
 
 function CreateMutationResultPlot(
     ResultValue,
-    Captures
+    Captures,
+    AtTime
 ) {
     if (
         typeof ResultValue ===
@@ -785,7 +821,7 @@ function CreateMutationResultPlot(
 
         return {
             Plant: ResultValue,
-            PlantedAt: Date.now()
+            PlantedAt: AtTime
         };
     }
 
@@ -841,7 +877,7 @@ function CreateMutationResultPlot(
 
     return {
         Plant: ResultValue.Plant,
-        PlantedAt: Date.now()
+        PlantedAt: AtTime
     };
 }
 
@@ -1006,42 +1042,56 @@ function GetMutationPatternSpecificity(
 }
 
 
-function IsMutationCandidateOnCooldown(
+function GetMutationCandidateCooldownUntil(
     SaveData,
     Candidate
 ) {
-    const CooldownUntil =
-        Number(
-            SaveData.MutationCooldowns[
-                GetMutationCooldownKey(
-                    Candidate
-                )
-            ] ?? 0
-        );
+    return Number(
+        SaveData.MutationCooldowns[
+            GetMutationCooldownKey(
+                Candidate
+            )
+        ] ?? 0
+    );
+}
 
 
-    return CooldownUntil > Date.now();
+function IsMutationCandidateOnCooldown(
+    SaveData,
+    Candidate,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
+) {
+    return (
+        GetMutationCandidateCooldownUntil(
+            SaveData,
+            Candidate
+        ) > AtTime
+    );
 }
 
 
 function StartMutationCandidateCooldown(
     SaveData,
-    Candidate
+    Candidate,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
     const Cooldown = Math.max(
-        0,
+        SimulationMinimumEventInterval,
         Number(
             Candidate.Mutation.Cooldown ??
             0
-        )
+        ) || 0
     );
-
 
     SaveData.MutationCooldowns[
         GetMutationCooldownKey(
             Candidate
         )
-    ] = Date.now() + Cooldown;
+    ] = AtTime + Cooldown;
 }
 
 

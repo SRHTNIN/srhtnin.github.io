@@ -692,7 +692,9 @@ function TakeFertilizerUse(
 
 function GetFutureSightCooldownRemaining(
     SaveData,
-    Now = Date.now()
+    Now = GetSavedSimulationTime(
+        SaveData
+    )
 ) {
     return Math.max(
         0,
@@ -705,7 +707,9 @@ function GetFutureSightCooldownRemaining(
 
 function IsFutureSightReady(
     SaveData,
-    Now = Date.now()
+    Now = GetSavedSimulationTime(
+        SaveData
+    )
 ) {
     return GetFutureSightCooldownRemaining(
         SaveData,
@@ -716,7 +720,9 @@ function IsFutureSightReady(
 
 function StartFutureSightCooldown(
     SaveData,
-    Now = Date.now()
+    Now = GetSavedSimulationTime(
+        SaveData
+    )
 ) {
     SaveData.Tools ??= {};
     SaveData.Tools.FutureSightCooldownUntil =

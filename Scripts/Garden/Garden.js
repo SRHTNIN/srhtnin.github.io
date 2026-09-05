@@ -65,19 +65,23 @@ async function StartGame() {
 
     GameSave = await LoadGame();
 
+    const InitialSimulationResult =
+        AdvanceGameSimulation(
+            GameSave,
+            Date.now()
+        );
+
     BindGardenTools();
     BindGardenSelector();
     BindQuickBuyControls();
     EnsureSelectedSeed();
 
-    const InitialMutationResult =
-        CheckAllGardenMutations(
-            GameSave
-        );
-
     RenderGame();
 
-    if (InitialMutationResult.Attempted) {
+    if (
+        InitialSimulationResult.Advanced ||
+        InitialSimulationResult.Dirty
+    ) {
         await SaveGame(
             GameSave
         );
@@ -184,6 +188,13 @@ function BindGardenSelector() {
 async function SwitchGarden(
     Direction
 ) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     const GardenCount =
         GameSave.Gardens.length;
 
@@ -219,7 +230,8 @@ async function SwitchGarden(
 
     const MutationResult =
         CheckGardenMutations(
-            GameSave
+            GameSave,
+            ActionTime
         );
 
     RenderGame();
@@ -348,49 +360,15 @@ function RenderGardenSelector() {
 
 
 function CheckAllGardenMutations(
-    SaveData
+    SaveData,
+    AtTime = GetSimulationTime(
+        SaveData
+    )
 ) {
-    const OriginalGardenIndex =
-        SaveData.ActiveGardenIndex;
-
-    const Result = {
-        Attempted: false,
-        Changed: false
-    };
-
-
-    for (
-        let GardenIndex = 0;
-        GardenIndex <
-            SaveData.Gardens.length;
-        GardenIndex++
-    ) {
-        SetActiveGardenIndex(
-            SaveData,
-            GardenIndex
-        );
-
-        const GardenResult =
-            CheckGardenMutations(
-                SaveData
-            );
-
-        Result.Attempted =
-            Result.Attempted ||
-            GardenResult.Attempted;
-
-        Result.Changed =
-            Result.Changed ||
-            GardenResult.Changed;
-    }
-
-
-    SetActiveGardenIndex(
+    return CheckAllGardenMutationsAtTime(
         SaveData,
-        OriginalGardenIndex
+        AtTime
     );
-
-    return Result;
 }
 
 
@@ -1832,7 +1810,9 @@ function CreateGardenPlotTimer(
             0,
             Plant.GrowthTime -
             (
-                Date.now() -
+                GetSimulationTime(
+                    GameSave
+                ) -
                 Plot.PlantedAt
             )
         );
@@ -1905,6 +1885,13 @@ function FormatGardenRemainingTime(
 async function PlantSeed(
     PlotIndex
 ) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     if (
         GameSave.Garden.Plots[
             PlotIndex
@@ -1959,7 +1946,7 @@ async function PlantSeed(
         PlotIndex
     ] = {
         Plant: PlantKey,
-        PlantedAt: Date.now()
+        PlantedAt: ActionTime
     };
 
 
@@ -1970,7 +1957,8 @@ async function PlantSeed(
     );
 
     CheckGardenMutations(
-        GameSave
+        GameSave,
+        ActionTime
     );
 
     RenderGame();
@@ -1982,6 +1970,13 @@ async function PlantSeed(
 
 
 async function PlantManySeeds() {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     EnsureSelectedSeed();
 
     if (SelectedSeedId === null) {
@@ -2066,7 +2061,7 @@ async function PlantManySeeds() {
     }
 
 
-    const PlantedAt = Date.now();
+    const PlantedAt = ActionTime;
 
     for (
         let Index = 0;
@@ -2093,7 +2088,8 @@ async function PlantManySeeds() {
     );
 
     CheckGardenMutations(
-        GameSave
+        GameSave,
+        ActionTime
     );
 
     RenderGame();
@@ -2107,6 +2103,13 @@ async function PlantManySeeds() {
 async function HarvestPlant(
     PlotIndex
 ) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     const Plot =
         GameSave.Garden.Plots[
             PlotIndex
@@ -2166,7 +2169,8 @@ async function HarvestPlant(
     );
 
     CheckGardenMutations(
-        GameSave
+        GameSave,
+        ActionTime
     );
 
     RenderGame();
@@ -2180,6 +2184,13 @@ async function HarvestPlant(
 async function RemovePlant(
     PlotIndex
 ) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     const Plot =
         GameSave.Garden.Plots[
             PlotIndex
@@ -2257,7 +2268,8 @@ async function RemovePlant(
     );
 
     CheckGardenMutations(
-        GameSave
+        GameSave,
+        ActionTime
     );
 
     RenderGame();
@@ -2271,6 +2283,13 @@ async function RemovePlant(
 async function FertilizePlant(
     PlotIndex
 ) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     const Plot =
         GameSave.Garden.Plots[
             PlotIndex
@@ -2330,7 +2349,8 @@ async function FertilizePlant(
     );
 
     CheckGardenMutations(
-        GameSave
+        GameSave,
+        ActionTime
     );
 
     RenderGame();
@@ -2342,6 +2362,13 @@ async function FertilizePlant(
 
 
 async function UseFutureSight() {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
     if (
         !IsGardenToolUnlocked(
             GameSave,
@@ -2450,41 +2477,37 @@ function CreateFutureSightPreview() {
 
 
 async function GardenTick() {
-    RenderGarden();
-    RenderTools();
-    RenderNextHarvest();
-    RenderGardenOverview();
-    RenderGardenEconomy();
-    RenderGardenInfoLayout();
-
-
-    if (
-        SelectedGardenTool ===
-            "FutureSight" &&
-        FutureSightPreview !== null
-    ) {
-        return;
-    }
-
-
     if (MutationCheckPending) {
         return;
     }
 
-
     MutationCheckPending = true;
 
-
     try {
-        const MutationResult =
-            CheckAllGardenMutations(
-                GameSave
+        const SimulationResult =
+            AdvanceGameSimulation(
+                GameSave,
+                Date.now()
             );
 
+        if (
+            SimulationResult.Attempted &&
+            FutureSightPreview !== null
+        ) {
+            FutureSightPreview = null;
 
-        if (MutationResult.Attempted) {
-            RenderGame();
+            if (
+                SelectedGardenTool ===
+                "FutureSight"
+            ) {
+                SelectedGardenTool =
+                    "Trowel";
+            }
+        }
 
+        RenderGame();
+
+        if (SimulationResult.Dirty) {
             await SaveGame(
                 GameSave
             );
@@ -2531,7 +2554,9 @@ function GetPlantGrowthProgress(
     }
 
     const Age =
-        Date.now() -
+        GetSimulationTime(
+            GameSave
+        ) -
         Plot.PlantedAt;
 
     return Math.max(
@@ -2733,7 +2758,9 @@ function RenderNextHarvest() {
 
     const Remaining =
         Harvest.Time -
-        Date.now();
+        GetSimulationTime(
+            GameSave
+        );
 
     const IncludePlantName =
         HasOverview;
