@@ -15,7 +15,7 @@ const MaximumGardenNameLength = 32;
 const StartingGardenWidth = 4;
 const StartingGardenHeight = 4;
 
-const CurrentSaveVersion = 7;
+const CurrentSaveVersion = 8;
 
 
 function CreateSimulationRandomState() {
@@ -287,6 +287,77 @@ function NormalizeGardenData(
             )
                 ? Plot.Rotation
                 : "East";
+
+        if (
+            Plot.FunctionalCooldowns === null ||
+            typeof Plot.FunctionalCooldowns !==
+                "object" ||
+            Array.isArray(
+                Plot.FunctionalCooldowns
+            )
+        ) {
+            Plot.FunctionalCooldowns = {};
+        }
+
+        for (
+            const [CooldownKey, CooldownValue]
+            of Object.entries(
+                Plot.FunctionalCooldowns
+            )
+        ) {
+            let StartedAt = 0;
+            let Until = 0;
+
+            if (
+                CooldownValue !== null &&
+                typeof CooldownValue ===
+                    "object" &&
+                !Array.isArray(
+                    CooldownValue
+                )
+            ) {
+                StartedAt = Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            CooldownValue.StartedAt ?? 0
+                        ) || 0
+                    )
+                );
+
+                Until = Math.max(
+                    StartedAt,
+                    Math.floor(
+                        Number(
+                            CooldownValue.Until ?? 0
+                        ) || 0
+                    )
+                );
+            } else {
+                Until = Math.max(
+                    0,
+                    Math.floor(
+                        Number(
+                            CooldownValue
+                        ) || 0
+                    )
+                );
+            }
+
+            if (Until <= 0) {
+                delete Plot.FunctionalCooldowns[
+                    CooldownKey
+                ];
+                continue;
+            }
+
+            Plot.FunctionalCooldowns[
+                CooldownKey
+            ] = {
+                StartedAt,
+                Until
+            };
+        }
 
         delete Plot.VisualVariant;
         delete Plot.AddedTags;

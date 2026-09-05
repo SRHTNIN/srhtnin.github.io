@@ -754,6 +754,15 @@ input, button, textarea, select {
     --GrowthColour: var(--Yellow);
 }
 
+.GardenPlotFunctionalCooldown,
+.GardenPlotFunctionalCooldown:hover {
+    --GrowthColour: var(--Blue);
+}
+
+.GardenPlotFunctionalCooldown .GardenPlotTimer {
+    color: var(--Blue);
+}
+
 .SeedList {
     display: flex;
     gap: 0.5rem;

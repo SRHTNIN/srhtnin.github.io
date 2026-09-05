@@ -58,6 +58,153 @@ function ValidateAdminKey(
 }
 
 
+function ValidateAdminFunctionalEffects(
+    Effects
+) {
+    const Functional =
+        Effects?.Functional;
+
+    if (Functional === undefined) {
+        return true;
+    }
+
+    if (!Array.isArray(Functional)) {
+        throw new Error(
+            "Effects.Functional must be an array."
+        );
+    }
+
+    if (Functional.length > 32) {
+        throw new Error(
+            "Effects.Functional cannot contain more than 32 effects."
+        );
+    }
+
+    const SeenKeys = new Set();
+
+    for (
+        let EffectIndex = 0;
+        EffectIndex < Functional.length;
+        EffectIndex++
+    ) {
+        const Effect =
+            Functional[EffectIndex];
+
+        if (!IsAdminPlainObject(Effect)) {
+            throw new Error(
+                "Functional effect " +
+                (EffectIndex + 1) +
+                " must be an object."
+            );
+        }
+
+        ValidateAdminKey(
+            String(
+                Effect.Type ?? ""
+            ).trim(),
+            "Functional effect type"
+        );
+
+        if (Effect.Key !== undefined) {
+            const EffectKey = String(
+                Effect.Key ?? ""
+            ).trim();
+
+            ValidateAdminKey(
+                EffectKey,
+                "Functional effect key"
+            );
+
+            if (SeenKeys.has(EffectKey)) {
+                throw new Error(
+                    "Functional effect keys must be unique within a plant."
+                );
+            }
+
+            SeenKeys.add(EffectKey);
+        }
+
+        for (const Field of [
+            "Area",
+            "Source",
+            "Target"
+        ]) {
+            if (Effect[Field] === undefined) {
+                continue;
+            }
+
+            const Area = String(
+                Effect[Field]
+            );
+
+            if (
+                typeof FunctionalEffectAreas !==
+                    "undefined" &&
+                !FunctionalEffectAreas.includes(
+                    Area
+                )
+            ) {
+                throw new Error(
+                    "Functional effect " +
+                    Field.toLowerCase() +
+                    " must be Front, Behind, Cardinal, Adjacent or Farm."
+                );
+            }
+        }
+
+        if (Effect.Cooldown !== undefined) {
+            ValidateAdminInteger(
+                Number(
+                    Effect.Cooldown
+                ),
+                "Functional effect cooldown",
+                typeof FunctionalEffectMinimumCooldown !==
+                    "undefined"
+                    ? FunctionalEffectMinimumCooldown
+                    : 1000
+            );
+        }
+
+        if (Effect.Amount !== undefined) {
+            const Amount = Number(
+                Effect.Amount
+            );
+
+            if (!Number.isFinite(Amount)) {
+                throw new Error(
+                    "Functional effect amount must be a number."
+                );
+            }
+        }
+
+        if (
+            Effect.RequireMature !== undefined &&
+            typeof Effect.RequireMature !==
+                "boolean"
+        ) {
+            throw new Error(
+                "Functional effect RequireMature must be On or Off."
+            );
+        }
+
+        if (
+            typeof IsFunctionalEffectActive ===
+                "function" &&
+            IsFunctionalEffectActive(
+                Effect
+            ) &&
+            Effect.Cooldown === undefined
+        ) {
+            throw new Error(
+                "Active functional effects need a cooldown."
+            );
+        }
+    }
+
+    return true;
+}
+
+
 function ValidateAdminPlant(
     Plant,
     Catalogue,
@@ -204,6 +351,10 @@ function ValidateAdminPlant(
             "Effects JSON must be an object."
         );
     }
+
+    ValidateAdminFunctionalEffects(
+        Plant.Effects
+    );
 
     if (
         Plant.DirectionalSprites !== undefined &&

@@ -91,6 +91,28 @@ function MergeSimulationMutationResult(
 }
 
 
+function MergeSimulationFunctionalResult(
+    Target,
+    Source
+) {
+    if (Source === null || Source === undefined) {
+        return;
+    }
+
+    Target.FunctionalAttempted =
+        Target.FunctionalAttempted ||
+        Source.Attempted === true;
+
+    Target.Changed =
+        Target.Changed ||
+        Source.Changed === true;
+
+    Target.FunctionalActivations.push(
+        ...(Source.Activations ?? [])
+    );
+}
+
+
 function CreateSimulationResult(
     StartTime,
     TargetTime
@@ -100,6 +122,7 @@ function CreateSimulationResult(
         TargetTime,
         Advanced: TargetTime > StartTime,
         Attempted: false,
+        FunctionalAttempted: false,
         Changed: false,
         Dirty: false,
         CaughtUp: StartTime >= TargetTime,
@@ -107,7 +130,8 @@ function CreateSimulationResult(
         Steps: 0,
         SuccessfulMutations: [],
         NewlyDiscoveredMutations: [],
-        NewlyDiscoveredPlants: []
+        NewlyDiscoveredPlants: [],
+        FunctionalActivations: []
     };
 }
 
@@ -135,6 +159,7 @@ function FinalizeSimulationResult(
 
     Result.Dirty =
         Result.Attempted ||
+        Result.FunctionalAttempted ||
         Result.Changed;
 
     return Result;
@@ -324,18 +349,27 @@ function GetNextSimulationEventTime(
             TargetTime
         );
 
-    if (MaturityTime === null) {
-        return MutationTime;
-    }
+    const FunctionalTime =
+        typeof GetNextFunctionalEffectEventTime ===
+            "function"
+            ? GetNextFunctionalEffectEventTime(
+                SaveData,
+                CurrentTime,
+                TargetTime
+            )
+            : null;
 
-    if (MutationTime === null) {
-        return MaturityTime;
-    }
-
-    return Math.min(
+    const EventTimes = [
         MaturityTime,
-        MutationTime
+        MutationTime,
+        FunctionalTime
+    ].filter(
+        Time => Time !== null
     );
+
+    return EventTimes.length === 0
+        ? null
+        : Math.min(...EventTimes);
 }
 
 
@@ -386,6 +420,22 @@ function AdvanceGameSimulation(
             Result,
             MutationResult
         );
+
+        if (
+            typeof ProcessFunctionalEffectsAtTime ===
+                "function"
+        ) {
+            const FunctionalResult =
+                ProcessFunctionalEffectsAtTime(
+                    SaveData,
+                    CurrentTime
+                );
+
+            MergeSimulationFunctionalResult(
+                Result,
+                FunctionalResult
+            );
+        }
 
         if (CurrentTime >= SafeTargetTime) {
             Result.CaughtUp = true;

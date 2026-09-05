@@ -211,6 +211,7 @@ $PageSection = "Admin";
             </div>
         </main>
 
+        <script src="/Scripts/Garden/FunctionalEffects.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/AdminValidation.js"></script>
         <script src="/Scripts/Garden/AdminMassPlantEditor.js"></script>

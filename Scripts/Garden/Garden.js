@@ -1669,10 +1669,34 @@ function CreatePlotElement(
             Plant
         );
 
+    const CooldownState =
+        Progress >= 1 &&
+        typeof GetFunctionalPlantCooldownDisplayState ===
+            "function"
+            ? GetFunctionalPlantCooldownDisplayState(
+                Plot,
+                Plant,
+                GetSimulationTime(
+                    GameSave
+                )
+            )
+            : null;
+
+    const BorderProgress =
+        CooldownState === null
+            ? Progress
+            : CooldownState.Progress;
+
     Tile.style.setProperty(
         "--GrowthProgress",
-        `${Progress * 100}%`
+        `${BorderProgress * 100}%`
     );
+
+    if (CooldownState !== null) {
+        Tile.classList.add(
+            "GardenPlotFunctionalCooldown"
+        );
+    }
 
 
     const ImagePath =
@@ -2001,6 +2025,31 @@ function CreateGardenPlotTimer(
         Timer.textContent = "";
 
         return Timer;
+    }
+
+
+    if (
+        Progress >= 1 &&
+        typeof GetFunctionalPlantCooldownDisplayState ===
+            "function"
+    ) {
+        const CooldownState =
+            GetFunctionalPlantCooldownDisplayState(
+                Plot,
+                Plant,
+                GetSimulationTime(
+                    GameSave
+                )
+            );
+
+        if (CooldownState !== null) {
+            Timer.textContent =
+                FormatGardenRemainingTime(
+                    CooldownState.Remaining
+                );
+
+            return Timer;
+        }
     }
 
 
