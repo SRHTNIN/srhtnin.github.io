@@ -20,7 +20,7 @@ $PageSection = "Social";
                 id="Leaderboard"
                 class="Panel Leaderboard"
             >
-                <h2>Leaderboard</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Leaderboard</h2>
 
                 <div class="LeaderboardTableContainer">
                     <table class="LeaderboardTable">

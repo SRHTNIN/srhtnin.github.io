@@ -367,7 +367,7 @@ function CreatePlantEncyclopediaCard(
         );
 
     Header.className =
-        "PlantEncyclopediaHeader";
+        "PanelHeader PlantEncyclopediaHeader";
 
 
     const Number =

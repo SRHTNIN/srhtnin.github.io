@@ -485,7 +485,7 @@ function CreateTrowelToolCard() {
         );
 
     Header.className =
-        "ShopItemHeader ShopItemHeaderOwned";
+        "PanelHeader PanelHeaderInset ShopItemHeader ShopItemHeaderOwned";
 
 
     const Name =
@@ -584,7 +584,7 @@ function CreateToolUnlockCard(
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -724,7 +724,7 @@ function CreateShovelToolCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -761,27 +761,22 @@ function CreateShovelToolCard() {
 
     Details.append(
         CreateShopStat(
-            "Status",
+            "Current",
             IsOwned
-                ? "Unlocked"
+                ? GetShovelLevelDescription(
+                    Level
+                )
                 : "Locked"
         ),
         CreateShopStat(
-            IsOwned
-                ? "Current"
-                : "On unlock",
-            GetShovelLevelDescription(
-                Level
-            )
-        ),
-        CreateShopStat(
-            IsOwned
-                ? "Next"
-                : "First upgrade",
+            "Next",
+            IsOwned &&
             Level >= ShovelMaximumLevel
                 ? "Maximum level"
                 : GetShovelLevelDescription(
-                    Level + 1
+                    IsOwned
+                        ? Level + 1
+                        : 0
                 )
         )
     );
@@ -860,18 +855,18 @@ function GetShovelLevelDescription(
     Level
 ) {
     if (Level <= 0) {
-        return "Level 0 - returns nothing";
+        return "Returns nothing";
     }
 
     if (Level === 1) {
-        return "Level 1 - returns 33% of seed cost";
+        return "Returns 33% of seed cost";
     }
 
     if (Level === 2) {
-        return "Level 2 - returns 66% of seed cost";
+        return "Returns 66% of seed cost";
     }
 
-    return "Level 3 - returns the planted seed";
+    return "Returns the planted seed";
 }
 
 
@@ -910,7 +905,7 @@ function CreateFertilizerToolCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -947,12 +942,6 @@ function CreateFertilizerToolCard() {
 
     Details.append(
         CreateShopStat(
-            "Status",
-            IsOwned
-                ? "Unlocked"
-                : "Locked"
-        ),
-        CreateShopStat(
             "Current uses",
             Number(
                 ShopSave.Inventory
@@ -960,30 +949,23 @@ function CreateFertilizerToolCard() {
             ).toLocaleString()
         ),
         CreateShopStat(
+            "Current",
             IsOwned
-                ? "Current"
-                : "On unlock",
-            "Level " +
-            Level +
-            " - " +
-            FertilizerGrowthMinutes[
-                Level
-            ] +
-            " minutes"
+                ? FertilizerGrowthMinutes[
+                    Level
+                ] + " minutes"
+                : "Locked"
         ),
         CreateShopStat(
-            IsOwned
-                ? "Next"
-                : "First upgrade",
+            "Next",
+            IsOwned &&
             Level >= FertilizerMaximumLevel
                 ? "Maximum level"
-                : "Level " +
-                    (Level + 1) +
-                    " - " +
-                    FertilizerGrowthMinutes[
-                        Level + 1
-                    ] +
-                    " minutes"
+                : FertilizerGrowthMinutes[
+                    IsOwned
+                        ? Level + 1
+                        : 0
+                ] + " minutes"
         )
     );
 
@@ -1184,7 +1166,7 @@ function CreateGardenExpansionCard(
         );
 
     Header.className =
-        "ShopItemHeader";
+        "PanelHeader PanelHeaderInset ShopItemHeader";
 
 
     const Name =
@@ -1311,7 +1293,7 @@ function CreateNewGardenCard() {
         );
 
     Header.className =
-        "ShopItemHeader";
+        "PanelHeader PanelHeaderInset ShopItemHeader";
 
 
     const Name =
@@ -1420,7 +1402,7 @@ function CreatePlantInformationUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -1541,7 +1523,7 @@ function CreateGardenOverviewUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -1662,7 +1644,7 @@ function CreateGardenEconomyUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
             IsOwned
                 ? " ShopItemHeaderOwned"
@@ -1757,13 +1739,24 @@ function CreateGardenEconomyUpgradeCard() {
 
 
 function CreateMutationHintsUpgradeCard() {
-    const Cost =
-        GetMutationHintsUpgradeCost();
-
-    const IsOwned =
+    const IsUnlocked =
         HasMutationHintsUpgrade(
             ShopSave
         );
+
+    const Level =
+        GetMutationHintsLevel(
+            ShopSave
+        );
+
+    const Cost =
+        GetMutationHintsUpgradeCost(
+            ShopSave
+        );
+
+    const IsMaximumLevel =
+        IsUnlocked &&
+        Level >= MutationHintsMaximumLevel;
 
 
     const Card =
@@ -1781,9 +1774,9 @@ function CreateMutationHintsUpgradeCard() {
         );
 
     Header.className =
-        "ShopItemHeader" +
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
         (
-            IsOwned
+            IsMaximumLevel
                 ? " ShopItemHeaderOwned"
                 : ""
         );
@@ -1806,7 +1799,7 @@ function CreateMutationHintsUpgradeCard() {
         );
 
     Description.textContent =
-        "Show subtle hints for undiscovered mutations once you've discovered the plants needed to attempt them. Hints appear in the Mutation encyclopedia without revealing the recipe.";
+        "Show subtle hints for undiscovered mutations once you've discovered the plants needed to attempt them. The first level shows one hint; the upgrade shows every available hint, up to 10.";
 
 
     const Details =
@@ -1819,44 +1812,52 @@ function CreateMutationHintsUpgradeCard() {
 
     Details.append(
         CreateShopStat(
-            "Mutation hints",
-            IsOwned
-                ? "Unlocked"
-                : "Locked"
+            "Current",
+            !IsUnlocked
+                ? "Locked"
+                : Level >= MutationHintsMaximumLevel
+                    ? "All hints (max 10)"
+                    : "1 hint at a time"
         ),
         CreateShopStat(
-            "Requirements",
-            "Required plants discovered"
+            "Next",
+            !IsUnlocked
+                ? "1 hint at a time"
+                : IsMaximumLevel
+                    ? "Maximum level"
+                    : "All hints (max 10)"
         )
     );
 
 
-    const BuyButton =
+    const ActionButton =
         document.createElement(
             "button"
         );
 
-    BuyButton.className =
+    ActionButton.className =
         "ActionButton ShopBuyButton";
 
-    BuyButton.type = "button";
+    ActionButton.type = "button";
 
-    if (IsOwned) {
-        BuyButton.textContent =
-            "Purchased";
+    if (Cost === null) {
+        ActionButton.textContent =
+            "Maximum level";
 
-        BuyButton.disabled = true;
+        ActionButton.disabled = true;
     } else {
-        BuyButton.textContent =
-            "Buy - " +
+        ActionButton.textContent =
+            (IsUnlocked
+                ? "Upgrade - "
+                : "Buy - ") +
             Cost.toLocaleString() +
             " Dew";
 
-        BuyButton.disabled =
+        ActionButton.disabled =
             ShopSave.Currency.Dew < Cost ||
             ShopPurchasePending;
 
-        BuyButton.addEventListener(
+        ActionButton.addEventListener(
             "click",
             BuyMutationHintsUpgrade
         );
@@ -1867,7 +1868,7 @@ function CreateMutationHintsUpgradeCard() {
         Header,
         Description,
         Details,
-        BuyButton
+        ActionButton
     );
 
 
@@ -1893,7 +1894,7 @@ function CreateShopSeedCard(
         );
 
     Header.className =
-        "ShopItemHeader";
+        "PanelHeader PanelHeaderInset ShopItemHeader";
 
 
     const Name =
@@ -3028,25 +3029,33 @@ async function BuyGardenEconomyUpgrade() {
 
 
 async function BuyMutationHintsUpgrade() {
-    if (
-        ShopPurchasePending ||
-        HasMutationHintsUpgrade(
-            ShopSave
-        )
-    ) {
+    if (ShopPurchasePending) {
         return;
     }
 
 
+    const IsUnlocked =
+        HasMutationHintsUpgrade(
+            ShopSave
+        );
+
     const Cost =
-        GetMutationHintsUpgradeCost();
+        GetMutationHintsUpgradeCost(
+            ShopSave
+        );
+
+    if (Cost === null) {
+        return;
+    }
 
     if (
         ShopSave.Currency.Dew <
         Cost
     ) {
         SetShopMessage(
-            "You don't have enough Dew for Mutation hints."
+            IsUnlocked
+                ? "You don't have enough Dew to upgrade Mutation hints."
+                : "You don't have enough Dew for Mutation hints."
         );
 
         return;
@@ -3062,16 +3071,27 @@ async function BuyMutationHintsUpgrade() {
         ShopSave.Statistics.CurrencySpent.Dew +=
             Cost;
 
-        UnlockMutationHints(
-            ShopSave
-        );
+        if (IsUnlocked) {
+            UpgradeMutationHints(
+                ShopSave
+            );
 
+            SetShopMessage(
+                "Upgraded Mutation hints for " +
+                Cost.toLocaleString() +
+                " Dew. Up to 10 eligible hints are now shown at once."
+            );
+        } else {
+            UnlockMutationHints(
+                ShopSave
+            );
 
-        SetShopMessage(
-            "Bought Mutation hints for " +
-            Cost.toLocaleString() +
-            " Dew. Eligible hints are now visible in the Mutation encyclopedia."
-        );
+            SetShopMessage(
+                "Bought Mutation hints for " +
+                Cost.toLocaleString() +
+                " Dew. The lowest-ID eligible hint is now visible in the Mutation encyclopedia."
+            );
+        }
 
         RenderShop();
 

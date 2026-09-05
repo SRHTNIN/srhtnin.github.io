@@ -392,7 +392,7 @@ function CreateNewSave() {
 
 
     return NormalizeSaveData({
-        Version: 4,
+        Version: 5,
         Revision: 0,
         LastSavedAt: Date.now(),
 
@@ -432,7 +432,8 @@ function CreateNewSave() {
             PlantInformation: false,
             GardenOverview: false,
             GardenEconomy: false,
-            MutationHints: false
+            MutationHints: false,
+            MutationHintsLevel: 0
         },
 
         Preferences: {
@@ -469,7 +470,7 @@ function NormalizeSaveData(
         Number(
             SaveData.Version ?? 1
         ),
-        4
+        5
     );
 
     SaveData.Revision = Number(
@@ -687,6 +688,20 @@ function NormalizeSaveData(
     SaveData.Upgrades.MutationHints =
         SaveData.Upgrades.MutationHints ===
         true;
+
+    SaveData.Upgrades.MutationHintsLevel =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                Math.floor(
+                    Number(
+                        SaveData.Upgrades
+                            .MutationHintsLevel ?? 0
+                    ) || 0
+                )
+            )
+        );
 
 
     SaveData.Preferences ??= {};

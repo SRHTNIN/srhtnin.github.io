@@ -53,8 +53,6 @@ $PageSection = "Garden";
                 id="GardenInfoPanel"
                 class="StatusPanel GardenInfoPanel"
             >
-                <h2 class="GardenInfoHeading">Info</h2>
-
                 <div class="GardenInfoRow GardenInfoTopRow">
                     <div class="GardenInfoSection GardenInfoPrimarySection">
                         <div class="GardenStatusLine">
@@ -170,7 +168,7 @@ $PageSection = "Garden";
                 id="QuickBuy"
                 class="Panel GardenQuickBuyPanel"
             >
-                <div class="GardenQuickBuyHeader">
+                <div class="PanelHeader PanelHeaderInset GardenQuickBuyHeader">
                     <h2>Quick-buy</h2>
 
                     <div
@@ -214,7 +212,7 @@ $PageSection = "Garden";
                 id="Tools"
                 class="Panel GardenToolsPanel"
             >
-                <h2>Tools</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Tools</h2>
 
                 <div
                     id="ToolList"
@@ -226,7 +224,7 @@ $PageSection = "Garden";
                 id="Seeds"
                 class="Panel GardenInventoryPanel"
             >
-                <h2>Inventory</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Inventory</h2>
 
                 <div
                     id="SeedList"
@@ -238,7 +236,7 @@ $PageSection = "Garden";
                 id="Plots"
                 class="Panel GardenPlotsPanel"
             >
-                <h2>Plots</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Plots</h2>
 
                 <div class="GardenGridViewport">
                     <div
@@ -256,7 +254,7 @@ $PageSection = "Garden";
                 id="Player"
                 class="Panel GardenUser"
             >
-                <h2>Player</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Player</h2>
 
                 <p>
                     Username:

@@ -23,7 +23,10 @@ const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
 const GardenEconomyUpgradeCost = 1000;
-const MutationHintsUpgradeCost = 1500;
+const MutationHintsUnlockCost = 1500;
+const MutationHintsUpgradeCostMultiplier = 2;
+const MutationHintsMaximumLevel = 1;
+const MutationHintsMaximumVisible = 10;
 const NewGardenBaseCost = 4000;
 const NewGardenCostMultiplier = 1.5;
 
@@ -290,8 +293,73 @@ function HasMutationHintsUpgrade(
 }
 
 
-function GetMutationHintsUpgradeCost() {
-    return MutationHintsUpgradeCost;
+function GetMutationHintsLevel(
+    SaveData
+) {
+    return Math.max(
+        0,
+        Math.min(
+            MutationHintsMaximumLevel,
+            Math.floor(
+                Number(
+                    SaveData
+                        ?.Upgrades
+                        ?.MutationHintsLevel ?? 0
+                ) || 0
+            )
+        )
+    );
+}
+
+
+function GetMutationHintsDisplayLimit(
+    SaveData
+) {
+    if (
+        !HasMutationHintsUpgrade(
+            SaveData
+        )
+    ) {
+        return 0;
+    }
+
+    return GetMutationHintsLevel(
+        SaveData
+    ) >= MutationHintsMaximumLevel
+        ? MutationHintsMaximumVisible
+        : 1;
+}
+
+
+function GetMutationHintsUpgradeCost(
+    SaveData
+) {
+    if (
+        !HasMutationHintsUpgrade(
+            SaveData
+        )
+    ) {
+        return MutationHintsUnlockCost;
+    }
+
+    const Level =
+        GetMutationHintsLevel(
+            SaveData
+        );
+
+    if (
+        Level >= MutationHintsMaximumLevel
+    ) {
+        return null;
+    }
+
+    return Math.round(
+        MutationHintsUnlockCost *
+        Math.pow(
+            MutationHintsUpgradeCostMultiplier,
+            Level + 1
+        )
+    );
 }
 
 
@@ -301,6 +369,37 @@ function UnlockMutationHints(
     SaveData.Upgrades ??= {};
     SaveData.Upgrades.MutationHints =
         true;
+    SaveData.Upgrades.MutationHintsLevel =
+        0;
+}
+
+
+function UpgradeMutationHints(
+    SaveData
+) {
+    if (
+        !HasMutationHintsUpgrade(
+            SaveData
+        )
+    ) {
+        return false;
+    }
+
+    const Level =
+        GetMutationHintsLevel(
+            SaveData
+        );
+
+    if (
+        Level >= MutationHintsMaximumLevel
+    ) {
+        return false;
+    }
+
+    SaveData.Upgrades.MutationHintsLevel =
+        Level + 1;
+
+    return true;
 }
 
 

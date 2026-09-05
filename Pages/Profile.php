@@ -27,7 +27,7 @@ $PageTitle = "Profile";
                 id="Player"
                 class="Panel ProfileSection"
             >
-                <h2>Player</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Player</h2>
 
                 <form id="ProfileUsernameForm">
                     <label
@@ -103,7 +103,7 @@ $PageTitle = "Profile";
                 id="GardenDisplay"
                 class="Panel ProfileSection"
             >
-                <h2>Garden display</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Garden display</h2>
 
                 <h3>Tool selection</h3>
 
@@ -223,7 +223,7 @@ $PageTitle = "Profile";
                 id="Statistics"
                 class="Panel ProfileSection"
             >
-                <h3>Statistics</h3>
+                <h3 class="PanelHeader PanelHeaderInset">Statistics</h3>
 
                 <div class="ProfileStatistics">
                     <div class="ProfileStatistic">
@@ -283,7 +283,7 @@ $PageTitle = "Profile";
                 id="Account"
                 class="Panel ProfileSection"
             >
-                <h2>Account</h2>
+                <h2 class="PanelHeader PanelHeaderInset">Account</h2>
 
                 <p>
                     Your Account Key is the secret key used
@@ -392,7 +392,7 @@ $PageTitle = "Profile";
                 id="Import"
                 class="Panel ProfileSection"
             >
-                <h3>Import Account</h3>
+                <h3 class="PanelHeader PanelHeaderInset">Import Account</h3>
 
                 <p>
                     To use an existing Garden account on

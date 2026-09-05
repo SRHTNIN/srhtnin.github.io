@@ -117,13 +117,24 @@ function RenderMutationEncyclopedia() {
             )
             : [];
 
+    const HintLimit =
+        GetMutationHintsDisplayLimit(
+            MutationEncyclopediaSave
+        );
+
+    const DisplayedHints =
+        AvailableHints.slice(
+            0,
+            HintLimit
+        );
+
     const SearchQuery =
         MutationEncyclopediaSearchQuery
             .trim()
             .toLocaleLowerCase();
 
     const VisibleHints =
-        AvailableHints.filter(
+        DisplayedHints.filter(
             Mutation =>
                 DoesMutationHintMatchSearch(
                     Mutation,
@@ -145,13 +156,16 @@ function RenderMutationEncyclopedia() {
             );
 
 
-    for (
-        const Mutation
-        of VisibleHints
-    ) {
+    if (VisibleHints.length > 0) {
         List.appendChild(
             CreateMutationHintCard(
-                Mutation.Hint
+                VisibleHints.map(
+                    Mutation =>
+                        Mutation.Hint
+                ),
+                GetMutationHintsLevel(
+                    MutationEncyclopediaSave
+                )
             )
         );
     }
@@ -205,18 +219,6 @@ function RenderMutationEncyclopedia() {
                 .toLocaleString() +
             " discovered mutations."
         );
-
-        if (AvailableHints.length > 0) {
-            MessageParts.push(
-                "Showing " +
-                VisibleHints.length
-                    .toLocaleString() +
-                " of " +
-                AvailableHints.length
-                    .toLocaleString() +
-                " available hints."
-            );
-        }
     } else {
         MessageParts.push(
             DiscoveredMutations.length === 1
@@ -225,16 +227,20 @@ function RenderMutationEncyclopedia() {
                     .toLocaleString() +
                     " mutations discovered."
         );
+    }
 
-        if (AvailableHints.length > 0) {
-            MessageParts.push(
-                AvailableHints.length === 1
-                    ? "1 hint available."
-                    : AvailableHints.length
-                        .toLocaleString() +
-                        " hints available."
-            );
-        }
+    if (AvailableHints.length > 0) {
+        MessageParts.push(
+            "Showing " +
+            VisibleHints.length
+                .toLocaleString() +
+            " of " +
+            AvailableHints.length
+                .toLocaleString() +
+            (AvailableHints.length === 1
+                ? " available hint."
+                : " available hints.")
+        );
     }
 
     SetMutationEncyclopediaMessage(
@@ -645,7 +651,8 @@ function DoesPlantMatchHintMatcher(
 
 
 function CreateMutationHintCard(
-    Hint
+    Hints,
+    Level
 ) {
     const Card =
         document.createElement(
@@ -662,7 +669,7 @@ function CreateMutationHintCard(
         );
 
     Header.className =
-        "MutationEncyclopediaHeader";
+        "PanelHeader MutationEncyclopediaHeader";
 
 
     const Name =
@@ -671,7 +678,9 @@ function CreateMutationHintCard(
         );
 
     Name.textContent =
-        "Mutation hint";
+        Level >= MutationHintsMaximumLevel
+            ? "Mutation hints"
+            : "Mutation hint";
 
     Header.appendChild(Name);
 
@@ -685,20 +694,53 @@ function CreateMutationHintCard(
         "MutationEncyclopediaBody";
 
 
-    const HintText =
-        document.createElement(
-            "p"
+    if (
+        Level < MutationHintsMaximumLevel
+    ) {
+        const HintText =
+            document.createElement(
+                "p"
+            );
+
+        HintText.className =
+            "MutationEncyclopediaDescription";
+
+        HintText.textContent =
+            String(
+                Hints[0] ?? ""
+            ).trim();
+
+        Body.appendChild(
+            HintText
         );
+    } else {
+        const HintList =
+            document.createElement(
+                "ul"
+            );
 
-    HintText.className =
-        "MutationEncyclopediaDescription";
+        HintList.className =
+            "MutationHintList";
 
-    HintText.textContent =
-        Hint.trim();
+        for (const Hint of Hints) {
+            const Item =
+                document.createElement(
+                    "li"
+                );
 
-    Body.appendChild(
-        HintText
-    );
+            Item.textContent =
+                "- " +
+                String(Hint).trim();
+
+            HintList.appendChild(
+                Item
+            );
+        }
+
+        Body.appendChild(
+            HintList
+        );
+    }
 
 
     Card.append(
@@ -733,7 +775,7 @@ function CreateMutationEncyclopediaCard(
         );
 
     Header.className =
-        "MutationEncyclopediaHeader";
+        "PanelHeader MutationEncyclopediaHeader";
 
 
     const Number =
