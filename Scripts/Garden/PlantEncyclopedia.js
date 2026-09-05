@@ -244,6 +244,32 @@ function ComparePlantEncyclopediaPlants(
                 -1
             ) || A.Id - B.Id;
 
+        case "CostAsc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantShopCost(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantShopCost(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                1
+            ) || A.Id - B.Id;
+
+        case "CostDesc":
+            return ComparePlantEncyclopediaNumbers(
+                GetPlantShopCost(
+                    PlantEncyclopediaSave,
+                    A.Id
+                ),
+                GetPlantShopCost(
+                    PlantEncyclopediaSave,
+                    B.Id
+                ),
+                -1
+            ) || A.Id - B.Id;
+
         case "RewardAsc":
             return ComparePlantEncyclopediaNumbers(
                 GetPlantHarvestReward(
@@ -553,6 +579,12 @@ function CreatePlantEncyclopediaDetails(
     );
 
 
+    const Cost =
+        GetPlantShopCost(
+            PlantEncyclopediaSave,
+            Plant.Id
+        );
+
     const Reward =
         GetPlantHarvestReward(
             PlantEncyclopediaSave,
@@ -564,6 +596,16 @@ function CreatePlantEncyclopediaDetails(
             PlantEncyclopediaSave,
             Plant.Id
         );
+
+    Details.appendChild(
+        CreatePlantEncyclopediaStat(
+            "Cost",
+            Cost === null
+                ? "Unavailable"
+                : Cost.toLocaleString() +
+                    " Dew"
+        )
+    );
 
     Details.appendChild(
         CreatePlantEncyclopediaStat(
