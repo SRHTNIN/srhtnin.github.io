@@ -3,9 +3,8 @@ const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
 const GardenEconomyUpgradeCost = 1000;
 const MutationHintsUpgradeCost = 1500;
-const NewGardenBaseCost = 15000;
+const NewGardenBaseCost = 4000;
 const NewGardenCostMultiplier = 1.5;
-const NewGardenCostRounding = 1000;
 
 
 function GetGardenColumnUpgradeCost(
@@ -124,22 +123,13 @@ function GetNewGardenCost(
         SaveData.Gardens?.length ?? 1
     );
 
-    let Cost =
-        NewGardenBaseCost;
-
-    for (
-        let GardenNumber = 1;
-        GardenNumber < GardensOwned;
-        GardenNumber++
-    ) {
-        Cost = Math.round(
-            Cost *
-            NewGardenCostMultiplier /
-            NewGardenCostRounding
-        ) * NewGardenCostRounding;
-    }
-
-    return Cost;
+    return Math.round(
+        NewGardenBaseCost *
+        Math.pow(
+            NewGardenCostMultiplier,
+            GardensOwned - 1
+        )
+    );
 }
 
 
