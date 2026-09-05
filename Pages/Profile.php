@@ -105,6 +105,29 @@ $PageTitle = "Profile";
             >
                 <h2>Garden display</h2>
 
+                <h3>Tool selection</h3>
+
+                <p>
+                    Choose which Garden actions automatically change
+                    your selected seed or tool.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="ToggleSelectQuickBoughtPlantButton"
+                        type="button"
+                    >
+                        Select bought plant when you quick-buy one: On
+                    </button>
+
+                    <button
+                        id="ToggleSelectTrowelWithInventoryPlantButton"
+                        type="button"
+                    >
+                        Select trowel when you select an inventory plant: On
+                    </button>
+                </div>
+
                 <h3>Plant information</h3>
 
                 <p>

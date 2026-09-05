@@ -1,6 +1,7 @@
 let GameSave;
 let SelectedSeedId = null;
-let SelectedGardenTool = "Seed";
+let SelectedGardenTool = "Trowel";
+let FutureSightPreview = null;
 
 let MutationCheckPending = false;
 let QuickBuyPurchasePending = false;
@@ -92,6 +93,7 @@ async function StartGame() {
 
 
 function RenderGame() {
+    EnsureSelectedGardenTool();
     EnsureSelectedSeed();
     RenderCurrency();
     RenderQuickBuy();
@@ -204,6 +206,16 @@ async function SwitchGarden(
         GameSave,
         NewIndex
     );
+
+    FutureSightPreview = null;
+
+    if (
+        SelectedGardenTool ===
+        "FutureSight"
+    ) {
+        SelectedGardenTool =
+            "Trowel";
+    }
 
     const MutationResult =
         CheckGardenMutations(
@@ -383,58 +395,240 @@ function CheckAllGardenMutations(
 
 
 function BindGardenTools() {
-    const ShovelButton =
+    const ToolList =
         document.getElementById(
-            "ShovelToolButton"
+            "ToolList"
         );
 
-    if (ShovelButton === null) {
+    if (ToolList === null) {
         return;
     }
 
-    ShovelButton.addEventListener(
+
+    ToolList.addEventListener(
         "click",
-        () => {
+        Event => {
+            const Button =
+                Event.target.closest(
+                    "[data-garden-tool]"
+                );
+
             if (
-                SelectedGardenTool ===
-                "Shovel"
+                Button === null ||
+                !ToolList.contains(
+                    Button
+                )
             ) {
-                SelectedGardenTool =
-                    null;
-            } else {
-                SelectedGardenTool =
-                    "Shovel";
+                return;
             }
 
-            RenderSeeds();
-            RenderTools();
-            RenderGarden();
+            const Tool =
+                Button.dataset
+                    .gardenTool;
+
+            SelectGardenTool(
+                Tool
+            );
         }
     );
 }
 
 
-function RenderTools() {
-    const ShovelButton =
-        document.getElementById(
-            "ShovelToolButton"
-        );
-
-    if (ShovelButton === null) {
+async function SelectGardenTool(
+    Tool
+) {
+    if (
+        !IsGardenToolUnlocked(
+            GameSave,
+            Tool
+        )
+    ) {
         return;
     }
 
+
+    if (Tool === "FutureSight") {
+        if (
+            !IsFutureSightReady(
+                GameSave
+            ) &&
+            FutureSightPreview === null
+        ) {
+            SetGardenMessage(
+                "Future Sight is still recharging for " +
+                FormatGardenRemainingTime(
+                    GetFutureSightCooldownRemaining(
+                        GameSave
+                    )
+                ) +
+                "."
+            );
+
+            RenderTools();
+
+            return;
+        }
+
+        SelectedGardenTool =
+            "FutureSight";
+
+        if (FutureSightPreview === null) {
+            await UseFutureSight();
+        } else {
+            RenderTools();
+            RenderGarden();
+        }
+
+        return;
+    }
+
+
+    SelectedGardenTool = Tool;
+    FutureSightPreview = null;
+
+    RenderSeeds();
+    RenderTools();
+    RenderGarden();
+}
+
+
+function EnsureSelectedGardenTool() {
     if (
-        SelectedGardenTool ===
-        "Shovel"
+        !IsGardenToolUnlocked(
+            GameSave,
+            SelectedGardenTool
+        )
     ) {
-        ShovelButton.setAttribute(
-            "aria-current",
-            "true"
+        SelectedGardenTool =
+            "Trowel";
+
+        FutureSightPreview = null;
+    }
+}
+
+
+function RenderTools() {
+    const ToolList =
+        document.getElementById(
+            "ToolList"
         );
-    } else {
-        ShovelButton.removeAttribute(
-            "aria-current"
+
+    if (ToolList === null) {
+        return;
+    }
+
+
+    EnsureSelectedGardenTool();
+
+    const ToolDefinitions = [
+        [
+            "Trowel",
+            "Trowel"
+        ],
+        [
+            "MagicTrowel",
+            "Magic trowel"
+        ],
+        [
+            "Shovel",
+            "Shovel"
+        ],
+        [
+            "Fertilizer",
+            "Fertilizer"
+        ],
+        [
+            "FutureSight",
+            "Future Sight"
+        ]
+    ];
+
+
+    ToolList.replaceChildren();
+
+
+    for (
+        const [Tool, Name]
+        of ToolDefinitions
+    ) {
+        if (
+            !IsGardenToolUnlocked(
+                GameSave,
+                Tool
+            )
+        ) {
+            continue;
+        }
+
+
+        const Button =
+            document.createElement(
+                "button"
+            );
+
+        Button.className =
+            "ActionButton ToolButton ToolButton" +
+            Tool;
+
+        Button.type = "button";
+
+        Button.dataset.gardenTool =
+            Tool;
+
+
+        let Label = Name;
+
+        if (Tool === "Fertilizer") {
+            Label +=
+                " ×" +
+                Number(
+                    GameSave.Inventory
+                        .Fertilizer ?? 0
+                ).toLocaleString();
+        }
+
+        if (Tool === "FutureSight") {
+            const Remaining =
+                GetFutureSightCooldownRemaining(
+                    GameSave
+                );
+
+            if (Remaining > 0) {
+                Label +=
+                    " (" +
+                    FormatGardenRemainingTime(
+                        Remaining
+                    ) +
+                    ")";
+            }
+
+            Button.disabled =
+                Remaining > 0 &&
+                !(
+                    SelectedGardenTool ===
+                        "FutureSight" &&
+                    FutureSightPreview !==
+                        null
+                );
+        }
+
+
+        Button.textContent = Label;
+
+
+        if (
+            SelectedGardenTool ===
+            Tool
+        ) {
+            Button.setAttribute(
+                "aria-current",
+                "true"
+            );
+        }
+
+
+        ToolList.appendChild(
+            Button
         );
     }
 }
@@ -861,6 +1055,16 @@ async function BuyQuickBuyPlantSeed(
             PlantId
         );
 
+        if (
+            GameSave.Preferences
+                .SelectQuickBoughtPlant !==
+            false
+        ) {
+            SelectInventoryPlant(
+                PlantId
+            );
+        }
+
 
         SetGardenMessage(
             "Bought " +
@@ -938,12 +1142,41 @@ function EnsureSelectedSeed() {
         return;
     }
 
+}
+
+
+function SelectInventoryPlant(
+    PlantId
+) {
     if (
-        SelectedGardenTool ===
-        "Seed"
+        GetPlantById(
+            PlantId
+        ) === null ||
+        GetSeedCount(
+            GameSave,
+            PlantId
+        ) <= 0
     ) {
-        SelectedGardenTool = null;
+        return false;
     }
+
+
+    SelectedSeedId =
+        Number(PlantId);
+
+    if (
+        GameSave.Preferences
+            .SelectTrowelWithInventoryPlant !==
+        false
+    ) {
+        SelectedGardenTool =
+            "Trowel";
+
+        FutureSightPreview = null;
+    }
+
+
+    return true;
 }
 
 
@@ -1043,10 +1276,8 @@ function RenderSeeds() {
             );
 
         if (
-            SelectedGardenTool ===
-                "Seed" &&
             PlantId ===
-                SelectedSeedId
+            SelectedSeedId
         ) {
             Button.setAttribute(
                 "aria-current",
@@ -1057,11 +1288,9 @@ function RenderSeeds() {
         Button.addEventListener(
             "click",
             () => {
-                SelectedGardenTool =
-                    "Seed";
-
-                SelectedSeedId =
-                    PlantId;
+                SelectInventoryPlant(
+                    PlantId
+                );
 
                 RenderSeeds();
                 RenderTools();
@@ -1105,26 +1334,78 @@ function RenderGarden() {
         )
     );
 
+    GardenPanel.classList.toggle(
+        "GardenPlotsFutureSight",
+        SelectedGardenTool ===
+            "FutureSight" &&
+        FutureSightPreview !== null
+    );
+
     GardenGrid.replaceChildren();
 
 
     const DisplaySettings =
         GetGardenDisplaySettings();
 
+    const IsFutureSightPreview =
+        SelectedGardenTool ===
+            "FutureSight" &&
+        FutureSightPreview !== null;
+
 
     GameSave.Garden.Plots.forEach(
         (Plot, PlotIndex) => {
+            const DisplayPlot =
+                IsFutureSightPreview
+                    ? FutureSightPreview
+                        .Plots[PlotIndex]
+                    : Plot;
+
             const PlotElement =
                 CreatePlotElement(
-                    Plot,
+                    DisplayPlot,
                     PlotIndex,
-                    DisplaySettings
+                    DisplaySettings,
+                    IsFutureSightPreview
                 );
+
+            if (IsFutureSightPreview) {
+                PlotElement.classList.add(
+                    "GardenPlotFutureSight"
+                );
+
+                if (
+                    !AreGardenPlotsEqual(
+                        Plot,
+                        DisplayPlot
+                    )
+                ) {
+                    PlotElement.classList.add(
+                        "GardenPlotFutureSightChanged"
+                    );
+                }
+            }
 
             GardenGrid.appendChild(
                 PlotElement
             );
         }
+    );
+}
+
+
+function AreGardenPlotsEqual(
+    A,
+    B
+) {
+    if (A === null || B === null) {
+        return A === B;
+    }
+
+    return (
+        A.Plant === B.Plant &&
+        Number(A.PlantedAt) ===
+        Number(B.PlantedAt)
     );
 }
 
@@ -1154,7 +1435,8 @@ function GetGardenDisplaySettings() {
 function CreatePlotElement(
     Plot,
     PlotIndex,
-    DisplaySettings
+    DisplaySettings,
+    IsPreview = false
 ) {
     const Button =
         document.createElement(
@@ -1220,7 +1502,9 @@ function CreatePlotElement(
         );
 
         Button.title =
-            "Empty plot";
+            IsPreview
+                ? "Future Sight: empty plot"
+                : "Empty plot";
 
         if (
             DisplaySettings
@@ -1235,9 +1519,13 @@ function CreatePlotElement(
             );
         }
 
+        if (IsPreview) {
+            return Button;
+        }
+
         if (
             SelectedGardenTool ===
-            "Seed"
+            "Trowel"
         ) {
             Button.addEventListener(
                 "click",
@@ -1246,6 +1534,21 @@ function CreatePlotElement(
                         PlotIndex
                     );
                 }
+            );
+        } else if (
+            SelectedGardenTool ===
+            "MagicTrowel"
+        ) {
+            Button.classList.add(
+                "GardenPlotMagicPlant"
+            );
+
+            Button.title =
+                "Fill empty plots with the selected seed";
+
+            Button.addEventListener(
+                "click",
+                PlantManySeeds
             );
         }
 
@@ -1340,6 +1643,15 @@ function CreatePlotElement(
     }
 
 
+    if (IsPreview) {
+        Button.title =
+            "Future Sight: " +
+            Plant.Name;
+
+        return Button;
+    }
+
+
     if (
         SelectedGardenTool ===
         "Shovel"
@@ -1360,6 +1672,60 @@ function CreatePlotElement(
                 );
             }
         );
+
+        return Button;
+    }
+
+
+    if (
+        SelectedGardenTool ===
+        "Fertilizer"
+    ) {
+        if (Progress >= 1) {
+            Button.title =
+                Plant.Name +
+                " is already fully grown";
+
+            return Button;
+        }
+
+        Button.classList.add(
+            "GardenPlotFertilize"
+        );
+
+        Button.title =
+            "Fertilize " +
+            Plant.Name +
+            " (" +
+            GetFertilizerGrowthMinutes(
+                GameSave
+            ) +
+            " minutes)";
+
+        Button.addEventListener(
+            "click",
+            () => {
+                FertilizePlant(
+                    PlotIndex
+                );
+            }
+        );
+
+        return Button;
+    }
+
+
+    if (
+        SelectedGardenTool !==
+        "Trowel"
+    ) {
+        Button.title =
+            Plant.Name +
+            " - " +
+            Math.floor(
+                Progress * 100
+            ) +
+            "% grown";
 
         return Button;
     }
@@ -1615,6 +1981,129 @@ async function PlantSeed(
 }
 
 
+async function PlantManySeeds() {
+    EnsureSelectedSeed();
+
+    if (SelectedSeedId === null) {
+        SetGardenMessage(
+            "You don't have any seeds to plant."
+        );
+
+        return;
+    }
+
+
+    const Plant =
+        GetPlantById(
+            SelectedSeedId
+        );
+
+    const PlantKey =
+        GetPlantKeyById(
+            SelectedSeedId
+        );
+
+    if (
+        Plant === null ||
+        PlantKey === null
+    ) {
+        return;
+    }
+
+
+    const EmptyPlotIndexes = [];
+
+    GameSave.Garden.Plots.forEach(
+        (Plot, PlotIndex) => {
+            if (Plot === null) {
+                EmptyPlotIndexes.push(
+                    PlotIndex
+                );
+            }
+        }
+    );
+
+    if (EmptyPlotIndexes.length === 0) {
+        SetGardenMessage(
+            "There aren't any empty plots to fill."
+        );
+
+        return;
+    }
+
+
+    const SeedCount =
+        GetSeedCount(
+            GameSave,
+            SelectedSeedId
+        );
+
+    const PlantCount = Math.min(
+        SeedCount,
+        EmptyPlotIndexes.length
+    );
+
+    if (PlantCount <= 0) {
+        EnsureSelectedSeed();
+        RenderGame();
+
+        SetGardenMessage(
+            "You don't have any of that seed left."
+        );
+
+        return;
+    }
+
+
+    if (
+        !TakeSeed(
+            GameSave,
+            SelectedSeedId,
+            PlantCount
+        )
+    ) {
+        return;
+    }
+
+
+    const PlantedAt = Date.now();
+
+    for (
+        let Index = 0;
+        Index < PlantCount;
+        Index++
+    ) {
+        GameSave.Garden.Plots[
+            EmptyPlotIndexes[Index]
+        ] = {
+            Plant: PlantKey,
+            PlantedAt: PlantedAt
+        };
+    }
+
+
+    SetGardenMessage(
+        "Magic trowel planted " +
+        PlantCount.toLocaleString() +
+        " " +
+        Plant.Name +
+        (PlantCount === 1
+            ? " seed."
+            : " seeds.")
+    );
+
+    CheckGardenMutations(
+        GameSave
+    );
+
+    RenderGame();
+
+    await SaveGame(
+        GameSave
+    );
+}
+
+
 async function HarvestPlant(
     PlotIndex
 ) {
@@ -1691,12 +2180,67 @@ async function HarvestPlant(
 async function RemovePlant(
     PlotIndex
 ) {
-    if (
+    const Plot =
         GameSave.Garden.Plots[
             PlotIndex
-        ] === null
-    ) {
+        ];
+
+    if (Plot === null) {
         return;
+    }
+
+
+    const Plant =
+        Plants[Plot.Plant];
+
+    let ReturnMessage = "";
+
+
+    if (
+        Plant !== undefined &&
+        DoesShovelReturnSeed(
+            GameSave
+        )
+    ) {
+        AddSeed(
+            GameSave,
+            Plant.Id,
+            1
+        );
+
+        ReturnMessage =
+            " The seed was returned.";
+    } else if (
+        Plant !== undefined
+    ) {
+        const RefundRate =
+            GetShovelRefundRate(
+                GameSave
+            );
+
+        const SeedCost =
+            GetPlantShopCost(
+                GameSave,
+                Plant.Id
+            );
+
+        const Refund =
+            SeedCost === null
+                ? 0
+                : Math.floor(
+                    SeedCost *
+                    RefundRate
+                );
+
+        if (Refund > 0) {
+            GameSave.Currency.Dew +=
+                Refund;
+
+            ReturnMessage =
+                " Recovered " +
+                Refund.toLocaleString() +
+                " Dew.";
+        }
     }
 
 
@@ -1704,6 +2248,13 @@ async function RemovePlant(
         PlotIndex
     ] = null;
 
+
+    SetGardenMessage(
+        "Removed " +
+        (Plant?.Name ?? "plant") +
+        "." +
+        ReturnMessage
+    );
 
     CheckGardenMutations(
         GameSave
@@ -1717,12 +2268,203 @@ async function RemovePlant(
 }
 
 
+async function FertilizePlant(
+    PlotIndex
+) {
+    const Plot =
+        GameSave.Garden.Plots[
+            PlotIndex
+        ];
+
+    if (Plot === null) {
+        return;
+    }
+
+
+    const Plant =
+        Plants[Plot.Plant];
+
+    if (
+        Plant === undefined ||
+        IsPlantMature(
+            Plot,
+            Plant
+        )
+    ) {
+        return;
+    }
+
+
+    if (
+        !TakeFertilizerUse(
+            GameSave
+        )
+    ) {
+        SetGardenMessage(
+            "You're out of Fertilizer. Buy more in the Shop."
+        );
+
+        RenderTools();
+
+        return;
+    }
+
+
+    const Minutes =
+        GetFertilizerGrowthMinutes(
+            GameSave
+        );
+
+    Plot.PlantedAt -=
+        Minutes * 60 * 1000;
+
+
+    SetGardenMessage(
+        "Fertilized " +
+        Plant.Name +
+        ", advancing its growth by " +
+        Minutes +
+        (Minutes === 1
+            ? " minute."
+            : " minutes.")
+    );
+
+    CheckGardenMutations(
+        GameSave
+    );
+
+    RenderGame();
+
+    await SaveGame(
+        GameSave
+    );
+}
+
+
+async function UseFutureSight() {
+    if (
+        !IsGardenToolUnlocked(
+            GameSave,
+            "FutureSight"
+        ) ||
+        !IsFutureSightReady(
+            GameSave
+        )
+    ) {
+        return;
+    }
+
+
+    const Preview =
+        CreateFutureSightPreview();
+
+    if (Preview === null) {
+        SelectedGardenTool =
+            "Trowel";
+
+        SetGardenMessage(
+            "Future Sight can't see a mutation from the current Garden."
+        );
+
+        RenderTools();
+        RenderGarden();
+
+        return;
+    }
+
+
+    FutureSightPreview = Preview;
+
+    StartFutureSightCooldown(
+        GameSave
+    );
+
+
+    SetGardenMessage(
+        "Future Sight: highlighted plots show the next mutation succeeding."
+    );
+
+    RenderSeeds();
+    RenderTools();
+    RenderGarden();
+
+    await SaveGame(
+        GameSave
+    );
+}
+
+
+function CreateFutureSightPreview() {
+    const PreviewSave =
+        NormalizeSaveData(
+            JSON.parse(
+                JSON.stringify(
+                    GameSave
+                )
+            )
+        );
+
+    const Candidates =
+        FindGardenMutationCandidates(
+            PreviewSave
+        )
+            .filter(
+                Candidate =>
+                    !IsMutationCandidateOnCooldown(
+                        PreviewSave,
+                        Candidate
+                    )
+            )
+            .sort(
+                CompareMutationCandidates
+            );
+
+    if (Candidates.length === 0) {
+        return null;
+    }
+
+
+    const Candidate =
+        Candidates[0];
+
+    ApplyMutationResult(
+        PreviewSave,
+        Candidate,
+        Candidate.Success
+    );
+
+
+    return {
+        MutationId:
+            Candidate.Mutation.Id,
+
+        Plots:
+            PreviewSave.Garden.Plots.map(
+                Plot =>
+                    CloneMutationPlot(
+                        Plot
+                    )
+            )
+    };
+}
+
+
 async function GardenTick() {
     RenderGarden();
+    RenderTools();
     RenderNextHarvest();
     RenderGardenOverview();
     RenderGardenEconomy();
     RenderGardenInfoLayout();
+
+
+    if (
+        SelectedGardenTool ===
+            "FutureSight" &&
+        FutureSightPreview !== null
+    ) {
+        return;
+    }
 
 
     if (MutationCheckPending) {

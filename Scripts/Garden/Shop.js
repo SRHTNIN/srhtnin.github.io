@@ -31,6 +31,11 @@ async function StartShop() {
 
 function BindShopSectionToggles() {
     BindShopSectionToggle(
+        "ToolsToggle",
+        "ToolsContent"
+    );
+
+    BindShopSectionToggle(
         "PermanentUpgradesToggle",
         "PermanentUpgradesContent"
     );
@@ -134,6 +139,7 @@ function BindShopSeedControls() {
 
 function RenderShop() {
     RenderShopCurrency();
+    RenderToolShop();
     RenderShopSeeds();
     RenderGardenUpgrades();
 }
@@ -419,6 +425,692 @@ function CompareShopNumbers(
 
     return (NumberA - NumberB) *
         Direction;
+}
+
+
+function RenderToolShop() {
+    const ToolList =
+        document.getElementById(
+            "ShopToolList"
+        );
+
+    if (ToolList === null) {
+        return;
+    }
+
+
+    ToolList.replaceChildren(
+        CreateTrowelToolCard(),
+        CreateToolUnlockCard(
+            "MagicTrowel",
+            "Magic trowel",
+            "Plant the selected seed into as many empty plots as possible in one use.",
+            [
+                [
+                    "Planting",
+                    "All empty plots"
+                ]
+            ]
+        ),
+        CreateShovelToolCard(),
+        CreateFertilizerToolCard(),
+        CreateToolUnlockCard(
+            "FutureSight",
+            "Future Sight",
+            "Preview what the Garden would look like if its next eligible mutation succeeded. Future Sight has a two-hour cooldown.",
+            [
+                [
+                    "Cooldown",
+                    "2 hours"
+                ]
+            ]
+        )
+    );
+}
+
+
+function CreateTrowelToolCard() {
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader ShopItemHeaderOwned";
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent = "Trowel";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Your default planting tool. Select a seed, then use the Trowel on an empty plot.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Status",
+            "Unlocked"
+        ),
+        CreateShopStat(
+            "Cost",
+            "Free"
+        )
+    );
+
+
+    const Button =
+        document.createElement(
+            "button"
+        );
+
+    Button.className =
+        "ActionButton ShopBuyButton";
+
+    Button.type = "button";
+    Button.textContent = "Default tool";
+    Button.disabled = true;
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        Button
+    );
+
+    return Card;
+}
+
+
+function CreateToolUnlockCard(
+    Tool,
+    NameText,
+    DescriptionText,
+    ExtraStats = []
+) {
+    const IsOwned =
+        IsGardenToolUnlocked(
+            ShopSave,
+            Tool
+        );
+
+    const Cost =
+        GetGardenToolUnlockCost(
+            Tool
+        );
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent = NameText;
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        DescriptionText;
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.appendChild(
+        CreateShopStat(
+            "Status",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        )
+    );
+
+    for (
+        const [Label, Value]
+        of ExtraStats
+    ) {
+        Details.appendChild(
+            CreateShopStat(
+                Label,
+                Value
+            )
+        );
+    }
+
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            () => {
+                BuyGardenTool(
+                    Tool,
+                    NameText
+                );
+            }
+        );
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
+
+    return Card;
+}
+
+
+function CreateShovelToolCard() {
+    const IsOwned =
+        IsGardenToolUnlocked(
+            ShopSave,
+            "Shovel"
+        );
+
+    const Level =
+        GetShovelLevel(
+            ShopSave
+        );
+
+    const UpgradeCost =
+        IsOwned
+            ? GetShovelUpgradeCost(
+                ShopSave
+            )
+            : null;
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent = "Shovel";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Remove planted crops. Upgrades recover more of the seed value instead of wasting it.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Status",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            IsOwned
+                ? "Current"
+                : "On unlock",
+            GetShovelLevelDescription(
+                Level
+            )
+        ),
+        CreateShopStat(
+            IsOwned
+                ? "Next"
+                : "First upgrade",
+            Level >= ShovelMaximumLevel
+                ? "Maximum level"
+                : GetShovelLevelDescription(
+                    Level + 1
+                )
+        )
+    );
+
+
+    const ActionButton =
+        document.createElement(
+            "button"
+        );
+
+    ActionButton.className =
+        "ActionButton ShopBuyButton";
+
+    ActionButton.type = "button";
+
+    if (!IsOwned) {
+        const UnlockCost =
+            GetGardenToolUnlockCost(
+                "Shovel"
+            );
+
+        ActionButton.textContent =
+            "Buy - " +
+            UnlockCost.toLocaleString() +
+            " Dew";
+
+        ActionButton.disabled =
+            ShopSave.Currency.Dew <
+                UnlockCost ||
+            ShopPurchasePending;
+
+        ActionButton.addEventListener(
+            "click",
+            () => {
+                BuyGardenTool(
+                    "Shovel",
+                    "Shovel"
+                );
+            }
+        );
+    } else if (UpgradeCost === null) {
+        ActionButton.textContent =
+            "Maximum level";
+
+        ActionButton.disabled = true;
+    } else {
+        ActionButton.textContent =
+            "Upgrade - " +
+            UpgradeCost.toLocaleString() +
+            " Dew";
+
+        ActionButton.disabled =
+            ShopSave.Currency.Dew <
+                UpgradeCost ||
+            ShopPurchasePending;
+
+        ActionButton.addEventListener(
+            "click",
+            BuyShovelUpgrade
+        );
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        ActionButton
+    );
+
+    return Card;
+}
+
+
+function GetShovelLevelDescription(
+    Level
+) {
+    if (Level <= 0) {
+        return "Level 0 - returns nothing";
+    }
+
+    if (Level === 1) {
+        return "Level 1 - returns 33% of seed cost";
+    }
+
+    if (Level === 2) {
+        return "Level 2 - returns 66% of seed cost";
+    }
+
+    return "Level 3 - returns the planted seed";
+}
+
+
+function CreateFertilizerToolCard() {
+    const IsOwned =
+        IsGardenToolUnlocked(
+            ShopSave,
+            "Fertilizer"
+        );
+
+    const Level =
+        GetFertilizerLevel(
+            ShopSave
+        );
+
+    const UpgradeCost =
+        IsOwned
+            ? GetFertilizerUpgradeCost(
+                ShopSave
+            )
+            : null;
+
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
+
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent = "Fertilizer";
+
+    Header.appendChild(Name);
+
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Spend Fertilizer uses to advance a growing plant. Stronger levels advance more growth per use.";
+
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Status",
+            IsOwned
+                ? "Unlocked"
+                : "Locked"
+        ),
+        CreateShopStat(
+            "Current uses",
+            Number(
+                ShopSave.Inventory
+                    .Fertilizer ?? 0
+            ).toLocaleString()
+        ),
+        CreateShopStat(
+            IsOwned
+                ? "Current"
+                : "On unlock",
+            "Level " +
+            Level +
+            " - " +
+            FertilizerGrowthMinutes[
+                Level
+            ] +
+            " minutes"
+        ),
+        CreateShopStat(
+            IsOwned
+                ? "Next"
+                : "First upgrade",
+            Level >= FertilizerMaximumLevel
+                ? "Maximum level"
+                : "Level " +
+                    (Level + 1) +
+                    " - " +
+                    FertilizerGrowthMinutes[
+                        Level + 1
+                    ] +
+                    " minutes"
+        )
+    );
+
+
+    const Actions =
+        document.createElement(
+            "div"
+        );
+
+    Actions.className =
+        "ShopItemActions";
+
+
+    const ActionButton =
+        document.createElement(
+            "button"
+        );
+
+    ActionButton.className =
+        "ActionButton ShopBuyButton";
+
+    ActionButton.type = "button";
+
+    if (!IsOwned) {
+        const UnlockCost =
+            GetGardenToolUnlockCost(
+                "Fertilizer"
+            );
+
+        ActionButton.textContent =
+            "Buy - " +
+            UnlockCost.toLocaleString() +
+            " Dew";
+
+        ActionButton.disabled =
+            ShopSave.Currency.Dew <
+                UnlockCost ||
+            ShopPurchasePending;
+
+        ActionButton.addEventListener(
+            "click",
+            () => {
+                BuyGardenTool(
+                    "Fertilizer",
+                    "Fertilizer"
+                );
+            }
+        );
+    } else if (UpgradeCost === null) {
+        ActionButton.textContent =
+            "Maximum level";
+
+        ActionButton.disabled = true;
+    } else {
+        ActionButton.textContent =
+            "Upgrade - " +
+            UpgradeCost.toLocaleString() +
+            " Dew";
+
+        ActionButton.disabled =
+            ShopSave.Currency.Dew <
+                UpgradeCost ||
+            ShopPurchasePending;
+
+        ActionButton.addEventListener(
+            "click",
+            BuyFertilizerUpgrade
+        );
+    }
+
+    Actions.appendChild(
+        ActionButton
+    );
+
+
+    if (IsOwned) {
+        for (const Amount of [1, 10]) {
+            const Cost =
+                GetFertilizerUseCost(
+                    Amount
+                );
+
+            const Button =
+                document.createElement(
+                    "button"
+                );
+
+            Button.className =
+                "ActionButton ShopBuyButton";
+
+            Button.type = "button";
+
+            Button.textContent =
+                "Buy uses ×" +
+                Amount +
+                " - " +
+                Cost.toLocaleString() +
+                " Dew";
+
+            Button.disabled =
+                ShopSave.Currency.Dew < Cost ||
+                ShopPurchasePending;
+
+            Button.addEventListener(
+                "click",
+                () => {
+                    BuyFertilizerUses(
+                        Amount
+                    );
+                }
+            );
+
+            Actions.appendChild(
+                Button
+            );
+        }
+    }
+
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        Actions
+    );
+
+    return Card;
 }
 
 
@@ -1726,6 +2418,296 @@ async function BuyPlantSeed(
         RenderShop();
     }
 }
+
+async function BuyGardenTool(
+    Tool,
+    Name
+) {
+    if (
+        ShopPurchasePending ||
+        IsGardenToolUnlocked(
+            ShopSave,
+            Tool
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetGardenToolUnlockCost(
+            Tool
+        );
+
+    if (Cost === null) {
+        return;
+    }
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for " +
+            Name +
+            "."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockGardenTool(
+            ShopSave,
+            Tool
+        );
+
+
+        SetShopMessage(
+            "Unlocked " +
+            Name +
+            " for " +
+            Cost.toLocaleString() +
+            " Dew."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyShovelUpgrade() {
+    if (
+        ShopPurchasePending ||
+        !IsGardenToolUnlocked(
+            ShopSave,
+            "Shovel"
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetShovelUpgradeCost(
+            ShopSave
+        );
+
+    if (Cost === null) {
+        return;
+    }
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for the next Shovel upgrade."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        if (!UpgradeShovel(ShopSave)) {
+            return;
+        }
+
+
+        SetShopMessage(
+            "Upgraded Shovel to level " +
+            GetShovelLevel(
+                ShopSave
+            ) +
+            " for " +
+            Cost.toLocaleString() +
+            " Dew."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyFertilizerUpgrade() {
+    if (
+        ShopPurchasePending ||
+        !IsGardenToolUnlocked(
+            ShopSave,
+            "Fertilizer"
+        )
+    ) {
+        return;
+    }
+
+
+    const Cost =
+        GetFertilizerUpgradeCost(
+            ShopSave
+        );
+
+    if (Cost === null) {
+        return;
+    }
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for the next Fertilizer upgrade."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        if (!UpgradeFertilizer(ShopSave)) {
+            return;
+        }
+
+
+        SetShopMessage(
+            "Upgraded Fertilizer to level " +
+            GetFertilizerLevel(
+                ShopSave
+            ) +
+            " for " +
+            Cost.toLocaleString() +
+            " Dew. Each use now advances " +
+            GetFertilizerGrowthMinutes(
+                ShopSave
+            ) +
+            " minutes."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyFertilizerUses(
+    Amount
+) {
+    if (
+        ShopPurchasePending ||
+        !IsGardenToolUnlocked(
+            ShopSave,
+            "Fertilizer"
+        )
+    ) {
+        return;
+    }
+
+
+    Amount = Math.max(
+        1,
+        Math.floor(
+            Number(Amount) || 1
+        )
+    );
+
+    const Cost =
+        GetFertilizerUseCost(
+            Amount
+        );
+
+    if (
+        ShopSave.Currency.Dew <
+        Cost
+    ) {
+        SetShopMessage(
+            "You don't have enough Dew for that much Fertilizer."
+        );
+
+        return;
+    }
+
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -=
+            Cost;
+
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        AddFertilizerUses(
+            ShopSave,
+            Amount
+        );
+
+
+        SetShopMessage(
+            "Bought " +
+            Amount.toLocaleString() +
+            (Amount === 1
+                ? " Fertilizer use for "
+                : " Fertilizer uses for ") +
+            Cost.toLocaleString() +
+            " Dew."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
 
 async function BuyGardenExpansion(
     Direction

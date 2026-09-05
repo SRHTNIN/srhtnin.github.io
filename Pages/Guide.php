@@ -203,11 +203,43 @@ $PageSection = "Guide";
                 <h2>Tools</h2>
 
                 <p>
-                    The Shovel removes a planted crop without giving a
-                    harvest reward. Select it, click the plant you want
-                    to remove, and click the Shovel again when you want
-                    to have no tool equipped. It's very useful when you
-                    decide you want to try a new mutation, for example.
+                    The <strong>Trowel</strong> is the default tool. Select
+                    a seed from your inventory, then use the Trowel on an
+                    empty plot to plant it.
+                </p>
+
+                <p>
+                    The <strong>Magic trowel</strong> fills as many empty
+                    plots as it can with the selected seed. If you have
+                    fewer seeds than empty plots, it simply plants every
+                    seed you have.
+                </p>
+
+                <p>
+                    The <strong>Shovel</strong> removes planted crops. At
+                    level 0 it returns nothing, level 1 returns 33% of the
+                    seed cost, level 2 returns 66%, and level 3 returns the
+                    planted seed itself.
+                </p>
+
+                <p>
+                    <strong>Fertilizer</strong> consumes one Fertilizer use
+                    to advance a growing plant. Its six levels advance 10,
+                    20, 30, 40, 50, or 60 minutes respectively. Additional
+                    Fertilizer uses are bought from the Shop.
+                </p>
+
+                <p>
+                    <strong>Future Sight</strong> previews the Garden's next
+                    mutation as though that mutation succeeded. The preview
+                    does not actually mutate or discover anything, and Future
+                    Sight must recharge for two hours after a successful use.
+                </p>
+
+                <p>
+                    Tools and their upgrades are bought from the Shop. Shovel
+                    and Fertilizer upgrade prices rise exponentially as their
+                    levels increase.
                 </p>
             </section>
 

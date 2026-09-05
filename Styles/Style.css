@@ -719,6 +719,20 @@ input, button, textarea, select {
     gap: 0.5rem;
 }
 
+.ToolButtonTrowel[aria-current="true"] {
+    --ActionAccent: var(--Green);
+    color: var(--Green);
+    background-color: var(--Surface1);
+    border-color: var(--Green);
+}
+
+.ToolButtonMagicTrowel[aria-current="true"] {
+    --ActionAccent: var(--Mauve);
+    color: var(--Mauve);
+    background-color: var(--Surface1);
+    border-color: var(--Mauve);
+}
+
 .ToolButtonShovel[aria-current="true"] {
     --ActionAccent: var(--Red);
     color: var(--Red);
@@ -726,9 +740,60 @@ input, button, textarea, select {
     border-color: var(--Red);
 }
 
+.ToolButtonFertilizer[aria-current="true"] {
+    --ActionAccent: var(--Yellow);
+    color: var(--Yellow);
+    background-color: var(--Surface1);
+    border-color: var(--Yellow);
+}
+
+.ToolButtonFutureSight[aria-current="true"] {
+    --ActionAccent: var(--Lavender);
+    color: var(--Lavender);
+    background-color: var(--Surface1);
+    border-color: var(--Lavender);
+}
+
+.ToolButton:disabled {
+    cursor: not-allowed;
+    color: var(--Overlay1);
+    background-color: var(--Mantle);
+    border-color: var(--Surface1);
+    box-shadow: none;
+}
+
+.GardenPlotMagicPlant:hover {
+    --PlotBorderColour: var(--Mauve);
+}
+
 .GardenPlotRemove:hover {
     --GrowthColour: var(--Red);
     --PlotBorderColour: var(--Red);
+}
+
+.GardenPlotFertilize:hover {
+    --GrowthColour: var(--Yellow);
+    --PlotBorderColour: var(--Yellow);
+}
+
+.GardenPlotsFutureSight {
+    border-color: var(--Lavender);
+}
+
+.GardenPlotFutureSight {
+    cursor: default;
+}
+
+.GardenPlotFutureSight:hover {
+    transform: none;
+    box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.GardenPlotFutureSightChanged {
+    --GrowthColour: var(--Lavender);
+    --PlotBorderColour: var(--Lavender);
+    outline: 3px solid var(--Lavender);
+    outline-offset: -3px;
 }
 
 .GardenUser, .Leaderboard {
@@ -1344,6 +1409,7 @@ input, button, textarea, select {
     padding: 0.65rem 0.8rem;
 }
 
+.ShopItemActions,
 .ShopSeedBuyOptions {
     display: flex;
     flex-direction: column;

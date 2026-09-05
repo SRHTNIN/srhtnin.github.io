@@ -41,6 +41,39 @@ $PageSection = "Shop";
             </p>
 
             <section
+                id="Tools"
+                class="ShopSection"
+            >
+                <h2 class="ShopSectionHeading">
+                    <button
+                        id="ToolsToggle"
+                        class="ShopSectionToggle"
+                        type="button"
+                        aria-expanded="true"
+                        aria-controls="ToolsContent"
+                    >
+                        <span class="ShopSectionArrow" aria-hidden="true">&gt;</span>
+                        <span>Tools</span>
+                    </button>
+                </h2>
+
+                <div
+                    id="ToolsContent"
+                    class="ShopSectionContent"
+                >
+                    <p>
+                        Unlock Garden tools, improve the Shovel and
+                        Fertilizer, and restock Fertilizer uses.
+                    </p>
+
+                    <div
+                        id="ShopToolList"
+                        class="ShopSeedList"
+                    ></div>
+                </div>
+            </section>
+
+            <section
                 id="PermanentUpgrades"
                 class="ShopSection"
             >

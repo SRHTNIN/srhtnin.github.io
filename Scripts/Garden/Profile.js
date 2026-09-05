@@ -77,6 +77,14 @@ async function StartProfile() {
 function BindGardenDisplayPreferences() {
     const PreferenceButtons = [
         [
+            "ToggleSelectQuickBoughtPlantButton",
+            "SelectQuickBoughtPlant"
+        ],
+        [
+            "ToggleSelectTrowelWithInventoryPlantButton",
+            "SelectTrowelWithInventoryPlant"
+        ],
+        [
             "TogglePlantNamesButton",
             "ShowPlantNames"
         ],
@@ -140,8 +148,46 @@ function BindGardenDisplayPreferences() {
 
 
 function RenderGardenDisplayPreferences() {
+    RenderToolSelectionPreferences();
     RenderPlantInformationPreferences();
     RenderGardenOverviewPreferences();
+}
+
+
+function RenderToolSelectionPreferences() {
+    const QuickBuyButton =
+        document.getElementById(
+            "ToggleSelectQuickBoughtPlantButton"
+        );
+
+    const TrowelButton =
+        document.getElementById(
+            "ToggleSelectTrowelWithInventoryPlantButton"
+        );
+
+    if (
+        QuickBuyButton === null ||
+        TrowelButton === null
+    ) {
+        return;
+    }
+
+
+    SetPreferenceButtonState(
+        QuickBuyButton,
+        "Select bought plant when you quick-buy one",
+        ProfileSave.Preferences
+            .SelectQuickBoughtPlant !==
+            false
+    );
+
+    SetPreferenceButtonState(
+        TrowelButton,
+        "Select trowel when you select an inventory plant",
+        ProfileSave.Preferences
+            .SelectTrowelWithInventoryPlant !==
+            false
+    );
 }
 
 
@@ -322,6 +368,11 @@ function SetPreferenceButtonState(
 async function ToggleGardenDisplayPreference(
     PreferenceName
 ) {
+    const ToolSelectionPreferences = [
+        "SelectQuickBoughtPlant",
+        "SelectTrowelWithInventoryPlant"
+    ];
+
     const PlantInformationPreferences = [
         "ShowPlantNames",
         "ShowGrowthTimers"
@@ -337,6 +388,11 @@ async function ToggleGardenDisplayPreference(
     ];
 
 
+    const IsToolSelectionPreference =
+        ToolSelectionPreferences.includes(
+            PreferenceName
+        );
+
     const IsPlantInformationPreference =
         PlantInformationPreferences.includes(
             PreferenceName
@@ -349,6 +405,7 @@ async function ToggleGardenDisplayPreference(
 
 
     if (
+        !IsToolSelectionPreference &&
         !IsPlantInformationPreference &&
         !IsGardenOverviewPreference
     ) {

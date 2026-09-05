@@ -392,7 +392,7 @@ function CreateNewSave() {
 
 
     return NormalizeSaveData({
-        Version: 3,
+        Version: 4,
         Revision: 0,
         LastSavedAt: Date.now(),
 
@@ -413,7 +413,18 @@ function CreateNewSave() {
         },
 
         Inventory: {
-            Seeds: SeedInventory
+            Seeds: SeedInventory,
+            Fertilizer: 0
+        },
+
+        Tools: {
+            MagicTrowel: false,
+            Shovel: false,
+            Fertilizer: false,
+            FutureSight: false,
+            ShovelLevel: 0,
+            FertilizerLevel: 0,
+            FutureSightCooldownUntil: 0
         },
 
         Upgrades: {
@@ -432,7 +443,9 @@ function CreateNewSave() {
             ShowEmptyPlots: true,
             ShowPlantedPlots: true,
             ShowGrowingPlots: true,
-            ShowReadyPlots: true
+            ShowReadyPlots: true,
+            SelectQuickBoughtPlant: true,
+            SelectTrowelWithInventoryPlant: true
         },
 
         Gardens: [
@@ -456,7 +469,7 @@ function NormalizeSaveData(
         Number(
             SaveData.Version ?? 1
         ),
-        3
+        4
     );
 
     SaveData.Revision = Number(
@@ -492,6 +505,14 @@ function NormalizeSaveData(
 
     SaveData.Inventory ??= {};
     SaveData.Inventory.Seeds ??= {};
+    SaveData.Inventory.Fertilizer = Math.max(
+        0,
+        Math.floor(
+            Number(
+                SaveData.Inventory.Fertilizer ?? 0
+            ) || 0
+        )
+    );
 
 
     /*
@@ -561,6 +582,54 @@ function NormalizeSaveData(
 
 
     delete SaveData.Seeds;
+
+
+    SaveData.Tools ??= {};
+
+    SaveData.Tools.MagicTrowel =
+        SaveData.Tools.MagicTrowel === true;
+
+    SaveData.Tools.Shovel =
+        SaveData.Tools.Shovel === true;
+
+    SaveData.Tools.Fertilizer =
+        SaveData.Tools.Fertilizer === true;
+
+    SaveData.Tools.FutureSight =
+        SaveData.Tools.FutureSight === true;
+
+    SaveData.Tools.ShovelLevel = Math.max(
+        0,
+        Math.min(
+            3,
+            Math.floor(
+                Number(
+                    SaveData.Tools.ShovelLevel ?? 0
+                ) || 0
+            )
+        )
+    );
+
+    SaveData.Tools.FertilizerLevel = Math.max(
+        0,
+        Math.min(
+            5,
+            Math.floor(
+                Number(
+                    SaveData.Tools.FertilizerLevel ?? 0
+                ) || 0
+            )
+        )
+    );
+
+    SaveData.Tools.FutureSightCooldownUntil = Math.max(
+        0,
+        Math.floor(
+            Number(
+                SaveData.Tools.FutureSightCooldownUntil ?? 0
+            ) || 0
+        )
+    );
 
 
     SaveData.Discoveries ??= {};
@@ -652,6 +721,14 @@ function NormalizeSaveData(
 
     SaveData.Preferences.ShowReadyPlots =
         SaveData.Preferences.ShowReadyPlots !==
+        false;
+
+    SaveData.Preferences.SelectQuickBoughtPlant =
+        SaveData.Preferences.SelectQuickBoughtPlant !==
+        false;
+
+    SaveData.Preferences.SelectTrowelWithInventoryPlant =
+        SaveData.Preferences.SelectTrowelWithInventoryPlant !==
         false;
 
 

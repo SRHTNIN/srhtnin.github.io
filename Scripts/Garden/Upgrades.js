@@ -1,3 +1,24 @@
+const MagicTrowelUnlockCost = 1000;
+const ShovelUnlockCost = 50;
+const FertilizerUnlockCost = 200;
+const FutureSightUnlockCost = 5000;
+
+const ToolUpgradeCostMultiplier = 2;
+const ShovelMaximumLevel = 3;
+const FertilizerMaximumLevel = 5;
+const FertilizerUseCost = 100;
+const FertilizerGrowthMinutes = [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60
+];
+
+const FutureSightCooldown =
+    2 * 60 * 60 * 1000;
+
 const GardenExpansionBaseCost = 1000;
 const PlantInformationUpgradeCost = 500;
 const GardenOverviewUpgradeCost = 1000;
@@ -280,4 +301,325 @@ function UnlockMutationHints(
     SaveData.Upgrades ??= {};
     SaveData.Upgrades.MutationHints =
         true;
+}
+
+
+function IsGardenToolUnlocked(
+    SaveData,
+    Tool
+) {
+    if (Tool === "Trowel") {
+        return true;
+    }
+
+    if (Tool === "MagicTrowel") {
+        return SaveData?.Tools?.MagicTrowel === true;
+    }
+
+    if (Tool === "Shovel") {
+        return SaveData?.Tools?.Shovel === true;
+    }
+
+    if (Tool === "Fertilizer") {
+        return SaveData?.Tools?.Fertilizer === true;
+    }
+
+    if (Tool === "FutureSight") {
+        return SaveData?.Tools?.FutureSight === true;
+    }
+
+    return false;
+}
+
+
+function GetGardenToolUnlockCost(
+    Tool
+) {
+    const Costs = {
+        MagicTrowel: MagicTrowelUnlockCost,
+        Shovel: ShovelUnlockCost,
+        Fertilizer: FertilizerUnlockCost,
+        FutureSight: FutureSightUnlockCost
+    };
+
+    return Costs[Tool] ?? null;
+}
+
+
+function UnlockGardenTool(
+    SaveData,
+    Tool
+) {
+    SaveData.Tools ??= {};
+
+    if (
+        ![
+            "MagicTrowel",
+            "Shovel",
+            "Fertilizer",
+            "FutureSight"
+        ].includes(Tool)
+    ) {
+        return false;
+    }
+
+    SaveData.Tools[Tool] = true;
+
+    return true;
+}
+
+
+function GetShovelLevel(
+    SaveData
+) {
+    return Math.max(
+        0,
+        Math.min(
+            ShovelMaximumLevel,
+            Math.floor(
+                Number(
+                    SaveData?.Tools?.ShovelLevel ?? 0
+                ) || 0
+            )
+        )
+    );
+}
+
+
+function GetShovelUpgradeCost(
+    SaveData
+) {
+    const Level = GetShovelLevel(
+        SaveData
+    );
+
+    if (Level >= ShovelMaximumLevel) {
+        return null;
+    }
+
+    return Math.round(
+        ShovelUnlockCost *
+        Math.pow(
+            ToolUpgradeCostMultiplier,
+            Level + 1
+        )
+    );
+}
+
+
+function UpgradeShovel(
+    SaveData
+) {
+    if (
+        !IsGardenToolUnlocked(
+            SaveData,
+            "Shovel"
+        )
+    ) {
+        return false;
+    }
+
+    const Level = GetShovelLevel(
+        SaveData
+    );
+
+    if (Level >= ShovelMaximumLevel) {
+        return false;
+    }
+
+    SaveData.Tools.ShovelLevel =
+        Level + 1;
+
+    return true;
+}
+
+
+function GetShovelRefundRate(
+    SaveData
+) {
+    const Level = GetShovelLevel(
+        SaveData
+    );
+
+    if (Level === 1) {
+        return 0.33;
+    }
+
+    if (Level === 2) {
+        return 0.66;
+    }
+
+    return 0;
+}
+
+
+function DoesShovelReturnSeed(
+    SaveData
+) {
+    return GetShovelLevel(
+        SaveData
+    ) >= 3;
+}
+
+
+function GetFertilizerLevel(
+    SaveData
+) {
+    return Math.max(
+        0,
+        Math.min(
+            FertilizerMaximumLevel,
+            Math.floor(
+                Number(
+                    SaveData?.Tools?.FertilizerLevel ?? 0
+                ) || 0
+            )
+        )
+    );
+}
+
+
+function GetFertilizerUpgradeCost(
+    SaveData
+) {
+    const Level = GetFertilizerLevel(
+        SaveData
+    );
+
+    if (Level >= FertilizerMaximumLevel) {
+        return null;
+    }
+
+    return Math.round(
+        FertilizerUnlockCost *
+        Math.pow(
+            ToolUpgradeCostMultiplier,
+            Level + 1
+        )
+    );
+}
+
+
+function UpgradeFertilizer(
+    SaveData
+) {
+    if (
+        !IsGardenToolUnlocked(
+            SaveData,
+            "Fertilizer"
+        )
+    ) {
+        return false;
+    }
+
+    const Level = GetFertilizerLevel(
+        SaveData
+    );
+
+    if (Level >= FertilizerMaximumLevel) {
+        return false;
+    }
+
+    SaveData.Tools.FertilizerLevel =
+        Level + 1;
+
+    return true;
+}
+
+
+function GetFertilizerGrowthMinutes(
+    SaveData
+) {
+    return FertilizerGrowthMinutes[
+        GetFertilizerLevel(
+            SaveData
+        )
+    ];
+}
+
+
+function GetFertilizerUseCost(
+    Amount = 1
+) {
+    return FertilizerUseCost *
+        Math.max(
+            1,
+            Math.floor(
+                Number(Amount) || 1
+            )
+        );
+}
+
+
+function AddFertilizerUses(
+    SaveData,
+    Amount = 1
+) {
+    SaveData.Inventory ??= {};
+    SaveData.Inventory.Fertilizer ??= 0;
+
+    SaveData.Inventory.Fertilizer +=
+        Math.max(
+            0,
+            Math.floor(
+                Number(Amount) || 0
+            )
+        );
+}
+
+
+function TakeFertilizerUse(
+    SaveData
+) {
+    const CurrentUses = Math.max(
+        0,
+        Math.floor(
+            Number(
+                SaveData?.Inventory?.Fertilizer ?? 0
+            ) || 0
+        )
+    );
+
+    if (CurrentUses <= 0) {
+        return false;
+    }
+
+    SaveData.Inventory.Fertilizer =
+        CurrentUses - 1;
+
+    return true;
+}
+
+
+function GetFutureSightCooldownRemaining(
+    SaveData,
+    Now = Date.now()
+) {
+    return Math.max(
+        0,
+        Number(
+            SaveData?.Tools?.FutureSightCooldownUntil ?? 0
+        ) - Now
+    );
+}
+
+
+function IsFutureSightReady(
+    SaveData,
+    Now = Date.now()
+) {
+    return GetFutureSightCooldownRemaining(
+        SaveData,
+        Now
+    ) <= 0;
+}
+
+
+function StartFutureSightCooldown(
+    SaveData,
+    Now = Date.now()
+) {
+    SaveData.Tools ??= {};
+    SaveData.Tools.FutureSightCooldownUntil =
+        Now + FutureSightCooldown;
 }

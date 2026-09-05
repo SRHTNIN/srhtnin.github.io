@@ -216,15 +216,10 @@ $PageSection = "Garden";
             >
                 <h2>Tools</h2>
 
-                <div class="ToolList">
-                    <button
-                        id="ShovelToolButton"
-                        class="ActionButton ToolButton ToolButtonShovel"
-                        type="button"
-                    >
-                        Shovel
-                    </button>
-                </div>
+                <div
+                    id="ToolList"
+                    class="ToolList"
+                ></div>
             </section>
 
             <section
@@ -254,7 +249,7 @@ $PageSection = "Garden";
             </section>
 
             <p id="GardenMessage" class="PageMessage">
-                Select a seed, then choose an empty plot.
+                Select a seed and use the Trowel on an empty plot.
             </p>
 
             <section
