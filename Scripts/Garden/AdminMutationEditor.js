@@ -81,6 +81,31 @@ function BindAdminMutationEditor() {
     );
 
     document.getElementById(
+        "AdminMutationImportButton"
+    ).addEventListener(
+        "click",
+        () => {
+            document.getElementById(
+                "AdminMutationImportFile"
+            ).click();
+        }
+    );
+
+    document.getElementById(
+        "AdminMutationImportFile"
+    ).addEventListener(
+        "change",
+        ImportAdminMutationJson
+    );
+
+    document.getElementById(
+        "AdminMutationExportButton"
+    ).addEventListener(
+        "click",
+        ExportAdminMutationJson
+    );
+
+    document.getElementById(
         "AdminMutationResizeButton"
     ).addEventListener(
         "click",
@@ -2339,6 +2364,21 @@ async function SaveAdminMutation(
         return;
     }
 
+    try {
+        ValidateAdminMutation(
+            Mutation,
+            AdminMutationCatalogue,
+            AdminMutationPlantCatalogue,
+            AdminMutationEditingKey
+        );
+    } catch (Error) {
+        SetAdminMutationMessage(
+            Error.message
+        );
+
+        return;
+    }
+
     AdminMutationSavePending = true;
 
     const SaveButton =
@@ -2415,6 +2455,458 @@ function RenderAdminMutationJsonPreview() {
         Preview.textContent =
             "Invalid editor data: " +
             Error.message;
+    }
+}
+
+
+function GetAdminMutationPortableRelations(
+    Relations
+) {
+    const Result = {
+        PlantsUsed: [],
+        PlantsCreated: []
+    };
+
+    for (
+        const RelationName
+        of [
+            "PlantsUsed",
+            "PlantsCreated"
+        ]
+    ) {
+        for (
+            const PlantId
+            of Relations?.[
+                RelationName
+            ] ?? []
+        ) {
+            const PlantKey =
+                GetAdminPlantKeyById(
+                    PlantId,
+                    AdminMutationPlantCatalogue
+                );
+
+            if (PlantKey !== null) {
+                Result[RelationName].push(
+                    PlantKey
+                );
+            }
+        }
+    }
+
+    return Result;
+}
+
+
+function GetAdminMutationPortableData(
+    Mutation
+) {
+    return {
+        MutationKey:
+            Mutation.MutationKey,
+        Name: Mutation.Name,
+        Description:
+            Mutation.Description,
+        Hint:
+            Mutation.Hint === ""
+                ? null
+                : Mutation.Hint,
+        Priority: Mutation.Priority,
+        Chance: Mutation.Chance,
+        Cooldown: Mutation.Cooldown,
+        Rotation: Mutation.Rotation,
+        AllowImmature:
+            Mutation.AllowImmature === true,
+        Pattern:
+            CloneAdminMutationValue(
+                Mutation.Pattern
+            ),
+        Success:
+            CloneAdminMutationValue(
+                Mutation.Success
+            ),
+        Failure:
+            CloneAdminMutationValue(
+                Mutation.Failure
+            ),
+        Relations:
+            GetAdminMutationPortableRelations(
+                Mutation.Relations
+            )
+    };
+}
+
+
+function ExportAdminMutationJson() {
+    const Form =
+        document.getElementById(
+            "AdminMutationForm"
+        );
+
+    if (!Form.reportValidity()) {
+        return;
+    }
+
+    try {
+        const Mutation =
+            GetAdminMutationFormData();
+
+        ValidateAdminMutation(
+            Mutation,
+            AdminMutationCatalogue,
+            AdminMutationPlantCatalogue,
+            AdminMutationEditingKey
+        );
+
+        DownloadAdminJson(
+            "Mutation-" +
+            Mutation.MutationKey +
+            ".json",
+            {
+                Type: "Mutation",
+                Version: 1,
+                Mutation:
+                    GetAdminMutationPortableData(
+                        Mutation
+                    )
+            }
+        );
+
+        SetAdminMutationMessage(
+            "Mutation JSON exported. Numeric IDs are not included."
+        );
+    } catch (Error) {
+        SetAdminMutationMessage(
+            Error.message ??
+            "Couldn't export mutation JSON."
+        );
+    }
+}
+
+
+function ConvertAdminMutationPortableRelations(
+    Relations
+) {
+    if (
+        Relations === undefined ||
+        Relations === null
+    ) {
+        return {
+            PlantsUsed: [],
+            PlantsCreated: []
+        };
+    }
+
+    if (!IsAdminPlainObject(Relations)) {
+        throw new Error(
+            "Relations must be an object."
+        );
+    }
+
+    const Result = {
+        PlantsUsed: [],
+        PlantsCreated: []
+    };
+
+    for (
+        const RelationName
+        of [
+            "PlantsUsed",
+            "PlantsCreated"
+        ]
+    ) {
+        const Values =
+            Relations[RelationName] ?? [];
+
+        if (!Array.isArray(Values)) {
+            throw new Error(
+                RelationName +
+                " must be an array of Plant Keys."
+            );
+        }
+
+        for (const Value of Values) {
+            if (typeof Value !== "string") {
+                throw new Error(
+                    RelationName +
+                    " must use Plant Keys, not numeric IDs."
+                );
+            }
+
+            const Plant =
+                AdminMutationPlantCatalogue[
+                    Value
+                ];
+
+            if (Plant === undefined) {
+                throw new Error(
+                    RelationName +
+                    " references unknown Plant Key: " +
+                    Value
+                );
+            }
+
+            Result[RelationName].push(
+                Number(Plant.Id)
+            );
+        }
+
+        Result[RelationName] = [
+            ...new Set(
+                Result[RelationName]
+            )
+        ].sort(
+            (A, B) => A - B
+        );
+    }
+
+    return Result;
+}
+
+
+async function ImportAdminMutationJson(
+    Event
+) {
+    const Input = Event.target;
+    const File = Input.files?.[0];
+
+    Input.value = "";
+
+    if (File === undefined) {
+        return;
+    }
+
+    try {
+        const DocumentData =
+            await ReadAdminJsonFile(
+                File
+            );
+
+        if (
+            IsAdminPlainObject(
+                DocumentData
+            ) &&
+            DocumentData.Type !==
+                undefined &&
+            DocumentData.Type !== "Mutation"
+        ) {
+            throw new Error(
+                "That JSON file is not a mutation export."
+            );
+        }
+
+        if (
+            IsAdminPlainObject(
+                DocumentData
+            ) &&
+            DocumentData.Version !==
+                undefined &&
+            Number(DocumentData.Version) !== 1
+        ) {
+            throw new Error(
+                "Unsupported mutation JSON version."
+            );
+        }
+
+        const Imported =
+            IsAdminPlainObject(
+                DocumentData?.Mutation
+            )
+                ? DocumentData.Mutation
+                : DocumentData;
+
+        if (!IsAdminPlainObject(Imported)) {
+            throw new Error(
+                "Mutation JSON must contain a mutation object."
+            );
+        }
+
+        const MutationKey =
+            String(
+                Imported.MutationKey ?? ""
+            ).trim();
+
+        const Existing =
+            AdminMutationCatalogue[
+                MutationKey
+            ];
+
+        const Mutation = {
+            Id:
+                Existing?.Id ??
+                GetNextAdminMutationId(),
+            MutationKey: MutationKey,
+            Name:
+                String(
+                    Imported.Name ?? ""
+                ).trim(),
+            Description:
+                typeof Imported.Description ===
+                    "string"
+                    ? Imported.Description.trim()
+                    : "",
+            Hint:
+                typeof Imported.Hint ===
+                    "string"
+                    ? Imported.Hint.trim()
+                    : "",
+            Priority:
+                Number(
+                    Imported.Priority ?? 0
+                ),
+            Chance:
+                Number(
+                    Imported.Chance
+                ),
+            Cooldown:
+                Number(
+                    Imported.Cooldown
+                ),
+            Rotation:
+                Imported.Rotation ??
+                "None",
+            AllowImmature:
+                Imported.AllowImmature ===
+                true,
+            Pattern:
+                CloneAdminMutationValue(
+                    Imported.Pattern
+                ),
+            Success:
+                CloneAdminMutationValue(
+                    Imported.Success
+                ),
+            Failure:
+                CloneAdminMutationValue(
+                    Imported.Failure ??
+                    "Keep"
+                ),
+            Relations:
+                ConvertAdminMutationPortableRelations(
+                    Imported.Relations
+                ),
+            IsNew:
+                Existing === undefined
+        };
+
+        ValidateAdminMutation(
+            Mutation,
+            AdminMutationCatalogue,
+            AdminMutationPlantCatalogue,
+            Existing === undefined
+                ? null
+                : MutationKey
+        );
+
+        if (Existing === undefined) {
+            StartNewAdminMutation();
+            AdminMutationEditingKey = null;
+        } else {
+            LoadAdminMutationIntoForm(
+                MutationKey
+            );
+        }
+
+        SetAdminMutationField(
+            "AdminMutationId",
+            Mutation.Id
+        );
+        SetAdminMutationField(
+            "AdminMutationKey",
+            Mutation.MutationKey
+        );
+        SetAdminMutationField(
+            "AdminMutationName",
+            Mutation.Name
+        );
+        SetAdminMutationField(
+            "AdminMutationDescription",
+            Mutation.Description
+        );
+        SetAdminMutationField(
+            "AdminMutationHint",
+            Mutation.Hint
+        );
+        SetAdminMutationField(
+            "AdminMutationPriority",
+            Mutation.Priority
+        );
+        SetAdminMutationField(
+            "AdminMutationChance",
+            Mutation.Chance * 100
+        );
+        SetAdminMutationDurationFields(
+            Mutation.Cooldown
+        );
+        SetAdminMutationField(
+            "AdminMutationRotation",
+            Mutation.Rotation
+        );
+
+        document.getElementById(
+            "AdminMutationAllowImmature"
+        ).checked =
+            Mutation.AllowImmature;
+
+        AdminMutationPattern =
+            CloneAdminMutationMatrix(
+                Mutation.Pattern,
+                "Any"
+            );
+        AdminMutationResult =
+            NormalizeAdminMutationMatrix(
+                Mutation.Success,
+                AdminMutationPattern[0]
+                    .length,
+                AdminMutationPattern.length,
+                "Keep"
+            );
+
+        SetAdminMutationField(
+            "AdminMutationWidth",
+            AdminMutationPattern[0]
+                .length
+        );
+        SetAdminMutationField(
+            "AdminMutationHeight",
+            AdminMutationPattern.length
+        );
+
+        LoadAdminMutationFailure(
+            Mutation.Failure
+        );
+        SetAdminMutationRelations(
+            Mutation.Relations
+        );
+
+        document.getElementById(
+            "AdminMutationId"
+        ).readOnly =
+            Existing !== undefined;
+        document.getElementById(
+            "AdminMutationKey"
+        ).readOnly =
+            Existing !== undefined;
+
+        AdminMutationSelectedCell = null;
+        HideAdminMutationCellEditor();
+        RenderAdminMutationGrids();
+        UpdateAdminMutationFailureVisibility();
+        UpdateAdminMutationCooldownHint();
+        RenderAdminMutationJsonPreview();
+
+        SetAdminMutationMessage(
+            Existing === undefined
+                ? "Mutation JSON imported as a new mutation. Review it, then save when ready."
+                : "Mutation JSON imported over " +
+                    MutationKey +
+                    ". Review it, then save when ready."
+        );
+    } catch (Error) {
+        SetAdminMutationMessage(
+            Error.message ??
+            "Couldn't import mutation JSON."
+        );
     }
 }
 

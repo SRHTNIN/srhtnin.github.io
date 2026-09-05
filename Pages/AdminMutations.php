@@ -64,6 +64,31 @@ $PageSection = "Admin";
                     </button>
                 </div>
 
+                <div class="AdminEditorActions AdminEditorTransferActions">
+                    <button
+                        id="AdminMutationImportButton"
+                        class="ActionButton AdminInlineButton"
+                        type="button"
+                    >
+                        Import JSON
+                    </button>
+
+                    <input
+                        id="AdminMutationImportFile"
+                        type="file"
+                        accept="application/json,.json"
+                        hidden
+                    >
+
+                    <button
+                        id="AdminMutationExportButton"
+                        class="ActionButton AdminInlineButton"
+                        type="button"
+                    >
+                        Export JSON
+                    </button>
+                </div>
+
                 <form
                     id="AdminMutationForm"
                     class="Panel AdminEditorForm"
@@ -489,6 +514,7 @@ $PageSection = "Admin";
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/AdminValidation.js"></script>
         <script src="/Scripts/Garden/AdminMutationEditor.js"></script>
     </body>
 </html>

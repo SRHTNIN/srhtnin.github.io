@@ -72,6 +72,31 @@ function BindAdminPlantEditor() {
     );
 
     document.getElementById(
+        "AdminPlantImportButton"
+    ).addEventListener(
+        "click",
+        () => {
+            document.getElementById(
+                "AdminPlantImportFile"
+            ).click();
+        }
+    );
+
+    document.getElementById(
+        "AdminPlantImportFile"
+    ).addEventListener(
+        "change",
+        ImportAdminPlantJson
+    );
+
+    document.getElementById(
+        "AdminPlantExportButton"
+    ).addEventListener(
+        "click",
+        ExportAdminPlantJson
+    );
+
+    document.getElementById(
         "AdminPlantForm"
     ).addEventListener(
         "submit",
@@ -922,6 +947,20 @@ async function SaveAdminPlant(
     try {
         Plant =
             GetAdminPlantFormData();
+    } catch (Error) {
+        SetAdminPlantMessage(
+            Error.message
+        );
+
+        return;
+    }
+
+    try {
+        ValidateAdminPlant(
+            Plant,
+            AdminPlantCatalogue,
+            AdminPlantEditingKey
+        );
     } catch (Error) {
         SetAdminPlantMessage(
             Error.message
@@ -1829,6 +1868,297 @@ async function DeleteAdminPlantImage(
     } finally {
         AdminPlantImagePending = false;
         RenderAdminPlantImageManager();
+    }
+}
+
+
+function GetAdminPlantPortableData(
+    Plant
+) {
+    return {
+        PlantKey: Plant.PlantKey,
+        Name: Plant.Name,
+        Description: Plant.Description,
+        Tags: [...Plant.Tags],
+        GrowthTime: Plant.GrowthTime,
+        HarvestMultiplier:
+            Plant.HarvestMultiplier,
+        Effects: JSON.parse(
+            JSON.stringify(
+                Plant.Effects ?? {}
+            )
+        ),
+        Shop: {
+            ShopPlant:
+                Plant.ShopPlant === true,
+            BaseCost:
+                Plant.ShopPlant === true
+                    ? Plant.BaseCost
+                    : null
+        }
+    };
+}
+
+
+function ExportAdminPlantJson() {
+    const Form =
+        document.getElementById(
+            "AdminPlantForm"
+        );
+
+    if (!Form.reportValidity()) {
+        return;
+    }
+
+    try {
+        const Plant =
+            GetAdminPlantFormData();
+
+        ValidateAdminPlant(
+            Plant,
+            AdminPlantCatalogue,
+            AdminPlantEditingKey
+        );
+
+        DownloadAdminJson(
+            "Plant-" +
+            Plant.PlantKey +
+            ".json",
+            {
+                Type: "Plant",
+                Version: 1,
+                Plant:
+                    GetAdminPlantPortableData(
+                        Plant
+                    )
+            }
+        );
+
+        SetAdminPlantMessage(
+            "Plant JSON exported. Sprites and numeric ID are not included."
+        );
+    } catch (Error) {
+        SetAdminPlantMessage(
+            Error.message ??
+            "Couldn't export plant JSON."
+        );
+    }
+}
+
+
+async function ImportAdminPlantJson(
+    Event
+) {
+    const Input = Event.target;
+    const File = Input.files?.[0];
+
+    Input.value = "";
+
+    if (File === undefined) {
+        return;
+    }
+
+    try {
+        const DocumentData =
+            await ReadAdminJsonFile(
+                File
+            );
+
+        if (
+            IsAdminPlainObject(
+                DocumentData
+            ) &&
+            DocumentData.Type !==
+                undefined &&
+            DocumentData.Type !== "Plant"
+        ) {
+            throw new Error(
+                "That JSON file is not a plant export."
+            );
+        }
+
+        if (
+            IsAdminPlainObject(
+                DocumentData
+            ) &&
+            DocumentData.Version !==
+                undefined &&
+            Number(DocumentData.Version) !== 1
+        ) {
+            throw new Error(
+                "Unsupported plant JSON version."
+            );
+        }
+
+        const Imported =
+            IsAdminPlainObject(
+                DocumentData?.Plant
+            )
+                ? DocumentData.Plant
+                : DocumentData;
+
+        if (!IsAdminPlainObject(Imported)) {
+            throw new Error(
+                "Plant JSON must contain a plant object."
+            );
+        }
+
+        const PlantKey =
+            String(
+                Imported.PlantKey ?? ""
+            ).trim();
+
+        const Existing =
+            AdminPlantCatalogue[
+                PlantKey
+            ];
+
+        const Shop =
+            IsAdminPlainObject(
+                Imported.Shop
+            )
+                ? Imported.Shop
+                : {};
+
+        const Plant = {
+            Id:
+                Existing?.Id ??
+                GetNextAdminPlantId(),
+            PlantKey: PlantKey,
+            Name:
+                String(
+                    Imported.Name ?? ""
+                ).trim(),
+            Description:
+                typeof Imported.Description ===
+                    "string"
+                    ? Imported.Description.trim()
+                    : "",
+            Tags:
+                Array.isArray(Imported.Tags)
+                    ? Imported.Tags.map(
+                        Tag =>
+                            String(Tag).trim()
+                    )
+                    : [],
+            GrowthTime:
+                Number(
+                    Imported.GrowthTime
+                ),
+            HarvestMultiplier:
+                Number(
+                    Imported.HarvestMultiplier ??
+                    1.5
+                ),
+            Effects:
+                IsAdminPlainObject(
+                    Imported.Effects
+                )
+                    ? JSON.parse(
+                        JSON.stringify(
+                            Imported.Effects
+                        )
+                    )
+                    : {},
+            ShopPlant:
+                Shop.ShopPlant === true ||
+                Imported.ShopPlant === true,
+            BaseCost:
+                Shop.BaseCost ??
+                Imported.BaseCost ??
+                null,
+            IsNew:
+                Existing === undefined
+        };
+
+        ValidateAdminPlant(
+            Plant,
+            AdminPlantCatalogue,
+            Existing === undefined
+                ? null
+                : PlantKey
+        );
+
+        if (Existing === undefined) {
+            StartNewAdminPlant();
+            AdminPlantEditingKey = null;
+        } else {
+            LoadAdminPlantIntoForm(
+                PlantKey
+            );
+        }
+
+        SetAdminPlantField(
+            "AdminPlantId",
+            Plant.Id
+        );
+        SetAdminPlantField(
+            "AdminPlantKey",
+            Plant.PlantKey
+        );
+        SetAdminPlantField(
+            "AdminPlantName",
+            Plant.Name
+        );
+        SetAdminPlantField(
+            "AdminPlantDescription",
+            Plant.Description
+        );
+        SetAdminPlantField(
+            "AdminPlantTags",
+            Plant.Tags.join(", ")
+        );
+        SetAdminPlantDurationFields(
+            Plant.GrowthTime
+        );
+        SetAdminPlantField(
+            "AdminPlantHarvestMultiplier",
+            Plant.HarvestMultiplier
+        );
+
+        document.getElementById(
+            "AdminPlantShopPlant"
+        ).checked = Plant.ShopPlant;
+
+        SetAdminPlantField(
+            "AdminPlantBaseCost",
+            Plant.BaseCost ?? ""
+        );
+        SetAdminPlantField(
+            "AdminPlantEffects",
+            JSON.stringify(
+                Plant.Effects,
+                null,
+                4
+            )
+        );
+
+        document.getElementById(
+            "AdminPlantId"
+        ).readOnly =
+            Existing !== undefined;
+
+        document.getElementById(
+            "AdminPlantKey"
+        ).readOnly =
+            Existing !== undefined;
+
+        UpdateAdminPlantShopFields();
+        RenderAdminPlantPreview();
+        RenderAdminPlantImageManager();
+
+        SetAdminPlantMessage(
+            Existing === undefined
+                ? "Plant JSON imported as a new plant. Review it, then save when ready."
+                : "Plant JSON imported over " +
+                    PlantKey +
+                    ". Review it, then save when ready."
+        );
+    } catch (Error) {
+        SetAdminPlantMessage(
+            Error.message ??
+            "Couldn't import plant JSON."
+        );
     }
 }
 
