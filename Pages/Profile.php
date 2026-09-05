@@ -159,6 +159,30 @@ $PageTitle = "Profile";
                     to use these settings.
                 </p>
 
+                <h3>Plot rotation</h3>
+
+                <p>
+                    Choose whether plot directions are shown
+                    beside plot timers.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="TogglePlotRotationButton"
+                        type="button"
+                    >
+                        Plot rotation: Locked
+                    </button>
+                </div>
+
+                <p
+                    id="PlotRotationDisplayMessage"
+                    class="ProfileMessage"
+                >
+                    Unlock Plot rotation in the Shop
+                    to use this setting.
+                </p>
+
                 <h3>Garden overview</h3>
 
                 <p>

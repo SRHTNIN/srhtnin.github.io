@@ -15,7 +15,7 @@ const MaximumGardenNameLength = 32;
 const StartingGardenWidth = 4;
 const StartingGardenHeight = 4;
 
-const CurrentSaveVersion = 6;
+const CurrentSaveVersion = 7;
 
 
 function CreateSimulationRandomState() {
@@ -273,6 +273,20 @@ function NormalizeGardenData(
             Plot.PlantedAt ??
             Date.now()
         );
+
+        const ValidRotations = [
+            "North",
+            "East",
+            "South",
+            "West"
+        ];
+
+        Plot.Rotation =
+            ValidRotations.includes(
+                Plot.Rotation
+            )
+                ? Plot.Rotation
+                : "East";
 
         delete Plot.VisualVariant;
         delete Plot.AddedTags;
@@ -571,7 +585,8 @@ function CreateNewSave() {
             GardenOverview: false,
             GardenEconomy: false,
             MutationHints: false,
-            MutationHintsLevel: 0
+            MutationHintsLevel: 0,
+            Rotation: false
         },
 
         Preferences: {
@@ -584,7 +599,8 @@ function CreateNewSave() {
             ShowGrowingPlots: true,
             ShowReadyPlots: true,
             SelectQuickBoughtPlant: true,
-            SelectTrowelWithInventoryPlant: true
+            SelectTrowelWithInventoryPlant: true,
+            ShowPlotRotation: true
         },
 
         Gardens: [
@@ -831,6 +847,9 @@ function NormalizeSaveData(
         SaveData.Upgrades.MutationHints ===
         true;
 
+    SaveData.Upgrades.Rotation =
+        SaveData.Upgrades.Rotation === true;
+
     SaveData.Upgrades.MutationHintsLevel =
         Math.max(
             0,
@@ -886,6 +905,10 @@ function NormalizeSaveData(
 
     SaveData.Preferences.SelectTrowelWithInventoryPlant =
         SaveData.Preferences.SelectTrowelWithInventoryPlant !==
+        false;
+
+    SaveData.Preferences.ShowPlotRotation =
+        SaveData.Preferences.ShowPlotRotation !==
         false;
 
 

@@ -93,6 +93,10 @@ function BindGardenDisplayPreferences() {
             "ShowGrowthTimers"
         ],
         [
+            "TogglePlotRotationButton",
+            "ShowPlotRotation"
+        ],
+        [
             "ToggleNextHarvestButton",
             "ShowNextHarvest"
         ],
@@ -150,6 +154,7 @@ function BindGardenDisplayPreferences() {
 function RenderGardenDisplayPreferences() {
     RenderToolSelectionPreferences();
     RenderPlantInformationPreferences();
+    RenderPlotRotationPreference();
     RenderGardenOverviewPreferences();
 }
 
@@ -259,6 +264,44 @@ function RenderPlantInformationPreferences() {
 
     Message.textContent =
         "Plant names and growth timers can be changed independently.";
+}
+
+
+function RenderPlotRotationPreference() {
+    const Button =
+        document.getElementById(
+            "TogglePlotRotationButton"
+        );
+
+    const Message =
+        document.getElementById(
+            "PlotRotationDisplayMessage"
+        );
+
+    if (
+        Button === null ||
+        Message === null
+    ) {
+        return;
+    }
+
+    const IsOwned =
+        HasRotationUpgrade(
+            ProfileSave
+        );
+
+    SetPreferenceButtonState(
+        Button,
+        "Plot rotation",
+        ProfileSave.Preferences
+            .ShowPlotRotation !== false,
+        !IsOwned
+    );
+
+    Message.textContent =
+        IsOwned
+            ? "Plot directions can be hidden without changing their saved rotation."
+            : "Unlock Plot rotation in the Shop to use this setting.";
 }
 
 
@@ -378,6 +421,10 @@ async function ToggleGardenDisplayPreference(
         "ShowGrowthTimers"
     ];
 
+    const RotationPreferences = [
+        "ShowPlotRotation"
+    ];
+
     const GardenOverviewPreferences = [
         "ShowNextHarvest",
         "ShowGardenSize",
@@ -398,6 +445,11 @@ async function ToggleGardenDisplayPreference(
             PreferenceName
         );
 
+    const IsRotationPreference =
+        RotationPreferences.includes(
+            PreferenceName
+        );
+
     const IsGardenOverviewPreference =
         GardenOverviewPreferences.includes(
             PreferenceName
@@ -407,6 +459,7 @@ async function ToggleGardenDisplayPreference(
     if (
         !IsToolSelectionPreference &&
         !IsPlantInformationPreference &&
+        !IsRotationPreference &&
         !IsGardenOverviewPreference
     ) {
         return;
@@ -415,6 +468,15 @@ async function ToggleGardenDisplayPreference(
     if (
         IsPlantInformationPreference &&
         !HasPlantInformationUpgrade(
+            ProfileSave
+        )
+    ) {
+        return;
+    }
+
+    if (
+        IsRotationPreference &&
+        !HasRotationUpgrade(
             ProfileSave
         )
     ) {

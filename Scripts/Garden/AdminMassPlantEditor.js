@@ -402,6 +402,8 @@ function BuildAdminMassPlantPayload(
                     Source.Effects ?? {}
                 )
             ),
+        DirectionalSprites:
+            Source.DirectionalSprites === true,
         ShopPlant:
             Source.Shop?.ShopPlant === true,
         BaseCost:

@@ -1114,6 +1114,7 @@ function RenderGardenUpgrades() {
             "Row"
         ),
         CreateNewGardenCard(),
+        CreateRotationUpgradeCard(),
         CreatePlantInformationUpgradeCard(),
         CreateGardenOverviewUpgradeCard(),
         CreateGardenEconomyUpgradeCard(),
@@ -1372,6 +1373,117 @@ function CreateNewGardenCard() {
         BuyButton
     );
 
+
+    return Card;
+}
+
+
+function CreateRotationUpgradeCard() {
+    const Cost =
+        GetRotationUpgradeCost();
+
+    const IsOwned =
+        HasRotationUpgrade(
+            ShopSave
+        );
+
+    const Card =
+        document.createElement(
+            "article"
+        );
+
+    Card.className =
+        "Panel ShopItem";
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "PanelHeader PanelHeaderInset ShopItemHeader" +
+        (
+            IsOwned
+                ? " ShopItemHeaderOwned"
+                : ""
+        );
+
+    const Name =
+        document.createElement(
+            "h3"
+        );
+
+    Name.textContent =
+        "Plot rotation";
+
+    Header.appendChild(Name);
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Rotate planted plots clockwise. Direction is stored per plot and can be shown beside the plot timer.";
+
+    const Details =
+        document.createElement(
+            "div"
+        );
+
+    Details.className =
+        "ShopItemDetails";
+
+    Details.append(
+        CreateShopStat(
+            "Current",
+            IsOwned
+                ? "Rotation unlocked"
+                : "Rotation locked"
+        ),
+        CreateShopStat(
+            "Next",
+            IsOwned
+                ? "Purchased"
+                : "Rotation controls"
+        )
+    );
+
+    const BuyButton =
+        document.createElement(
+            "button"
+        );
+
+    BuyButton.className =
+        "ActionButton ShopBuyButton";
+    BuyButton.type = "button";
+
+    if (IsOwned) {
+        BuyButton.textContent =
+            "Purchased";
+        BuyButton.disabled = true;
+    } else {
+        BuyButton.textContent =
+            "Buy - " +
+            Cost.toLocaleString() +
+            " Dew";
+
+        BuyButton.disabled =
+            ShopSave.Currency.Dew < Cost ||
+            ShopPurchasePending;
+
+        BuyButton.addEventListener(
+            "click",
+            BuyRotationUpgrade
+        );
+    }
+
+    Card.append(
+        Header,
+        Description,
+        Details,
+        BuyButton
+    );
 
     return Card;
 }
@@ -2840,6 +2952,55 @@ async function BuyNewGarden() {
             "Bought a new 3×3 Garden for " +
             Cost.toLocaleString() +
             " Dew. It is now your active Garden."
+        );
+
+        RenderShop();
+
+        await SaveGame(
+            ShopSave
+        );
+    } finally {
+        ShopPurchasePending = false;
+        RenderShop();
+    }
+}
+
+
+async function BuyRotationUpgrade() {
+    if (
+        ShopPurchasePending ||
+        HasRotationUpgrade(
+            ShopSave
+        )
+    ) {
+        return;
+    }
+
+    const Cost =
+        GetRotationUpgradeCost();
+
+    if (ShopSave.Currency.Dew < Cost) {
+        SetShopMessage(
+            "You don't have enough Dew for Plot rotation."
+        );
+        return;
+    }
+
+    ShopPurchasePending = true;
+
+    try {
+        ShopSave.Currency.Dew -= Cost;
+        ShopSave.Statistics.CurrencySpent.Dew +=
+            Cost;
+
+        UnlockRotation(
+            ShopSave
+        );
+
+        SetShopMessage(
+            "Bought Plot rotation for " +
+            Cost.toLocaleString() +
+            " Dew. Rotation controls are now visible on planted plots."
         );
 
         RenderShop();

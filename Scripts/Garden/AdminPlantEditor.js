@@ -169,6 +169,16 @@ function BindAdminPlantEditor() {
     );
 
     document.getElementById(
+        "AdminPlantDirectionalSprites"
+    ).addEventListener(
+        "change",
+        () => {
+            RenderAdminPlantImageManager();
+            RenderAdminPlantPreview();
+        }
+    );
+
+    document.getElementById(
         "AdminPlantImageUploadButton"
     ).addEventListener(
         "click",
@@ -540,6 +550,11 @@ function LoadAdminPlantIntoForm(
     ).checked =
         Plant.Shop?.ShopPlant === true;
 
+    document.getElementById(
+        "AdminPlantDirectionalSprites"
+    ).checked =
+        Plant.DirectionalSprites === true;
+
     SetAdminPlantField(
         "AdminPlantBaseCost",
         Plant.Shop?.BaseCost ?? ""
@@ -648,6 +663,11 @@ function DuplicateAdminPlant() {
     ).checked =
         SourcePlant.Shop?.ShopPlant === true;
 
+    document.getElementById(
+        "AdminPlantDirectionalSprites"
+    ).checked =
+        SourcePlant.DirectionalSprites === true;
+
     SetAdminPlantField(
         "AdminPlantBaseCost",
         SourcePlant.Shop?.BaseCost ?? ""
@@ -732,6 +752,10 @@ function StartNewAdminPlant() {
 
     document.getElementById(
         "AdminPlantShopPlant"
+    ).checked = false;
+
+    document.getElementById(
+        "AdminPlantDirectionalSprites"
     ).checked = false;
 
     SetAdminPlantField(
@@ -909,6 +933,11 @@ function GetAdminPlantFormData() {
 
         Effects:
             ParseAdminPlantEffects(),
+
+        DirectionalSprites:
+            document.getElementById(
+                "AdminPlantDirectionalSprites"
+            ).checked,
 
         ShopPlant: ShopPlant,
 
@@ -1249,6 +1278,10 @@ function GetAdminPlantPreviewDefinition() {
                 "AdminPlantHarvestMultiplier"
             ).value
         ),
+        DirectionalSprites:
+            document.getElementById(
+                "AdminPlantDirectionalSprites"
+            ).checked,
         Shop: {
             ShopPlant: ShopPlant,
             BaseCost:
@@ -1426,16 +1459,43 @@ function RenderAdminPlantImageManager() {
             "AdminPlantImageUploadButton"
         );
 
-    const FileInput =
+    const DefaultUpload =
         document.getElementById(
-            "AdminPlantImageFiles"
+            "AdminPlantDefaultImageUpload"
         );
+
+    const DirectionalUpload =
+        document.getElementById(
+            "AdminPlantDirectionalImageUpload"
+        );
+
+    const DirectionalToggle =
+        document.getElementById(
+            "AdminPlantDirectionalSprites"
+        );
+
+    const Inputs = [
+        "AdminPlantImageFiles",
+        "AdminPlantImageFilesNorth",
+        "AdminPlantImageFilesEast",
+        "AdminPlantImageFilesSouth",
+        "AdminPlantImageFilesWest"
+    ]
+        .map(
+            ElementId =>
+                document.getElementById(
+                    ElementId
+                )
+        )
+        .filter(Boolean);
 
     if (
         List === null ||
         Note === null ||
         UploadButton === null ||
-        FileInput === null
+        DefaultUpload === null ||
+        DirectionalUpload === null ||
+        DirectionalToggle === null
     ) {
         return;
     }
@@ -1449,6 +1509,15 @@ function RenderAdminPlantImageManager() {
                 AdminPlantEditingKey
             ] ?? null;
 
+    const IsDirectional =
+        DirectionalToggle.checked;
+
+    DefaultUpload.hidden =
+        IsDirectional;
+
+    DirectionalUpload.hidden =
+        !IsDirectional;
+
     const CanEdit =
         Plant !== null &&
         !AdminPlantImagePending;
@@ -1456,8 +1525,9 @@ function RenderAdminPlantImageManager() {
     UploadButton.disabled =
         !CanEdit;
 
-    FileInput.disabled =
-        !CanEdit;
+    for (const Input of Inputs) {
+        Input.disabled = !CanEdit;
+    }
 
     if (Plant === null) {
         Note.textContent =
@@ -1466,6 +1536,7 @@ function RenderAdminPlantImageManager() {
     }
 
     const StaticImages =
+        typeof PlantImages !== "undefined" &&
         Array.isArray(
             PlantImages[
                 AdminPlantEditingKey
@@ -1488,6 +1559,44 @@ function RenderAdminPlantImageManager() {
                 )
             : [];
 
+    const DirectionOrder = {
+        N: 0,
+        E: 1,
+        S: 2,
+        W: 3
+    };
+
+    const DirectionNames = {
+        N: "North",
+        E: "East",
+        S: "South",
+        W: "West"
+    };
+
+    const DirectionalStages =
+        Array.isArray(
+            Plant.DirectionalImageStages
+        )
+            ? [...Plant.DirectionalImageStages]
+                .sort(
+                    (A, B) =>
+                        Number(A.Stage) -
+                            Number(B.Stage) ||
+                        (
+                            DirectionOrder[
+                                String(A.Direction)
+                                    .toUpperCase()
+                            ] ?? 99
+                        ) -
+                        (
+                            DirectionOrder[
+                                String(B.Direction)
+                                    .toUpperCase()
+                            ] ?? 99
+                        )
+                )
+            : [];
+
     const FallbackText =
         StaticImages.length > 0
             ? " Repository fallback: " +
@@ -1500,27 +1609,44 @@ function RenderAdminPlantImageManager() {
                 )
             : "";
 
-    if (ApiStages.length === 0) {
+    const DisplayStages =
+        IsDirectional
+            ? DirectionalStages
+            : ApiStages;
+
+    if (DisplayStages.length === 0) {
         Note.textContent =
-            "No API sprites uploaded." +
-            FallbackText;
+            IsDirectional
+                ? "No directional API sprites uploaded. Choose stage-numbered PNGs for each direction." +
+                    FallbackText
+                : "No API sprites uploaded." +
+                    FallbackText;
         return;
     }
 
     Note.textContent =
-        ApiStages.length +
-        " API sprite" +
+        DisplayStages.length +
+        (IsDirectional
+            ? " directional API sprite"
+            : " API sprite") +
         (
-            ApiStages.length === 1
+            DisplayStages.length === 1
                 ? " uploaded."
                 : "s uploaded."
         ) +
         FallbackText;
 
-    for (const ImageStage of ApiStages) {
+    for (const ImageStage of DisplayStages) {
         const Stage = Number(
             ImageStage.Stage
         );
+
+        const Direction =
+            IsDirectional
+                ? String(
+                    ImageStage.Direction ?? ""
+                ).toUpperCase()
+                : null;
 
         const Row =
             document.createElement(
@@ -1550,13 +1676,24 @@ function RenderAdminPlantImageManager() {
             GetAdminPlantApiImageUrl(
                 Plant.Id,
                 Stage,
-                ImageStage.Revision
+                ImageStage.Revision,
+                Direction
             );
 
         Image.alt =
             Plant.Name +
             " stage " +
-            Stage;
+            Stage +
+            (
+                Direction === null
+                    ? ""
+                    : " " +
+                        (
+                            DirectionNames[
+                                Direction
+                            ] ?? Direction
+                        )
+            );
 
         Preview.appendChild(Image);
 
@@ -1566,7 +1703,17 @@ function RenderAdminPlantImageManager() {
             );
 
         Label.textContent =
-            "Stage " + Stage;
+            "Stage " + Stage +
+            (
+                Direction === null
+                    ? ""
+                    : " · " +
+                        (
+                            DirectionNames[
+                                Direction
+                            ] ?? Direction
+                        )
+            );
 
         const RemoveButton =
             document.createElement(
@@ -1586,7 +1733,8 @@ function RenderAdminPlantImageManager() {
             () =>
                 DeleteAdminPlantImage(
                     Plant.Id,
-                    Stage
+                    Stage,
+                    Direction
                 )
         );
 
@@ -1604,18 +1752,63 @@ function RenderAdminPlantImageManager() {
 function GetAdminPlantApiImageUrl(
     PlantId,
     Stage,
-    Revision = 0
+    Revision = 0,
+    Direction = null
 ) {
+    const QueryData = {
+        PlantId: String(PlantId),
+        Stage: String(Stage),
+        v: String(Revision ?? 0)
+    };
+
+    if (Direction !== null) {
+        QueryData.Direction =
+            String(Direction);
+    }
+
     const Query =
-        new URLSearchParams({
-            PlantId: String(PlantId),
-            Stage: String(Stage),
-            v: String(Revision ?? 0)
-        });
+        new URLSearchParams(
+            QueryData
+        );
 
     return ApiUrl +
         "/PlantImage.php?" +
         Query.toString();
+}
+
+
+function GetAdminPlantImageUploadSets() {
+    const IsDirectional =
+        document.getElementById(
+            "AdminPlantDirectionalSprites"
+        ).checked;
+
+    if (!IsDirectional) {
+        return [
+            {
+                Direction: null,
+                Input:
+                    document.getElementById(
+                        "AdminPlantImageFiles"
+                    )
+            }
+        ];
+    }
+
+    return [
+        ["N", "AdminPlantImageFilesNorth"],
+        ["E", "AdminPlantImageFilesEast"],
+        ["S", "AdminPlantImageFilesSouth"],
+        ["W", "AdminPlantImageFilesWest"]
+    ].map(
+        ([Direction, ElementId]) => ({
+            Direction: Direction,
+            Input:
+                document.getElementById(
+                    ElementId
+                )
+        })
+    );
 }
 
 
@@ -1636,71 +1829,72 @@ async function UploadAdminPlantImages() {
         return;
     }
 
-    const FileInput =
-        document.getElementById(
-            "AdminPlantImageFiles"
-        );
-
-    const Files =
-        Array.from(
-            FileInput.files ?? []
-        );
-
-    if (Files.length === 0) {
-        SetAdminPlantMessage(
-            "Choose one or more PNG sprites first."
-        );
-        return;
-    }
-
-    const Stages = new Set();
     const Uploads = [];
 
     try {
-        for (const File of Files) {
-            const Match =
-                /^(\\d+)\\.png$/i.exec(
-                    File.name
-                );
-
-            if (Match === null) {
-                throw new Error(
-                    "Sprite filenames must be stage numbers such as 1.png or 3.png."
-                );
-            }
-
-            const Stage = Number(
-                Match[1]
+        for (
+            const UploadSet
+            of GetAdminPlantImageUploadSets()
+        ) {
+            const Files = Array.from(
+                UploadSet.Input?.files ?? []
             );
 
-            if (
-                !Number.isInteger(Stage) ||
-                Stage < 1 ||
-                Stage > 255
-            ) {
-                throw new Error(
-                    "Sprite stages must be between 1 and 255."
+            const Stages = new Set();
+
+            for (const File of Files) {
+                const Match =
+                    /^(\d+)\.png$/i.exec(
+                        File.name
+                    );
+
+                if (Match === null) {
+                    throw new Error(
+                        "Sprite filenames must be stage numbers such as 1.png or 3.png."
+                    );
+                }
+
+                const Stage = Number(
+                    Match[1]
                 );
+
+                if (
+                    !Number.isInteger(Stage) ||
+                    Stage < 1 ||
+                    Stage > 255
+                ) {
+                    throw new Error(
+                        "Sprite stages must be between 1 and 255."
+                    );
+                }
+
+                if (Stages.has(Stage)) {
+                    throw new Error(
+                        "Stage " + Stage +
+                        " was selected more than once for the same direction."
+                    );
+                }
+
+                Stages.add(Stage);
+
+                Uploads.push({
+                    Stage: Stage,
+                    Direction:
+                        UploadSet.Direction,
+                    File: File
+                });
             }
-
-            if (Stages.has(Stage)) {
-                throw new Error(
-                    "Stage " +
-                    Stage +
-                    " was selected more than once."
-                );
-            }
-
-            Stages.add(Stage);
-
-            Uploads.push({
-                Stage: Stage,
-                File: File
-            });
         }
     } catch (Error) {
         SetAdminPlantMessage(
             Error.message
+        );
+        return;
+    }
+
+    if (Uploads.length === 0) {
+        SetAdminPlantMessage(
+            "Choose one or more PNG sprites first."
         );
         return;
     }
@@ -1719,18 +1913,32 @@ async function UploadAdminPlantImages() {
                     Upload.File
                 );
 
+            const RequestData = {
+                PlantId: Plant.Id,
+                Stage: Upload.Stage,
+                MimeType: "image/png",
+                DataBase64: DataBase64
+            };
+
+            if (Upload.Direction !== null) {
+                RequestData.Direction =
+                    Upload.Direction;
+            }
+
             await AdminPlantRequest(
                 "UploadImage",
-                {
-                    PlantId: Plant.Id,
-                    Stage: Upload.Stage,
-                    MimeType: "image/png",
-                    DataBase64: DataBase64
-                }
+                RequestData
             );
         }
 
-        FileInput.value = "";
+        for (
+            const UploadSet
+            of GetAdminPlantImageUploadSets()
+        ) {
+            if (UploadSet.Input !== null) {
+                UploadSet.Input.value = "";
+            }
+        }
 
         localStorage.removeItem(
             "SarahtoninGardenContent"
@@ -1818,7 +2026,8 @@ function ReadAdminPlantFileBase64(
 
 async function DeleteAdminPlantImage(
     PlantId,
-    Stage
+    Stage,
+    Direction = null
 ) {
     if (AdminPlantImagePending) {
         return;
@@ -1830,16 +2039,28 @@ async function DeleteAdminPlantImage(
     SetAdminPlantMessage(
         "Removing stage " +
         Stage +
+        (
+            Direction === null
+                ? ""
+                : " " + Direction
+        ) +
         " sprite..."
     );
 
     try {
+        const RequestData = {
+            PlantId: PlantId,
+            Stage: Stage
+        };
+
+        if (Direction !== null) {
+            RequestData.Direction =
+                Direction;
+        }
+
         await AdminPlantRequest(
             "DeleteImage",
-            {
-                PlantId: PlantId,
-                Stage: Stage
-            }
+            RequestData
         );
 
         localStorage.removeItem(
@@ -1853,6 +2074,11 @@ async function DeleteAdminPlantImage(
         SetAdminPlantMessage(
             "Stage " +
             Stage +
+            (
+                Direction === null
+                    ? ""
+                    : " " + Direction
+            ) +
             " sprite removed."
         );
     } catch (Error) {
@@ -1888,6 +2114,8 @@ function GetAdminPlantPortableData(
                 Plant.Effects ?? {}
             )
         ),
+        DirectionalSprites:
+            Plant.DirectionalSprites === true,
         Shop: {
             ShopPlant:
                 Plant.ShopPlant === true,
@@ -2060,6 +2288,9 @@ async function ImportAdminPlantJson(
                         )
                     )
                     : {},
+            DirectionalSprites:
+                Imported.DirectionalSprites ===
+                true,
             ShopPlant:
                 Shop.ShopPlant === true ||
                 Imported.ShopPlant === true,
@@ -2119,6 +2350,11 @@ async function ImportAdminPlantJson(
         document.getElementById(
             "AdminPlantShopPlant"
         ).checked = Plant.ShopPlant;
+
+        document.getElementById(
+            "AdminPlantDirectionalSprites"
+        ).checked =
+            Plant.DirectionalSprites;
 
         SetAdminPlantField(
             "AdminPlantBaseCost",

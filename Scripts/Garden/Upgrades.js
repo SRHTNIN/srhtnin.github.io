@@ -27,6 +27,7 @@ const MutationHintsUnlockCost = 1500;
 const MutationHintsUpgradeCostMultiplier = 2;
 const MutationHintsMaximumLevel = 1;
 const MutationHintsMaximumVisible = 10;
+const RotationUnlockCost = 1200;
 const NewGardenBaseCost = 4000;
 const NewGardenCostMultiplier = 1.5;
 
@@ -172,6 +173,34 @@ function AddNewGarden(
     );
 
     return SaveData.Garden;
+}
+
+
+function HasRotationUpgrade(
+    SaveData
+) {
+    return (
+        SaveData
+            ?.Upgrades
+            ?.Rotation === true
+    );
+}
+
+
+function GetRotationUpgradeCost() {
+    return RotationUnlockCost;
+}
+
+
+function UnlockRotation(
+    SaveData
+) {
+    SaveData.Upgrades ??= {};
+    SaveData.Preferences ??= {};
+
+    SaveData.Upgrades.Rotation = true;
+    SaveData.Preferences.ShowPlotRotation =
+        true;
 }
 
 

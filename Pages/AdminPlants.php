@@ -246,6 +246,17 @@ $PageSection = "Admin";
                             </span>
                         </label>
 
+                        <label class="AdminEditorCheckField">
+                            <input
+                                id="AdminPlantDirectionalSprites"
+                                name="DirectionalSprites"
+                                type="checkbox"
+                            >
+                            <span>
+                                Directional sprites
+                            </span>
+                        </label>
+
                         <label class="AdminEditorField AdminEditorWideField">
                             <span>Effects JSON</span>
                             <textarea
@@ -323,24 +334,74 @@ $PageSection = "Admin";
                             Optional. You can save a plant with no sprites and add them later.
                             Upload PNG files named by stage, such as
                             <code>1.png</code>, <code>2.png</code>, <code>3.png</code>.
+                            Directional plants use one stage set for each direction.
                         </p>
 
-                        <div class="AdminPlantImageUpload">
+                        <div
+                            id="AdminPlantDefaultImageUpload"
+                            class="AdminPlantImageUpload"
+                        >
                             <input
                                 id="AdminPlantImageFiles"
                                 type="file"
                                 accept="image/png,.png"
                                 multiple
                             >
-
-                            <button
-                                id="AdminPlantImageUploadButton"
-                                class="ActionButton AdminInlineButton"
-                                type="button"
-                            >
-                                Upload selected sprites
-                            </button>
                         </div>
+
+                        <div
+                            id="AdminPlantDirectionalImageUpload"
+                            class="AdminPlantDirectionalImageUpload"
+                            hidden
+                        >
+                            <label class="AdminEditorField">
+                                <span>North sprites</span>
+                                <input
+                                    id="AdminPlantImageFilesNorth"
+                                    type="file"
+                                    accept="image/png,.png"
+                                    multiple
+                                >
+                            </label>
+
+                            <label class="AdminEditorField">
+                                <span>East sprites</span>
+                                <input
+                                    id="AdminPlantImageFilesEast"
+                                    type="file"
+                                    accept="image/png,.png"
+                                    multiple
+                                >
+                            </label>
+
+                            <label class="AdminEditorField">
+                                <span>South sprites</span>
+                                <input
+                                    id="AdminPlantImageFilesSouth"
+                                    type="file"
+                                    accept="image/png,.png"
+                                    multiple
+                                >
+                            </label>
+
+                            <label class="AdminEditorField">
+                                <span>West sprites</span>
+                                <input
+                                    id="AdminPlantImageFilesWest"
+                                    type="file"
+                                    accept="image/png,.png"
+                                    multiple
+                                >
+                            </label>
+                        </div>
+
+                        <button
+                            id="AdminPlantImageUploadButton"
+                            class="ActionButton AdminInlineButton"
+                            type="button"
+                        >
+                            Upload selected sprites
+                        </button>
 
                         <p
                             id="AdminPlantImageNote"

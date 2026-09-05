@@ -768,6 +768,27 @@ function ApplyMutationResult(
                 continue;
             }
 
+            const ExistingPlot =
+                SaveData.Garden.Plots[
+                    PlotIndex
+                ];
+
+            if (
+                NewPlot !== null &&
+                typeof NewPlot === "object" &&
+                typeof NewPlot.Rotation !==
+                    "string"
+            ) {
+                NewPlot.Rotation =
+                    ExistingPlot !== null &&
+                    typeof ExistingPlot ===
+                        "object" &&
+                    typeof ExistingPlot.Rotation ===
+                        "string"
+                        ? ExistingPlot.Rotation
+                        : "East";
+            }
+
 
             SaveData.Garden.Plots[
                 PlotIndex

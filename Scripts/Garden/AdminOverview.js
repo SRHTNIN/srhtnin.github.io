@@ -95,10 +95,23 @@ function GetAdminOverviewMissingSprites(
                 )
         );
 
+    const DirectionalStages =
+        Array.isArray(
+            Plant.DirectionalImageStages
+        )
+            ? Plant.DirectionalImageStages
+            : [];
+
     const HighestApiStage =
         Math.max(
             0,
-            ...ApiStages
+            ...ApiStages,
+            ...DirectionalStages.map(
+                Stage =>
+                    Number(
+                        Stage?.Stage ?? 0
+                    )
+            )
         );
 
     const HighestStage =
@@ -109,6 +122,51 @@ function GetAdminOverviewMissingSprites(
         );
 
     const Missing = [];
+
+    if (Plant.DirectionalSprites === true) {
+        const Directions = [
+            ["N", "North"],
+            ["E", "East"],
+            ["S", "South"],
+            ["W", "West"]
+        ];
+
+        for (const [Code, Name] of Directions) {
+            const Stages = new Set(
+                DirectionalStages
+                    .filter(
+                        Stage =>
+                            String(
+                                Stage?.Direction ?? ""
+                            ).toUpperCase() === Code
+                    )
+                    .map(
+                        Stage =>
+                            Number(Stage.Stage)
+                    )
+                    .filter(
+                        Stage =>
+                            Number.isInteger(Stage) &&
+                            Stage > 0
+                    )
+            );
+
+            for (
+                let Stage = 1;
+                Stage <= HighestStage;
+                Stage++
+            ) {
+                if (!Stages.has(Stage)) {
+                    Missing.push(
+                        Name + "/" +
+                        Stage + ".png"
+                    );
+                }
+            }
+        }
+
+        return Missing;
+    }
 
     for (
         let Stage = 1;
@@ -131,7 +189,6 @@ function GetAdminOverviewMissingSprites(
 
     return Missing;
 }
-
 
 function CollectAdminOverviewCreatedPlants() {
     const Created = new Set();

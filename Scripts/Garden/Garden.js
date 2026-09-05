@@ -26,6 +26,20 @@ const GardenBorderColours = [
     "var(--Lavender)"
 ];
 
+const GardenPlotDefaultRotation = "East";
+const GardenPlotRotations = [
+    "North",
+    "East",
+    "South",
+    "West"
+];
+const GardenPlotRotationLabels = {
+    North: "^",
+    East: "->",
+    South: "v",
+    West: "<-"
+};
+
 
 function GetGardenBorderColour(
     GardenIndex
@@ -1383,7 +1397,9 @@ function AreGardenPlotsEqual(
     return (
         A.Plant === B.Plant &&
         Number(A.PlantedAt) ===
-        Number(B.PlantedAt)
+        Number(B.PlantedAt) &&
+        GetGardenPlotRotation(A) ===
+        GetGardenPlotRotation(B)
     );
 }
 
@@ -1405,8 +1421,100 @@ function GetGardenDisplaySettings() {
             HasPlantInformation &&
             GameSave.Preferences
                 .ShowGrowthTimers !==
+                false,
+
+        ShowPlotRotation:
+            HasRotationUpgrade(
+                GameSave
+            ) &&
+            GameSave.Preferences
+                .ShowPlotRotation !==
                 false
     };
+}
+
+
+function GetGardenPlotRotation(
+    Plot
+) {
+    return GardenPlotRotations.includes(
+        Plot?.Rotation
+    )
+        ? Plot.Rotation
+        : GardenPlotDefaultRotation;
+}
+
+
+function GetGardenPlotRotationLabel(
+    Plot
+) {
+    return GardenPlotRotationLabels[
+        GetGardenPlotRotation(
+            Plot
+        )
+    ] ?? "->";
+}
+
+
+async function RotateGardenPlot(
+    PlotIndex
+) {
+    if (
+        !HasRotationUpgrade(
+            GameSave
+        )
+    ) {
+        return;
+    }
+
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
+    const Plot =
+        GameSave.Garden.Plots[
+            PlotIndex
+        ];
+
+    if (
+        Plot === null ||
+        typeof Plot !== "object"
+    ) {
+        return;
+    }
+
+    const CurrentIndex =
+        GardenPlotRotations.indexOf(
+            GetGardenPlotRotation(
+                Plot
+            )
+        );
+
+    Plot.Rotation =
+        GardenPlotRotations[
+            (CurrentIndex + 1) %
+            GardenPlotRotations.length
+        ];
+
+    const Plant =
+        Plants[Plot.Plant];
+
+    SetGardenMessage(
+        "Rotated " +
+        (Plant?.Name ?? "plot") +
+        " " +
+        Plot.Rotation.toLowerCase() +
+        "."
+    );
+
+    RenderGame();
+
+    await SaveGame(
+        GameSave
+    );
 }
 
 
@@ -1416,30 +1524,29 @@ function CreatePlotElement(
     DisplaySettings,
     IsPreview = false
 ) {
-    const Button =
+    const Tile =
+        document.createElement(
+            "div"
+        );
+
+    Tile.className =
+        "PlantTile GardenPlot";
+
+    const MainButton =
         document.createElement(
             "button"
         );
 
-    Button.className =
-        "PlantTile GardenPlot";
-
-    Button.type = "button";
+    MainButton.className =
+        "GardenPlotMain";
+    MainButton.type = "button";
 
 
     if (
         DisplaySettings.ShowPlantNames
     ) {
-        Button.classList.add(
+        Tile.classList.add(
             "GardenPlotWithName"
-        );
-    }
-
-    if (
-        DisplaySettings.ShowGrowthTimers
-    ) {
-        Button.classList.add(
-            "GardenPlotWithTimer"
         );
     }
 
@@ -1452,7 +1559,7 @@ function CreatePlotElement(
     if (
         DisplaySettings.ShowPlantNames
     ) {
-        Button.appendChild(
+        MainButton.appendChild(
             CreateGardenPlotName(
                 Plot,
                 Plant
@@ -1469,43 +1576,45 @@ function CreatePlotElement(
     Visual.className =
         "GardenPlotVisual";
 
-    Button.appendChild(
+    MainButton.appendChild(
         Visual
+    );
+
+    Tile.appendChild(
+        MainButton
     );
 
 
     if (Plot === null) {
-        Button.classList.add(
+        Tile.classList.add(
             "GardenPlotEmpty"
         );
 
-        Button.title =
+        MainButton.title =
             IsPreview
                 ? "Future Sight: empty plot"
                 : "Empty plot";
 
-        if (
-            DisplaySettings
-                .ShowGrowthTimers
-        ) {
-            Button.appendChild(
-                CreateGardenPlotTimer(
-                    null,
-                    null,
-                    0
-                )
-            );
-        }
+        AppendGardenPlotFooter(
+            Tile,
+            null,
+            null,
+            0,
+            PlotIndex,
+            DisplaySettings,
+            IsPreview
+        );
 
         if (IsPreview) {
-            return Button;
+            MainButton.disabled = true;
+            return Tile;
         }
 
         if (
             SelectedGardenTool ===
             "Trowel"
         ) {
-            Button.addEventListener(
+            MainButton.addEventListener(
                 "click",
                 () => {
                     PlantSeed(
@@ -1517,40 +1626,40 @@ function CreatePlotElement(
             SelectedGardenTool ===
             "MagicTrowel"
         ) {
-            Button.classList.add(
+            Tile.classList.add(
                 "GardenPlotMagicPlant"
             );
 
-            Button.title =
+            MainButton.title =
                 "Fill empty plots with the selected seed";
 
-            Button.addEventListener(
+            MainButton.addEventListener(
                 "click",
                 PlantManySeeds
             );
+        } else {
+            MainButton.disabled = true;
         }
 
-        return Button;
+        return Tile;
     }
 
 
     if (Plant === undefined) {
         Visual.textContent = "?";
 
-        if (
-            DisplaySettings
-                .ShowGrowthTimers
-        ) {
-            Button.appendChild(
-                CreateGardenPlotTimer(
-                    Plot,
-                    null,
-                    0
-                )
-            );
-        }
+        AppendGardenPlotFooter(
+            Tile,
+            Plot,
+            null,
+            0,
+            PlotIndex,
+            DisplaySettings,
+            IsPreview
+        );
 
-        return Button;
+        MainButton.disabled = true;
+        return Tile;
     }
 
 
@@ -1560,7 +1669,7 @@ function CreatePlotElement(
             Plant
         );
 
-    Button.style.setProperty(
+    Tile.style.setProperty(
         "--GrowthProgress",
         `${Progress * 100}%`
     );
@@ -1608,25 +1717,24 @@ function CreatePlotElement(
     }
 
 
-    if (
-        DisplaySettings.ShowGrowthTimers
-    ) {
-        Button.appendChild(
-            CreateGardenPlotTimer(
-                Plot,
-                Plant,
-                Progress
-            )
-        );
-    }
+    AppendGardenPlotFooter(
+        Tile,
+        Plot,
+        Plant,
+        Progress,
+        PlotIndex,
+        DisplaySettings,
+        IsPreview
+    );
 
 
     if (IsPreview) {
-        Button.title =
+        MainButton.title =
             "Future Sight: " +
             Plant.Name;
 
-        return Button;
+        MainButton.disabled = true;
+        return Tile;
     }
 
 
@@ -1634,15 +1742,15 @@ function CreatePlotElement(
         SelectedGardenTool ===
         "Shovel"
     ) {
-        Button.classList.add(
+        Tile.classList.add(
             "GardenPlotRemove"
         );
 
-        Button.title =
+        MainButton.title =
             "Remove " +
             Plant.Name;
 
-        Button.addEventListener(
+        MainButton.addEventListener(
             "click",
             () => {
                 RemovePlant(
@@ -1651,7 +1759,7 @@ function CreatePlotElement(
             }
         );
 
-        return Button;
+        return Tile;
     }
 
 
@@ -1660,18 +1768,19 @@ function CreatePlotElement(
         "Fertilizer"
     ) {
         if (Progress >= 1) {
-            Button.title =
+            MainButton.title =
                 Plant.Name +
                 " is already fully grown";
 
-            return Button;
+            MainButton.disabled = true;
+            return Tile;
         }
 
-        Button.classList.add(
+        Tile.classList.add(
             "GardenPlotFertilize"
         );
 
-        Button.title =
+        MainButton.title =
             "Fertilize " +
             Plant.Name +
             " (" +
@@ -1680,7 +1789,7 @@ function CreatePlotElement(
             ) +
             " minutes)";
 
-        Button.addEventListener(
+        MainButton.addEventListener(
             "click",
             () => {
                 FertilizePlant(
@@ -1689,7 +1798,7 @@ function CreatePlotElement(
             }
         );
 
-        return Button;
+        return Tile;
     }
 
 
@@ -1697,7 +1806,7 @@ function CreatePlotElement(
         SelectedGardenTool !==
         "Trowel"
     ) {
-        Button.title =
+        MainButton.title =
             Plant.Name +
             " - " +
             Math.floor(
@@ -1705,22 +1814,23 @@ function CreatePlotElement(
             ) +
             "% grown";
 
-        return Button;
+        MainButton.disabled = true;
+        return Tile;
     }
 
 
     if (
         Progress >= 1
     ) {
-        Button.classList.add(
+        Tile.classList.add(
             "GardenPlotMature"
         );
 
-        Button.title =
+        MainButton.title =
             "Harvest " +
             Plant.Name;
 
-        Button.addEventListener(
+        MainButton.addEventListener(
             "click",
             () => {
                 HarvestPlant(
@@ -1729,17 +1839,114 @@ function CreatePlotElement(
             }
         );
     } else {
-        Button.title =
+        MainButton.title =
             Plant.Name +
             " - " +
             Math.floor(
                 Progress * 100
             ) +
             "% grown";
+
+        MainButton.disabled = true;
     }
 
 
-    return Button;
+    return Tile;
+}
+
+
+function AppendGardenPlotFooter(
+    Tile,
+    Plot,
+    Plant,
+    Progress,
+    PlotIndex,
+    DisplaySettings,
+    IsPreview
+) {
+    const ShowTimer =
+        DisplaySettings.ShowGrowthTimers;
+
+    const ShowRotation =
+        Plot !== null &&
+        DisplaySettings.ShowPlotRotation &&
+        !IsPreview;
+
+    if (
+        !ShowTimer &&
+        !ShowRotation
+    ) {
+        return;
+    }
+
+    Tile.classList.add(
+        "GardenPlotWithFooter"
+    );
+
+    const Footer =
+        document.createElement(
+            "span"
+        );
+
+    Footer.className =
+        "GardenPlotFooter";
+
+    if (
+        ShowTimer &&
+        ShowRotation
+    ) {
+        Footer.classList.add(
+            "GardenPlotFooterSplit"
+        );
+    }
+
+    if (ShowTimer) {
+        Footer.appendChild(
+            CreateGardenPlotTimer(
+                Plot,
+                Plant,
+                Progress
+            )
+        );
+    }
+
+    if (ShowRotation) {
+        const RotateButton =
+            document.createElement(
+                "button"
+            );
+
+        RotateButton.className =
+            "GardenPlotRotationButton";
+        RotateButton.type = "button";
+        RotateButton.textContent =
+            GetGardenPlotRotationLabel(
+                Plot
+            );
+        RotateButton.title =
+            "Rotate plot clockwise";
+        RotateButton.setAttribute(
+            "aria-label",
+            "Rotate " +
+            (Plant?.Name ?? "plot") +
+            " clockwise"
+        );
+
+        RotateButton.addEventListener(
+            "click",
+            () => {
+                RotateGardenPlot(
+                    PlotIndex
+                );
+            }
+        );
+
+        Footer.appendChild(
+            RotateButton
+        );
+    }
+
+    Tile.appendChild(Footer);
 }
 
 
@@ -1946,7 +2153,8 @@ async function PlantSeed(
         PlotIndex
     ] = {
         Plant: PlantKey,
-        PlantedAt: ActionTime
+        PlantedAt: ActionTime,
+        Rotation: GardenPlotDefaultRotation
     };
 
 
@@ -2072,7 +2280,8 @@ async function PlantManySeeds() {
             EmptyPlotIndexes[Index]
         ] = {
             Plant: PlantKey,
-            PlantedAt: PlantedAt
+            PlantedAt: PlantedAt,
+            Rotation: GardenPlotDefaultRotation
         };
     }
 
@@ -2597,8 +2806,17 @@ function GetPlantImages(
     Plot,
     Plant
 ) {
+    const Direction =
+        Plot !== null &&
+        Plant?.DirectionalSprites === true
+            ? GetGardenPlotRotation(
+                Plot
+            )
+            : null;
+
     return GetPlantImageSources(
-        Plant ?? Plot.Plant
+        Plant ?? Plot.Plant,
+        Direction
     );
 }
 

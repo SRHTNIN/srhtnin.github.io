@@ -1,5 +1,13 @@
 let Plants = {};
 
+const PlantDirectionCodes = {
+    North: "N",
+    East: "E",
+    South: "S",
+    West: "W"
+};
+
+
 
 async function FetchPlantsFromApi() {
     const Response =
@@ -50,7 +58,8 @@ async function FetchPlantsFromApi() {
 }
 
 function GetPlantImageSources(
-    PlantOrKey
+    PlantOrKey,
+    Direction = null
 ) {
     const PlantKey =
         typeof PlantOrKey === "string"
@@ -86,10 +95,43 @@ function GetPlantImageSources(
             ? Plant.ImageStages
             : [];
 
+    const DirectionCode =
+        typeof Direction === "string"
+            ? (
+                PlantDirectionCodes[
+                    Direction
+                ] ??
+                Direction.toUpperCase()
+            )
+            : null;
+
+    const DirectionalStages =
+        Plant?.DirectionalSprites === true &&
+        DirectionCode !== null &&
+        Array.isArray(
+            Plant?.DirectionalImageStages
+        )
+            ? Plant.DirectionalImageStages
+                .filter(
+                    ImageStage =>
+                        String(
+                            ImageStage?.Direction ??
+                            ""
+                        ).toUpperCase() ===
+                        DirectionCode
+                )
+            : [];
+
     let HighestStage =
         StaticImages.length;
 
-    for (const ImageStage of ApiStages) {
+    for (
+        const ImageStage
+        of [
+            ...ApiStages,
+            ...DirectionalStages
+        ]
+    ) {
         const Stage = Number(
             typeof ImageStage === "object" &&
             ImageStage !== null
@@ -156,9 +198,45 @@ function GetPlantImageSources(
             Query.toString();
     }
 
+    for (
+        const ImageStage
+        of DirectionalStages
+    ) {
+        const Stage = Number(
+            ImageStage?.Stage
+        );
+
+        if (
+            !Number.isInteger(Stage) ||
+            Stage < 1
+        ) {
+            continue;
+        }
+
+        const Revision = Number(
+            ImageStage?.Revision ?? 0
+        );
+
+        const Query =
+            new URLSearchParams({
+                PlantId: String(Plant.Id),
+                Stage: String(Stage),
+                Direction: DirectionCode,
+                v: String(
+                    Number.isFinite(Revision)
+                        ? Revision
+                        : 0
+                )
+            });
+
+        Images[Stage - 1] =
+            ApiUrl +
+            "/PlantImage.php?" +
+            Query.toString();
+    }
+
     return Images;
 }
-
 
 function GetPlantMatureImageSource(
     PlantOrKey

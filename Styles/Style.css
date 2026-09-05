@@ -634,8 +634,28 @@ input, button, textarea, select {
 }
 
 .GardenPlotWithName,
-.GardenPlotWithTimer {
+.GardenPlotWithFooter {
     aspect-ratio: auto;
+}
+
+.GardenPlotMain {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    cursor: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    font: inherit;
+    appearance: none;
+    opacity: 1;
+}
+
+.GardenPlotMain:disabled {
+    cursor: default;
 }
 
 .GardenPlotVisual {
@@ -650,7 +670,8 @@ input, button, textarea, select {
 }
 
 .GardenPlotName,
-.GardenPlotTimer {
+.GardenPlotTimer,
+.GardenPlotRotationButton {
     display: flex;
     min-width: 0;
     min-height: 1.5rem;
@@ -663,6 +684,10 @@ input, button, textarea, select {
     font-size: 0.75rem;
     line-height: 1;
     text-align: center;
+}
+
+.GardenPlotName,
+.GardenPlotTimer {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -671,8 +696,39 @@ input, button, textarea, select {
     border-bottom: 2px solid var(--Surface2);
 }
 
-.GardenPlotTimer {
+.GardenPlotFooter {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-width: 0;
+    background-color: var(--Mantle);
     border-top: 2px solid var(--Surface2);
+}
+
+.GardenPlotFooterSplit {
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.GardenPlotRotationButton {
+    padding-inline: 0.45rem;
+    cursor: pointer;
+    border: 0;
+    border-radius: 0;
+    appearance: none;
+}
+
+.GardenPlotFooterSplit .GardenPlotRotationButton {
+    border-left: 2px solid var(--Surface2);
+}
+
+.GardenPlotRotationButton:hover {
+    color: var(--Sky);
+    background-color: var(--Surface0);
+}
+
+.GardenPlotRotationButton:focus-visible,
+.GardenPlotMain:focus-visible {
+    outline: 3px solid var(--Yellow);
+    outline-offset: -3px;
 }
 
 .GardenPlotMature .GardenPlotTimer {
@@ -684,11 +740,6 @@ input, button, textarea, select {
     --PlotBorderColour: var(--Sky);
     transform: translate(1px, 1px);
     box-shadow: 2px 2px 0 var(--Crust);
-}
-
-.GardenPlot:focus-visible {
-    outline: 3px solid var(--Yellow);
-    outline-offset: 3px;
 }
 
 .GardenPlotEmpty {
@@ -2304,6 +2355,17 @@ input, button, textarea, select {
     flex: 1 1 18rem;
 }
 
+.AdminPlantDirectionalImageUpload {
+    display: grid;
+    grid-template-columns: repeat( 2, minmax(0, 1fr) );
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.AdminPlantDirectionalImageUpload .AdminEditorField {
+    margin: 0;
+}
+
 .AdminPlantImageNote {
     color: var(--Overlay2);
 }
@@ -2348,6 +2410,10 @@ input, button, textarea, select {
 
     .AdminPlantImageRow {
         grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .AdminPlantDirectionalImageUpload {
+        grid-template-columns: 1fr;
     }
 
     .AdminPlantImageRemoveButton {

@@ -205,6 +205,15 @@ function ValidateAdminPlant(
         );
     }
 
+    if (
+        Plant.DirectionalSprites !== undefined &&
+        typeof Plant.DirectionalSprites !== "boolean"
+    ) {
+        throw new Error(
+            "Directional sprites must be On or Off."
+        );
+    }
+
     if (Plant.ShopPlant === true) {
         ValidateAdminInteger(
             Number(Plant.BaseCost),
