@@ -1,5 +1,6 @@
 const SimulationMinimumEventInterval = 1000;
 const MaximumSimulationSteps = 250000;
+const MaximumSimulationSameTimePasses = 100;
 
 
 function GetSimulationTime(
@@ -410,31 +411,47 @@ function AdvanceGameSimulation(
     ) {
         Result.Steps = Step + 1;
 
-        const MutationResult =
-            CheckAllGardenMutationsAtTime(
-                SaveData,
-                CurrentTime
-            );
-
-        MergeSimulationMutationResult(
-            Result,
-            MutationResult
-        );
-
-        if (
-            typeof ProcessFunctionalEffectsAtTime ===
-                "function"
+        for (
+            let SameTimePass = 0;
+            SameTimePass <
+                MaximumSimulationSameTimePasses;
+            SameTimePass++
         ) {
-            const FunctionalResult =
-                ProcessFunctionalEffectsAtTime(
+            const MutationResult =
+                CheckAllGardenMutationsAtTime(
                     SaveData,
                     CurrentTime
                 );
 
-            MergeSimulationFunctionalResult(
+            MergeSimulationMutationResult(
                 Result,
-                FunctionalResult
+                MutationResult
             );
+
+            let FunctionalResult = null;
+
+            if (
+                typeof ProcessFunctionalEffectsAtTime ===
+                    "function"
+            ) {
+                FunctionalResult =
+                    ProcessFunctionalEffectsAtTime(
+                        SaveData,
+                        CurrentTime
+                    );
+
+                MergeSimulationFunctionalResult(
+                    Result,
+                    FunctionalResult
+                );
+            }
+
+            if (
+                MutationResult.Changed !== true &&
+                FunctionalResult?.Changed !== true
+            ) {
+                break;
+            }
         }
 
         if (CurrentTime >= SafeTargetTime) {

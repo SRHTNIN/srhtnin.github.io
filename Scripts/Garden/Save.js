@@ -289,6 +289,17 @@ function NormalizeGardenData(
                 : "East";
 
         if (
+            typeof Plot.AssignedSeed ===
+                "string" &&
+            Plot.AssignedSeed.trim().length > 0
+        ) {
+            Plot.AssignedSeed =
+                Plot.AssignedSeed.trim();
+        } else {
+            delete Plot.AssignedSeed;
+        }
+
+        if (
             Plot.FunctionalCooldowns === null ||
             typeof Plot.FunctionalCooldowns !==
                 "object" ||

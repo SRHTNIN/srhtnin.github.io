@@ -131,7 +131,7 @@ function CheckGardenMutations(
             );
 
 
-            const Chance = Math.max(
+            const BaseChance = Math.max(
                 0,
                 Math.min(
                     Number(
@@ -140,6 +140,31 @@ function CheckGardenMutations(
                     ),
                     1
                 )
+            );
+
+            const Catalyst =
+                typeof GetStrongestFunctionalEffectAffectingAnyPlot ===
+                    "function"
+                    ? GetStrongestFunctionalEffectAffectingAnyPlot(
+                        SaveData,
+                        SaveData.ActiveGardenIndex ?? 0,
+                        Candidate.Cells,
+                        "MutationChanceBonus",
+                        AtTime
+                    )
+                    : null;
+
+            const CatalystBonus =
+                typeof GetFunctionalPercentageAmount ===
+                    "function"
+                    ? GetFunctionalPercentageAmount(
+                        Catalyst?.Effect
+                    )
+                    : 0;
+
+            const Chance = Math.min(
+                1,
+                BaseChance + CatalystBonus
             );
 
 
@@ -383,6 +408,42 @@ function CreateMutationCandidate(
                 return null;
             }
         }
+    }
+
+
+    const GardenIndex =
+        Math.max(
+            0,
+            Number(
+                SaveData.ActiveGardenIndex ?? 0
+            ) || 0
+        );
+
+    if (
+        typeof IsGardenPlotMutationDisabled ===
+            "function" &&
+        Cells.some(
+            PlotIndex =>
+                IsGardenPlotMutationDisabled(
+                    SaveData,
+                    GardenIndex,
+                    PlotIndex,
+                    AtTime
+                )
+        ) &&
+        !(
+            typeof DoesMutationPatternInvolveDisableMutation ===
+                "function" &&
+            DoesMutationPatternInvolveDisableMutation(
+                SaveData,
+                GardenIndex,
+                OriginX,
+                OriginY,
+                Orientation.Pattern
+            )
+        )
+    ) {
+        return null;
     }
 
 
@@ -787,6 +848,23 @@ function ApplyMutationResult(
                         "string"
                         ? ExistingPlot.Rotation
                         : "East";
+            }
+
+            if (
+                NewPlot !== null &&
+                typeof NewPlot === "object" &&
+                ExistingPlot !== null &&
+                typeof ExistingPlot === "object" &&
+                typeof ExistingPlot.AssignedSeed ===
+                    "string" &&
+                typeof CanFunctionalPlantUseAssignedSeed ===
+                    "function" &&
+                CanFunctionalPlantUseAssignedSeed(
+                    Plants?.[NewPlot.Plant]
+                )
+            ) {
+                NewPlot.AssignedSeed =
+                    ExistingPlot.AssignedSeed;
             }
 
 

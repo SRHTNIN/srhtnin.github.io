@@ -2185,26 +2185,25 @@ async function PlantSeed(
     }
 
 
-    if (
-        !TakeSeed(
+    const PlantResult =
+        PlantGardenPlot(
             GameSave,
-            SelectedSeedId
-        )
-    ) {
+            GameSave.ActiveGardenIndex,
+            PlotIndex,
+            PlantKey,
+            ActionTime,
+            {
+                ConsumeSeed: true,
+                Rotation:
+                    GardenPlotDefaultRotation
+            }
+        );
+
+    if (!PlantResult.Planted) {
         EnsureSelectedSeed();
         RenderSeeds();
-
         return;
     }
-
-
-    GameSave.Garden.Plots[
-        PlotIndex
-    ] = {
-        Plant: PlantKey,
-        PlantedAt: ActionTime,
-        Rotation: GardenPlotDefaultRotation
-    };
 
 
     SetGardenMessage(
@@ -2307,40 +2306,47 @@ async function PlantManySeeds() {
     }
 
 
-    if (
-        !TakeSeed(
-            GameSave,
-            SelectedSeedId,
-            PlantCount
-        )
-    ) {
-        return;
-    }
-
-
-    const PlantedAt = ActionTime;
+    let PlantedCount = 0;
 
     for (
         let Index = 0;
         Index < PlantCount;
         Index++
     ) {
-        GameSave.Garden.Plots[
-            EmptyPlotIndexes[Index]
-        ] = {
-            Plant: PlantKey,
-            PlantedAt: PlantedAt,
-            Rotation: GardenPlotDefaultRotation
-        };
+        const PlantResult =
+            PlantGardenPlot(
+                GameSave,
+                GameSave.ActiveGardenIndex,
+                EmptyPlotIndexes[Index],
+                PlantKey,
+                ActionTime,
+                {
+                    ConsumeSeed: true,
+                    Rotation:
+                        GardenPlotDefaultRotation
+                }
+            );
+
+        if (!PlantResult.Planted) {
+            break;
+        }
+
+        PlantedCount++;
+    }
+
+    if (PlantedCount <= 0) {
+        EnsureSelectedSeed();
+        RenderSeeds();
+        return;
     }
 
 
     SetGardenMessage(
         "Magic trowel planted " +
-        PlantCount.toLocaleString() +
+        PlantedCount.toLocaleString() +
         " " +
         Plant.Name +
-        (PlantCount === 1
+        (PlantedCount === 1
             ? " seed."
             : " seeds.")
     );
@@ -2391,38 +2397,40 @@ async function HarvestPlant(
     }
 
 
-    const RewardAmount =
-        GetPlantHarvestReward(
+    const HarvestResult =
+        HarvestGardenPlot(
             GameSave,
-            Plant.Id
+            GameSave.ActiveGardenIndex,
+            PlotIndex,
+            ActionTime
         );
 
-    if (RewardAmount === null) {
-        SetGardenMessage(
-            "Couldn't calculate the harvest reward for " +
-            Plant.Name +
-            "."
-        );
+    if (!HarvestResult.Harvested) {
+        if (HarvestResult.Disabled) {
+            SetGardenMessage(
+                Plant.Name +
+                " can't be harvested right now."
+            );
+        } else if (
+            HarvestResult.RewardUnavailable
+        ) {
+            SetGardenMessage(
+                "Couldn't calculate the harvest reward for " +
+                Plant.Name +
+                "."
+            );
+        }
 
+        RenderGame();
         return;
     }
-
-
-    GiveReward({
-        Currency: "Dew",
-        Amount: RewardAmount
-    });
-
-    GameSave.Garden.Plots[
-        PlotIndex
-    ] = null;
 
 
     SetGardenMessage(
         "Harvested " +
         Plant.Name +
         " for " +
-        RewardAmount +
+        HarvestResult.RewardAmount +
         " Dew."
     );
 

@@ -98,12 +98,28 @@ function ValidateAdminFunctionalEffects(
             );
         }
 
+        const EffectType = String(
+            Effect.Type ?? ""
+        ).trim();
+
         ValidateAdminKey(
-            String(
-                Effect.Type ?? ""
-            ).trim(),
+            EffectType,
             "Functional effect type"
         );
+
+        if (
+            typeof IsKnownFunctionalEffectType ===
+                "function" &&
+            !IsKnownFunctionalEffectType(
+                EffectType
+            )
+        ) {
+            throw new Error(
+                "Unknown functional effect type: " +
+                EffectType +
+                "."
+            );
+        }
 
         if (Effect.Key !== undefined) {
             const EffectKey = String(
@@ -175,16 +191,41 @@ function ValidateAdminFunctionalEffects(
                     "Functional effect amount must be a number."
                 );
             }
+
+            if (
+                [
+                    "GrowthAdvance",
+                    "MutationChanceBonus",
+                    "CooldownReduction",
+                    "HarvestYieldBonus"
+                ].includes(EffectType) &&
+                (Amount < 0 || Amount > 1)
+            ) {
+                throw new Error(
+                    "Functional percentage amounts must be between 0 and 1."
+                );
+            }
         }
 
-        if (
-            Effect.RequireMature !== undefined &&
-            typeof Effect.RequireMature !==
-                "boolean"
-        ) {
-            throw new Error(
-                "Functional effect RequireMature must be On or Off."
-            );
+        for (const BooleanField of [
+            "RequireMature",
+            "RequireMatureSource",
+            "RandomSource",
+            "RandomTarget",
+            "ExcludeFunctional",
+            "ConsumeSeed"
+        ]) {
+            if (
+                Effect[BooleanField] !== undefined &&
+                typeof Effect[BooleanField] !==
+                    "boolean"
+            ) {
+                throw new Error(
+                    "Functional effect " +
+                    BooleanField +
+                    " must be On or Off."
+                );
+            }
         }
 
         if (
