@@ -74,7 +74,160 @@ $PageSection = "Admin";
                             Apply selected mutation fields to several mutations at once.
                         </span>
                     </a>
+
+                    <button
+                        id="AdminMassImportButton"
+                        class="ActionButton AdminEditorLink"
+                        type="button"
+                    >
+                        <strong>Mass import</strong>
+                        <span>
+                            Review and save several plant or mutation JSON files at once.
+                        </span>
+                    </button>
+
+                    <button
+                        id="AdminMassExportButton"
+                        class="ActionButton AdminEditorLink"
+                        type="button"
+                    >
+                        <strong>Mass export</strong>
+                        <span>
+                            Select plants and mutations to export together.
+                        </span>
+                    </button>
+
+                    <input
+                        id="AdminMassImportFiles"
+                        type="file"
+                        accept="application/json,.json"
+                        multiple
+                        hidden
+                    >
                 </div>
+
+                <section
+                    id="AdminMassImportPanel"
+                    class="Panel AdminTransferPanel"
+                    hidden
+                >
+                    <div class="PanelHeader AdminTransferPanelHeader">
+                        <h2>Mass import</h2>
+                        <button
+                            id="AdminMassImportCloseButton"
+                            class="ActionButton AdminTransferCloseButton"
+                            type="button"
+                        >
+                            Close
+                        </button>
+                    </div>
+
+                    <div class="AdminTransferPanelBody">
+                        <p>
+                            Review imported content before saving it. Nothing is changed until
+                            you press Save imported content.
+                        </p>
+
+                        <div class="AdminTransferToolbar">
+                            <button
+                                id="AdminMassImportChooseButton"
+                                class="ActionButton AdminInlineButton"
+                                type="button"
+                            >
+                                Choose JSON files
+                            </button>
+
+                            <span id="AdminMassImportSummary" class="AdminTransferSummary"></span>
+                        </div>
+
+                        <div
+                            id="AdminMassImportList"
+                            class="AdminTransferCardList"
+                        ></div>
+
+                        <p
+                            id="AdminMassImportMessage"
+                            class="PageMessage"
+                            aria-live="polite"
+                        ></p>
+
+                        <div class="AdminEditorActions AdminTransferFooter">
+                            <button
+                                id="AdminMassImportSaveButton"
+                                class="ActionButton AdminSaveButton"
+                                type="button"
+                                disabled
+                            >
+                                Save imported content
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section
+                    id="AdminMassExportPanel"
+                    class="Panel AdminTransferPanel"
+                    hidden
+                >
+                    <div class="PanelHeader AdminTransferPanelHeader">
+                        <h2>Mass export</h2>
+                        <button
+                            id="AdminMassExportCloseButton"
+                            class="ActionButton AdminTransferCloseButton"
+                            type="button"
+                        >
+                            Close
+                        </button>
+                    </div>
+
+                    <div class="AdminTransferPanelBody">
+                        <p>
+                            Select any mix of plants and mutations. Each item stays as its own
+                            portable JSON file inside the exported ZIP.
+                        </p>
+
+                        <div class="CatalogueControls AdminTransferSearchControls">
+                            <input
+                                id="AdminMassExportSearchInput"
+                                type="search"
+                                placeholder="Search plants and mutations..."
+                                aria-label="Search exportable content"
+                                autocomplete="off"
+                            >
+
+                            <span id="AdminMassExportSummary" class="AdminTransferSummary"></span>
+                        </div>
+
+                        <div class="AdminTransferSelectionActions">
+                            <button id="AdminMassExportSelectAllButton" class="ActionButton AdminInlineButton" type="button">Select all</button>
+                            <button id="AdminMassExportSelectPlantsButton" class="ActionButton AdminInlineButton" type="button">Select plants</button>
+                            <button id="AdminMassExportSelectMutationsButton" class="ActionButton AdminInlineButton" type="button">Select mutations</button>
+                            <button id="AdminMassExportDeselectAllButton" class="ActionButton AdminInlineButton" type="button">Deselect all</button>
+                        </div>
+
+                        <div
+                            id="AdminMassExportList"
+                            class="AdminTransferCardList"
+                        ></div>
+
+                        <p
+                            id="AdminMassExportMessage"
+                            class="PageMessage"
+                            aria-live="polite"
+                        ></p>
+
+                        <div class="AdminEditorActions AdminTransferFooter">
+                            <button
+                                id="AdminMassExportSaveButton"
+                                class="ActionButton AdminSaveButton"
+                                type="button"
+                                disabled
+                            >
+                                Export selected
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
                 <section
                     id="AdminOverview"
@@ -115,6 +268,13 @@ $PageSection = "Admin";
         </main>
 
         <script src="/Scripts/Garden/PlantImages.js"></script>
+        <script src="/Scripts/Garden/Plants.js"></script>
+        <script src="/Scripts/Garden/Mutations.js"></script>
+        <script src="/Scripts/Garden/FunctionalEffects.js"></script>
+        <script src="/Scripts/Garden/Save.js"></script>
+        <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/AdminValidation.js"></script>
         <script src="/Scripts/Garden/AdminOverview.js"></script>
+        <script src="/Scripts/Garden/AdminContentTransfer.js"></script>
     </body>
 </html>
