@@ -373,10 +373,11 @@ function RenderMutationRecipePreviewListCell(
     }
 
     const ItemIndex =
-        (
-            Frame +
-            Entry.Offset
-        ) % Items.length;
+        GetMutationRecipePreviewItemIndex(
+            Entry,
+            Frame,
+            Items.length
+        );
 
     ApplyMutationRecipePreviewCellDisplay(
         Entry,
@@ -385,6 +386,92 @@ function RenderMutationRecipePreviewListCell(
             Entry.PlantCatalogue
         )
     );
+}
+
+
+function GetMutationRecipePreviewItemIndex(
+    Entry,
+    Frame,
+    ItemCount
+) {
+    if (Entry.List?.Mode !== "Once") {
+        return (
+            Frame +
+            Entry.Offset
+        ) % ItemCount;
+    }
+
+    const Permutation =
+        CreateMutationRecipePreviewPermutation(
+            ItemCount,
+            Entry.ListNumber,
+            Frame
+        );
+
+    return Permutation[
+        Entry.Offset % ItemCount
+    ];
+}
+
+
+function CreateMutationRecipePreviewPermutation(
+    ItemCount,
+    ListNumber,
+    Frame
+) {
+    const Permutation =
+        Array.from(
+            { length: ItemCount },
+            (_, Index) => Index
+        );
+
+    if (ItemCount < 2 || Frame === 0) {
+        return Permutation;
+    }
+
+    let State =
+        (
+            Math.imul(
+                Frame + 1,
+                0x9e3779b1
+            ) ^
+            Math.imul(
+                ListNumber + 1,
+                0x85ebca6b
+            ) ^
+            Math.imul(
+                ItemCount,
+                0xc2b2ae35
+            )
+        ) >>> 0;
+
+    if (State === 0) {
+        State = 0x6d2b79f5;
+    }
+
+    for (
+        let Index = ItemCount - 1;
+        Index > 0;
+        Index--
+    ) {
+        State ^= State << 13;
+        State ^= State >>> 17;
+        State ^= State << 5;
+        State >>>= 0;
+
+        const SwapIndex =
+            State % (Index + 1);
+
+        [
+            Permutation[Index],
+            Permutation[SwapIndex]
+        ] = [
+            Permutation[SwapIndex],
+            Permutation[Index]
+        ];
+    }
+
+    return Permutation;
 }
 
 
