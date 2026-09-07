@@ -206,6 +206,14 @@ $PageSection = "Guide";
                 </p>
 
                 <p>
+                    Retired content may be archived instead of deleted.
+                    Archived plants and mutations no longer take part in
+                    normal progression, but anything you already discovered
+                    stays part of your Garden history and remains identified
+                    as archived in the encyclopedias.
+                </p>
+
+                <p>
                     Experiment with different plants, empty spaces, and
                     arrangements. Not every recipe has to look like the
                     example above. Some are logical (Red + Blue = Purple),

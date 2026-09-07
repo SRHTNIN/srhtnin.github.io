@@ -97,12 +97,25 @@ function RenderMutationEncyclopedia() {
                 )
         );
 
+    const ActiveDiscoveredMutations =
+        DiscoveredMutations.filter(
+            Mutation =>
+                Mutation.Archived !== true
+        );
+
+    const ArchivedDiscoveredMutations =
+        DiscoveredMutations.filter(
+            Mutation =>
+                Mutation.Archived === true
+        );
+
     const AvailableHints =
         HasMutationHintsUpgrade(
             MutationEncyclopediaSave
         )
             ? AllMutations.filter(
                 Mutation =>
+                    Mutation.Archived !== true &&
                     !HasDiscoveredMutation(
                         MutationEncyclopediaSave,
                         Mutation.Id
@@ -142,8 +155,8 @@ function RenderMutationEncyclopedia() {
                 )
         );
 
-    const VisibleMutations =
-        DiscoveredMutations
+    const VisibleActiveMutations =
+        ActiveDiscoveredMutations
             .filter(
                 Mutation =>
                     DoesMutationEncyclopediaMatchSearch(
@@ -154,6 +167,24 @@ function RenderMutationEncyclopedia() {
             .sort(
                 CompareMutationEncyclopediaMutations
             );
+
+    const VisibleArchivedMutations =
+        ArchivedDiscoveredMutations
+            .filter(
+                Mutation =>
+                    DoesMutationEncyclopediaMatchSearch(
+                        Mutation,
+                        SearchQuery
+                    )
+            )
+            .sort(
+                CompareMutationEncyclopediaMutations
+            );
+
+    const VisibleMutations = [
+        ...VisibleActiveMutations,
+        ...VisibleArchivedMutations
+    ];
 
 
     if (VisibleHints.length > 0) {
@@ -173,13 +204,33 @@ function RenderMutationEncyclopedia() {
 
     for (
         const Mutation
-        of VisibleMutations
+        of VisibleActiveMutations
     ) {
         List.appendChild(
             CreateMutationEncyclopediaCard(
                 Mutation
             )
         );
+    }
+
+
+    if (VisibleArchivedMutations.length > 0) {
+        List.appendChild(
+            CreateMutationEncyclopediaArchivedHeading(
+                VisibleArchivedMutations.length
+            )
+        );
+
+        for (
+            const Mutation
+            of VisibleArchivedMutations
+        ) {
+            List.appendChild(
+                CreateMutationEncyclopediaCard(
+                    Mutation
+                )
+            );
+        }
     }
 
 
@@ -229,6 +280,16 @@ function RenderMutationEncyclopedia() {
         );
     }
 
+    if (ArchivedDiscoveredMutations.length > 0) {
+        MessageParts.push(
+            ArchivedDiscoveredMutations.length === 1
+                ? "1 archived mutation."
+                : ArchivedDiscoveredMutations.length
+                    .toLocaleString() +
+                    " archived mutations."
+        );
+    }
+
     if (AvailableHints.length > 0) {
         MessageParts.push(
             "Showing " +
@@ -248,6 +309,41 @@ function RenderMutationEncyclopedia() {
             " "
         )
     );
+}
+
+
+function CreateMutationEncyclopediaArchivedHeading(
+    Count
+) {
+    const Header =
+        document.createElement(
+            "header"
+        );
+
+    const Heading =
+        document.createElement(
+            "h2"
+        );
+
+    Heading.textContent =
+        "Archived (" +
+        Count.toLocaleString() +
+        ")";
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Retired mutations you discovered remain recorded here.";
+
+    Header.append(
+        Heading,
+        Description
+    );
+
+    return Header;
 }
 
 
@@ -282,6 +378,9 @@ function DoesMutationEncyclopediaMatchSearch(
         Mutation.Name,
         Mutation.Description,
         Mutation.Hint,
+        Mutation.Archived === true
+            ? "Archived"
+            : "",
         FormatMutationChance(
             Mutation.Chance
         ),
@@ -552,6 +651,7 @@ function IsHintListItemAvailable(
 
         return (
             Plant !== undefined &&
+            Plant.Archived !== true &&
             HasDiscoveredPlant(
                 SaveData,
                 Plant.Id
@@ -564,6 +664,7 @@ function IsHintListItemAvailable(
             Plants
         ).some(
             Plant =>
+                Plant.Archived !== true &&
                 HasDiscoveredPlant(
                     SaveData,
                     Plant.Id
@@ -677,6 +778,7 @@ function IsHintMatcherAvailable(
 
         return (
             Plant !== undefined &&
+            Plant.Archived !== true &&
             HasDiscoveredPlant(
                 SaveData,
                 Plant.Id
@@ -698,6 +800,7 @@ function IsHintMatcherAvailable(
         Plants
     ).some(
         ([PlantKey, Plant]) =>
+            Plant.Archived !== true &&
             HasDiscoveredPlant(
                 SaveData,
                 Plant.Id
@@ -1018,6 +1121,15 @@ function CreateMutationEncyclopediaStats(
                 : "Required"
         )
     );
+
+    if (Mutation.Archived === true) {
+        Stats.appendChild(
+            CreateMutationEncyclopediaStat(
+                "Status",
+                "Archived"
+            )
+        );
+    }
 
 
     return Stats;
@@ -2049,7 +2161,12 @@ function CreateMutationPlantRelation(
         PlantId;
 
     Link.textContent =
-        Plant.Name;
+        Plant.Name +
+        (
+            Plant.Archived === true
+                ? " (archived)"
+                : ""
+        );
 
 
     Item.appendChild(

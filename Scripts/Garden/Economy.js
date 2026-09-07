@@ -177,6 +177,10 @@ function IsPlantAvailableInShop(
     SaveData,
     Plant
 ) {
+    if (Plant.Archived === true) {
+        return false;
+    }
+
     if (
         Plant.Shop?.ShopPlant ===
         true
@@ -325,6 +329,10 @@ function GetPlantShopCost(
             MutationSets
         )
     ) {
+        if (Mutation.Archived === true) {
+            continue;
+        }
+
         if (
             !HasDiscoveredMutation(
                 SaveData,
@@ -392,6 +400,10 @@ function GetMutationIngredientCost(
     Visiting
 ) {
     let TotalCost = 0;
+    const ListReferenceCounts =
+        GetEconomyMutationListReferenceCounts(
+            Mutation.Pattern
+        );
 
 
     for (
@@ -405,7 +417,10 @@ function GetMutationIngredientCost(
             if (
                 Matcher === null ||
                 Matcher === "Empty" ||
-                Matcher === "Any"
+                Matcher === "Any" ||
+                GetEconomyMutationListReference(
+                    Matcher
+                ) !== null
             ) {
                 continue;
             }
@@ -428,7 +443,237 @@ function GetMutationIngredientCost(
     }
 
 
+    for (
+        const [
+            ListNumber,
+            ReferenceCount
+        ]
+        of ListReferenceCounts
+    ) {
+        const List =
+            Mutation.Lists?.[
+                ListNumber - 1
+            ];
+
+        const ListCost =
+            GetMutationListSeedCost(
+                List,
+                ReferenceCount,
+                Item =>
+                    GetMutationListItemSeedCost(
+                        Item,
+                        Plants,
+                        Plant =>
+                            GetPlantShopCost(
+                                SaveData,
+                                Plant.Id,
+                                Cache,
+                                Visiting
+                            ),
+                        Plant =>
+                            IsPlantAvailableInShop(
+                                SaveData,
+                                Plant
+                            )
+                    )
+            );
+
+        if (ListCost === null) {
+            return null;
+        }
+
+        TotalCost += ListCost;
+    }
+
+
     return TotalCost;
+}
+
+
+function GetEconomyMutationListReference(
+    Matcher
+) {
+    if (typeof Matcher !== "string") {
+        return null;
+    }
+
+    const Match =
+        /^List:([1-9][0-9]*)$/.exec(
+            Matcher
+        );
+
+    return Match === null
+        ? null
+        : Number(Match[1]);
+}
+
+
+function GetEconomyMutationListReferenceCounts(
+    Pattern
+) {
+    const Counts = new Map();
+
+    for (const Row of Pattern ?? []) {
+        if (!Array.isArray(Row)) {
+            continue;
+        }
+
+        for (const Matcher of Row) {
+            const ListNumber =
+                GetEconomyMutationListReference(
+                    Matcher
+                );
+
+            if (ListNumber === null) {
+                continue;
+            }
+
+            Counts.set(
+                ListNumber,
+                (Counts.get(ListNumber) ?? 0) + 1
+            );
+        }
+    }
+
+    return Counts;
+}
+
+
+function GetMutationListSeedCost(
+    List,
+    ReferenceCount,
+    GetItemCost
+) {
+    if (
+        List === null ||
+        typeof List !== "object" ||
+        !Array.isArray(List.Items) ||
+        List.Items.length === 0 ||
+        !Number.isInteger(ReferenceCount) ||
+        ReferenceCount <= 0
+    ) {
+        return null;
+    }
+
+    const ItemCosts = [];
+
+    for (const Item of List.Items) {
+        const Cost = GetItemCost(Item);
+
+        if (
+            Cost === null ||
+            !Number.isFinite(Cost) ||
+            Cost < 0
+        ) {
+            continue;
+        }
+
+        ItemCosts.push(Cost);
+    }
+
+    if (ItemCosts.length === 0) {
+        return null;
+    }
+
+    if (List.Mode !== "Once") {
+        return (
+            Math.min(...ItemCosts) *
+            ReferenceCount
+        );
+    }
+
+    if (ItemCosts.length < ReferenceCount) {
+        return null;
+    }
+
+    ItemCosts.sort(
+        (A, B) => A - B
+    );
+
+    return ItemCosts
+        .slice(0, ReferenceCount)
+        .reduce(
+            (Total, Cost) =>
+                Total + Cost,
+            0
+        );
+}
+
+
+function GetMutationListItemSeedCost(
+    Item,
+    PlantCatalogue,
+    GetPlantCost,
+    IsPlantCandidateAvailable
+) {
+    if (
+        Item === null ||
+        typeof Item !== "object" ||
+        Array.isArray(Item)
+    ) {
+        return null;
+    }
+
+    if (
+        Item.Type === "Any" ||
+        Item.Type === "Empty"
+    ) {
+        return 0;
+    }
+
+    if (Item.Type === "Plant") {
+        const Plant =
+            PlantCatalogue[Item.Value];
+
+        if (
+            Plant === undefined ||
+            Plant.Archived === true
+        ) {
+            return null;
+        }
+
+        return GetPlantCost(Plant);
+    }
+
+    if (Item.Type !== "Tag") {
+        return null;
+    }
+
+    let CheapestCost = null;
+
+    for (
+        const Plant
+        of Object.values(
+            PlantCatalogue
+        )
+    ) {
+        if (
+            !IsPlantCandidateAvailable(
+                Plant
+            ) ||
+            !Array.isArray(Plant.Tags) ||
+            !Plant.Tags.includes(
+                Item.Value
+            )
+        ) {
+            continue;
+        }
+
+        const Cost = GetPlantCost(Plant);
+
+        if (Cost === null) {
+            continue;
+        }
+
+        if (
+            CheapestCost === null ||
+            Cost < CheapestCost
+        ) {
+            CheapestCost = Cost;
+        }
+    }
+
+    return CheapestCost;
 }
 
 
@@ -442,7 +687,10 @@ function GetMatcherSeedCost(
         const Plant =
             Plants[Matcher];
 
-        if (Plant === undefined) {
+        if (
+            Plant === undefined ||
+            Plant.Archived === true
+        ) {
             return null;
         }
 
@@ -470,7 +718,10 @@ function GetMatcherSeedCost(
         const Plant =
             Plants[Matcher.Plant];
 
-        if (Plant === undefined) {
+        if (
+            Plant === undefined ||
+            Plant.Archived === true
+        ) {
             return null;
         }
 
@@ -974,13 +1225,20 @@ function GetCatalogueMutationIngredientCost(
     Visiting
 ) {
     let TotalCost = 0;
+    const ListReferenceCounts =
+        GetEconomyMutationListReferenceCounts(
+            Mutation.Pattern
+        );
 
     for (const Row of Mutation.Pattern ?? []) {
         for (const Matcher of Row) {
             if (
                 Matcher === null ||
                 Matcher === "Empty" ||
-                Matcher === "Any"
+                Matcher === "Any" ||
+                GetEconomyMutationListReference(
+                    Matcher
+                ) !== null
             ) {
                 continue;
             }
@@ -1000,6 +1258,46 @@ function GetCatalogueMutationIngredientCost(
 
             TotalCost += MatcherCost;
         }
+    }
+
+    for (
+        const [
+            ListNumber,
+            ReferenceCount
+        ]
+        of ListReferenceCounts
+    ) {
+        const List =
+            Mutation.Lists?.[
+                ListNumber - 1
+            ];
+
+        const ListCost =
+            GetMutationListSeedCost(
+                List,
+                ReferenceCount,
+                Item =>
+                    GetMutationListItemSeedCost(
+                        Item,
+                        PlantCatalogue,
+                        Plant =>
+                            GetCataloguePlantCostInfo(
+                                Plant.Id,
+                                PlantCatalogue,
+                                MutationCatalogue,
+                                Cache,
+                                Visiting
+                            )?.Cost ?? null,
+                        Plant =>
+                            Plant.Archived !== true
+                    )
+            );
+
+        if (ListCost === null) {
+            return null;
+        }
+
+        TotalCost += ListCost;
     }
 
     return TotalCost;

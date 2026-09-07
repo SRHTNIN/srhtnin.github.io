@@ -88,13 +88,25 @@ function RenderPlantEncyclopedia() {
                     )
             );
 
+    const ActivePlants =
+        DiscoveredPlants.filter(
+            Plant =>
+                Plant.Archived !== true
+        );
+
+    const ArchivedPlants =
+        DiscoveredPlants.filter(
+            Plant =>
+                Plant.Archived === true
+        );
+
     const SearchQuery =
         PlantEncyclopediaSearchQuery
             .trim()
             .toLocaleLowerCase();
 
-    const VisiblePlants =
-        DiscoveredPlants
+    const VisibleActivePlants =
+        ActivePlants
             .filter(
                 Plant =>
                     DoesPlantEncyclopediaMatchSearch(
@@ -105,6 +117,24 @@ function RenderPlantEncyclopedia() {
             .sort(
                 ComparePlantEncyclopediaPlants
             );
+
+    const VisibleArchivedPlants =
+        ArchivedPlants
+            .filter(
+                Plant =>
+                    DoesPlantEncyclopediaMatchSearch(
+                        Plant,
+                        SearchQuery
+                    )
+            )
+            .sort(
+                ComparePlantEncyclopediaPlants
+            );
+
+    const VisiblePlants = [
+        ...VisibleActivePlants,
+        ...VisibleArchivedPlants
+    ];
 
 
     if (DiscoveredPlants.length === 0) {
@@ -127,7 +157,7 @@ function RenderPlantEncyclopedia() {
 
     for (
         const Plant
-        of VisiblePlants
+        of VisibleActivePlants
     ) {
         List.appendChild(
             CreatePlantEncyclopediaCard(
@@ -137,6 +167,36 @@ function RenderPlantEncyclopedia() {
     }
 
 
+    if (VisibleArchivedPlants.length > 0) {
+        List.appendChild(
+            CreatePlantEncyclopediaArchivedHeading(
+                VisibleArchivedPlants.length
+            )
+        );
+
+        for (
+            const Plant
+            of VisibleArchivedPlants
+        ) {
+            List.appendChild(
+                CreatePlantEncyclopediaCard(
+                    Plant
+                )
+            );
+        }
+    }
+
+
+    const ArchivedSummary =
+        ArchivedPlants.length > 0
+            ? " " +
+                ArchivedPlants.length
+                    .toLocaleString() +
+                (ArchivedPlants.length === 1
+                    ? " archived plant."
+                    : " archived plants.")
+            : "";
+
     if (SearchQuery.length > 0) {
         SetPlantEncyclopediaMessage(
             "Showing " +
@@ -145,7 +205,8 @@ function RenderPlantEncyclopedia() {
             " of " +
             DiscoveredPlants.length
                 .toLocaleString() +
-            " discovered plants."
+            " discovered plants." +
+            ArchivedSummary
         );
 
         return;
@@ -153,12 +214,49 @@ function RenderPlantEncyclopedia() {
 
 
     SetPlantEncyclopediaMessage(
-        DiscoveredPlants.length === 1
-            ? "1 plant discovered."
-            : DiscoveredPlants.length
-                .toLocaleString() +
-                " plants discovered."
+        (
+            DiscoveredPlants.length === 1
+                ? "1 plant discovered."
+                : DiscoveredPlants.length
+                    .toLocaleString() +
+                    " plants discovered."
+        ) + ArchivedSummary
     );
+}
+
+
+function CreatePlantEncyclopediaArchivedHeading(
+    Count
+) {
+    const Header =
+        document.createElement(
+            "header"
+        );
+
+    const Heading =
+        document.createElement(
+            "h2"
+        );
+
+    Heading.textContent =
+        "Archived (" +
+        Count.toLocaleString() +
+        ")";
+
+    const Description =
+        document.createElement(
+            "p"
+        );
+
+    Description.textContent =
+        "Retired plants you discovered remain recorded here.";
+
+    Header.append(
+        Heading,
+        Description
+    );
+
+    return Header;
 }
 
 
@@ -384,6 +482,16 @@ function CreatePlantEncyclopediaDetails(
     );
 
 
+    if (Plant.Archived === true) {
+        Details.appendChild(
+            CreatePlantEncyclopediaStat(
+                "Status",
+                "Archived"
+            )
+        );
+    }
+
+
     Details.appendChild(
         CreatePlantEncyclopediaStat(
             "Growth",
@@ -545,6 +653,15 @@ function CreatePlantMutationRelationGroup(
     Heading,
     Mutations
 ) {
+    Mutations = Mutations.filter(
+        Mutation =>
+            Mutation.Archived !== true ||
+            HasDiscoveredMutation(
+                PlantEncyclopediaSave,
+                Mutation.Id
+            )
+    );
+
     const Group =
         document.createElement(
             "section"
@@ -646,7 +763,12 @@ function CreatePlantMutationRelation(
         Mutation.Id;
 
     Link.textContent =
-        Mutation.Name;
+        Mutation.Name +
+        (
+            Mutation.Archived === true
+                ? " (archived)"
+                : ""
+        );
 
 
     Item.appendChild(
@@ -684,7 +806,16 @@ function GetPlantRecipeProgress(
                     Number(PlantId)
                 );
 
-        if (IsRelated) {
+        if (
+            IsRelated &&
+            (
+                Mutation.Archived !== true ||
+                HasDiscoveredMutation(
+                    PlantEncyclopediaSave,
+                    Mutation.Id
+                )
+            )
+        ) {
             RelatedMutationIds.add(
                 Mutation.Id
             );

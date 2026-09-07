@@ -33,6 +33,9 @@ function DoesPlantCatalogueMatchSearch(
         Plant.Id,
         Plant.Name,
         Plant.Description,
+        Plant.Archived === true
+            ? "Archived"
+            : "",
         ...(Array.isArray(Plant.Tags)
             ? Plant.Tags
             : [])

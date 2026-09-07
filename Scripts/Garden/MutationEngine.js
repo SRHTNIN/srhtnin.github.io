@@ -277,6 +277,10 @@ function FindGardenMutationCandidates(
             MutationSets
         )
     ) {
+        if (Mutation.Archived === true) {
+            continue;
+        }
+
         for (
             const Orientation
             of GetMutationOrientations(
