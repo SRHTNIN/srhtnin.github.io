@@ -4,6 +4,7 @@ let MutationRecipePreviewFrame = 0;
 let MutationRecipePreviewTimer = null;
 
 const MutationRecipePreviewCells = new Set();
+const MutationRecipePreviewPermutations = new Map();
 
 
 function GetMutationRecipePreviewListReference(
@@ -419,57 +420,93 @@ function CreateMutationRecipePreviewPermutation(
     ListNumber,
     Frame
 ) {
+    const CacheKey =
+        ListNumber + ":" + ItemCount;
+
+    const Cached =
+        MutationRecipePreviewPermutations.get(
+            CacheKey
+        );
+
+    if (Cached?.Frame === Frame) {
+        return Cached.Permutation;
+    }
+
     const Permutation =
         Array.from(
             { length: ItemCount },
             (_, Index) => Index
         );
 
-    if (ItemCount < 2 || Frame === 0) {
-        return Permutation;
+    if (ItemCount >= 2 && Frame !== 0) {
+        let State =
+            (
+                Math.imul(
+                    Frame + 1,
+                    0x9e3779b1
+                ) ^
+                Math.imul(
+                    ListNumber + 1,
+                    0x85ebca6b
+                ) ^
+                Math.imul(
+                    ItemCount,
+                    0xc2b2ae35
+                )
+            ) >>> 0;
+
+        if (State === 0) {
+            State = 0x6d2b79f5;
+        }
+
+        for (
+            let Index = ItemCount - 1;
+            Index > 0;
+            Index--
+        ) {
+            State ^= State << 13;
+            State ^= State >>> 17;
+            State ^= State << 5;
+            State >>>= 0;
+
+            const SwapIndex =
+                State % (Index + 1);
+
+            [
+                Permutation[Index],
+                Permutation[SwapIndex]
+            ] = [
+                Permutation[SwapIndex],
+                Permutation[Index]
+            ];
+        }
     }
 
-    let State =
-        (
-            Math.imul(
-                Frame + 1,
-                0x9e3779b1
-            ) ^
-            Math.imul(
-                ListNumber + 1,
-                0x85ebca6b
-            ) ^
-            Math.imul(
-                ItemCount,
-                0xc2b2ae35
-            )
-        ) >>> 0;
-
-    if (State === 0) {
-        State = 0x6d2b79f5;
-    }
-
-    for (
-        let Index = ItemCount - 1;
-        Index > 0;
-        Index--
+    if (
+        ItemCount >= 2 &&
+        Cached?.Frame === Frame - 1 &&
+        Permutation.every(
+            (Value, Index) =>
+                Value ===
+                Cached.Permutation[Index]
+        )
     ) {
-        State ^= State << 13;
-        State ^= State >>> 17;
-        State ^= State << 5;
-        State >>>= 0;
-
-        const SwapIndex =
-            State % (Index + 1);
-
         [
-            Permutation[Index],
-            Permutation[SwapIndex]
+            Permutation[0],
+            Permutation[1]
         ] = [
-            Permutation[SwapIndex],
-            Permutation[Index]
+            Permutation[1],
+            Permutation[0]
         ];
     }
+
+    MutationRecipePreviewPermutations.set(
+        CacheKey,
+        {
+            Frame: Frame,
+            Permutation: Permutation
+        }
+    );
 
     return Permutation;
 }
