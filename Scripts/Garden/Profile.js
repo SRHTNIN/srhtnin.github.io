@@ -796,6 +796,12 @@ function RenderProfileStatistics() {
             ?.length ??
         0;
 
+    const GardensOwned =
+        ProfileSave
+            ?.Gardens
+            ?.length ??
+        1;
+
     const GardenWidth =
         ProfileSave
             ?.Garden
@@ -838,6 +844,13 @@ function RenderProfileStatistics() {
     );
 
     SetProfileStatistic(
+        "ProfileGardensOwned",
+        FormatProfileNumber(
+            GardensOwned
+        )
+    );
+
+    SetProfileStatistic(
         "ProfileGardenSize",
         GardenWidth +
         "×" +
@@ -852,6 +865,7 @@ function RenderProfileStatisticsError() {
         "ProfileLifetimeDew",
         "ProfilePlantsDiscovered",
         "ProfileMutationsDiscovered",
+        "ProfileGardensOwned",
         "ProfileGardenSize"
     ];
 

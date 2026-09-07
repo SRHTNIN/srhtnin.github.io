@@ -17,9 +17,9 @@ $PageTitle = "Profile";
             <h1>Profile</h1>
 
             <p>
-                Manage your Garden profile, view your
-                statistics, and move your account between
-                devices.
+                Manage your Garden profile and display settings,
+                view your statistics, move your account between
+                devices, and find the Garden contact addresses.
             </p>
 
 
@@ -292,7 +292,17 @@ $PageTitle = "Profile";
 
                     <div class="ProfileStatistic">
                         <span class="ProfileStatisticName">
-                            Garden size
+                            Gardens owned
+                        </span>
+
+                        <strong id="ProfileGardensOwned">
+                            ...
+                        </strong>
+                    </div>
+
+                    <div class="ProfileStatistic">
+                        <span class="ProfileStatisticName">
+                            Active Garden size
                         </span>
 
                         <strong id="ProfileGardenSize">
@@ -300,6 +310,26 @@ $PageTitle = "Profile";
                         </strong>
                     </div>
                 </div>
+            </section>
+
+
+            <section
+                id="Contact"
+                class="Panel ProfileSection"
+            >
+                <h2 class="PanelHeader PanelHeaderInset">Contact</h2>
+
+                <p>
+                    For general Garden questions, email
+                    <a href="mailto:contact@srhtnin.garden">contact@srhtnin.garden</a>.
+                </p>
+
+                <p>
+                    Bug reports can be sent to
+                    <a href="mailto:bug@srhtnin.garden">bug@srhtnin.garden</a>,
+                    while ideas and suggestions can be sent to
+                    <a href="mailto:suggestion@srhtnin.garden">suggestion@srhtnin.garden</a>.
+                </p>
             </section>
 
 

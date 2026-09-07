@@ -19,8 +19,9 @@ $PageSection = "Guide";
 
             <p>
                 A quick guide to growing plants, earning Dew,
-                and discovering mutations. You do not need to
-                know everything here before you start playing.
+                discovering mutations, and using the Garden's
+                tools and upgrades. You do not need to know
+                everything here before you start playing.
                 (But it's useful to do..)
             </p>
 
@@ -53,9 +54,9 @@ $PageSection = "Guide";
 
                 <p>
                     In the <a href="/Pages/Garden.html">Garden</a>,
-                    select a seed and then choose an empty plot.
-                    Plants continue growing with real time, even while
-                    you are away from the page.
+                    select a seed and then choose an empty plot with
+                    the Trowel. Plants continue growing with real time,
+                    even while you are away from the page.
                 </p>
 
                 <p>
@@ -82,7 +83,9 @@ $PageSection = "Guide";
                     More valuable seeds usually give more Dew.
                     The Shop shows the current seed cost,
                     harvest reward, growth time, and how many seeds you
-                    already own. So you can be smart in your plant investments!
+                    already own. The Garden can also quick-buy the selected
+                    seed without making you leave the page. So you can be
+                    smart in your plant investments!
                 </p>
             </section>
 
@@ -102,7 +105,9 @@ $PageSection = "Guide";
                     Mutation-derived seed prices are based on their
                     recipes, so discovering and performing mutations is
                     often a useful alternative to simply buying the
-                    resulting seed.
+                    resulting seed. The Shop also contains tools, Garden
+                    expansions, additional Gardens, and optional information
+                    upgrades.
                 </p>
             </section>
 
@@ -186,6 +191,9 @@ $PageSection = "Guide";
                     additional seeds in the Shop, so you can skip
                     creating them through mutations. Though it always
                     costs more to buy the seeds than create them by mutation..
+                    Your discoveries are also recorded in the
+                    <a href="/Pages/Plants.html">Plant encyclopedia</a> and
+                    <a href="/Pages/Mutations.html">Mutation encyclopedia</a>.
                 </p>
 
                 <p>
@@ -212,7 +220,8 @@ $PageSection = "Guide";
                     The <strong>Magic trowel</strong> fills as many empty
                     plots as it can with the selected seed. If you have
                     fewer seeds than empty plots, it simply plants every
-                    seed you have.
+                    seed you have. Use it on a mature plant to harvest every
+                    mature plant of that same type in the active Garden.
                 </p>
 
                 <p>
@@ -244,6 +253,49 @@ $PageSection = "Guide";
             </section>
 
             <section
+                id="Gardens"
+                class="GuideSection"
+            >
+                <h2>Gardens and rotation</h2>
+
+                <p>
+                    You can buy additional Gardens from the Shop. Each Garden
+                    has its own name, plots, mutation cooldowns, and expansion
+                    size. Use the arrows beside the Garden name to switch
+                    between the Gardens you own.
+                </p>
+
+                <p>
+                    The Plot rotation upgrade adds a direction to planted
+                    plots. Rotation matters for directional mutations and
+                    functional plants, and plants with directional sprites
+                    can visually face their saved direction.
+                </p>
+            </section>
+
+            <section
+                id="FunctionalPlants"
+                class="GuideSection"
+            >
+                <h2>Functional plants</h2>
+
+                <p>
+                    Some mutation-created plants do more than grow and harvest.
+                    Once mature, functional plants can affect nearby plots or
+                    the wider Garden by harvesting, planting, duplicating,
+                    advancing growth, changing mutation behaviour, or modifying
+                    harvest rewards. Their exact behaviour depends on the plant.
+                </p>
+
+                <p>
+                    Directional functional plants use their plot rotation to
+                    decide where effects such as <strong>Front</strong> and
+                    <strong>Behind</strong> point. Other effects can target
+                    cardinal neighbours, adjacent plots, or the whole Garden.
+                </p>
+            </section>
+
+            <section
                 id="Account"
                 class="GuideSection"
             >
@@ -251,11 +303,11 @@ $PageSection = "Guide";
 
                 <p>
                     Your <a href="/Pages/Profile.html">Profile</a>
-                    contains your username, colour, statistics, and
-                    Account Key. Garden saves can sync through the API,
-                    while the Account Key lets you use the same Garden
-                    in another browser or on another device.
-                    It's basically just like logging into an account.
+                    contains your username, colour, Garden display settings,
+                    statistics, and Account Key. Garden saves can sync through
+                    the API, while the Account Key lets you use the same Garden
+                    in another browser or on another device. It's basically
+                    just like logging into an account.
                 </p>
 
                 <p>
@@ -295,6 +347,26 @@ $PageSection = "Guide";
                     Account Key and local save from the browser where you
                     perform the deletion. Other devices have their own local
                     browser storage and cannot be cleared remotely.
+                </p>
+            </section>
+
+            <section
+                id="Contact"
+                class="GuideSection"
+            >
+                <h2>Contact</h2>
+
+                <p>
+                    For general Garden questions or anything that does not fit
+                    elsewhere, email
+                    <a href="mailto:contact@srhtnin.garden">contact@srhtnin.garden</a>.
+                </p>
+
+                <p>
+                    Found a bug? Send it to
+                    <a href="mailto:bug@srhtnin.garden">bug@srhtnin.garden</a>.
+                    Ideas and suggestions can go to
+                    <a href="mailto:suggestion@srhtnin.garden">suggestion@srhtnin.garden</a>.
                 </p>
             </section>
         </main>

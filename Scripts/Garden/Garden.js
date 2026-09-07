@@ -1827,6 +1827,46 @@ function CreatePlotElement(
 
 
     if (
+        SelectedGardenTool ===
+        "MagicTrowel"
+    ) {
+        if (Progress < 1) {
+            MainButton.title =
+                Plant.Name +
+                " - " +
+                Math.floor(
+                    Progress * 100
+                ) +
+                "% grown";
+
+            MainButton.disabled = true;
+            return Tile;
+        }
+
+        Tile.classList.add(
+            "GardenPlotMature",
+            "GardenPlotMagicPlant"
+        );
+
+        MainButton.title =
+            "Harvest all mature " +
+            Plant.Name +
+            " plants in this Garden";
+
+        MainButton.addEventListener(
+            "click",
+            () => {
+                HarvestManyPlants(
+                    Plot.Plant
+                );
+            }
+        );
+
+        return Tile;
+    }
+
+
+    if (
         SelectedGardenTool !==
         "Trowel"
     ) {
@@ -2349,6 +2389,137 @@ async function PlantManySeeds() {
         (PlantedCount === 1
             ? " seed."
             : " seeds.")
+    );
+
+    CheckGardenMutations(
+        GameSave,
+        ActionTime
+    );
+
+    RenderGame();
+
+    await SaveGame(
+        GameSave
+    );
+}
+
+
+async function HarvestManyPlants(
+    PlantKey
+) {
+    const ActionTime = Date.now();
+
+    AdvanceGameSimulation(
+        GameSave,
+        ActionTime
+    );
+
+    const Plant =
+        Plants[PlantKey];
+
+    if (Plant === undefined) {
+        return;
+    }
+
+
+    const MatchingPlotIndexes = [];
+
+    GameSave.Garden.Plots.forEach(
+        (Plot, PlotIndex) => {
+            if (
+                Plot !== null &&
+                Plot.Plant === PlantKey &&
+                IsPlantMature(
+                    Plot,
+                    Plant
+                )
+            ) {
+                MatchingPlotIndexes.push(
+                    PlotIndex
+                );
+            }
+        }
+    );
+
+    if (MatchingPlotIndexes.length === 0) {
+        SetGardenMessage(
+            "There aren't any mature " +
+            Plant.Name +
+            " plants to harvest."
+        );
+
+        RenderGame();
+        return;
+    }
+
+
+    let HarvestedCount = 0;
+    let RewardAmount = 0;
+    let DisabledCount = 0;
+    let RewardUnavailableCount = 0;
+
+    for (
+        const PlotIndex
+        of MatchingPlotIndexes
+    ) {
+        const HarvestResult =
+            HarvestGardenPlot(
+                GameSave,
+                GameSave.ActiveGardenIndex,
+                PlotIndex,
+                ActionTime
+            );
+
+        if (!HarvestResult.Harvested) {
+            if (HarvestResult.Disabled) {
+                DisabledCount++;
+            } else if (
+                HarvestResult.RewardUnavailable
+            ) {
+                RewardUnavailableCount++;
+            }
+
+            continue;
+        }
+
+        HarvestedCount++;
+        RewardAmount +=
+            HarvestResult.RewardAmount;
+    }
+
+
+    if (HarvestedCount <= 0) {
+        if (DisabledCount > 0) {
+            SetGardenMessage(
+                Plant.Name +
+                " can't be harvested right now."
+            );
+        } else if (
+            RewardUnavailableCount > 0
+        ) {
+            SetGardenMessage(
+                "Couldn't calculate the harvest reward for " +
+                Plant.Name +
+                "."
+            );
+        }
+
+        RenderGame();
+        return;
+    }
+
+
+    SetGardenMessage(
+        "Magic trowel harvested " +
+        HarvestedCount.toLocaleString() +
+        " " +
+        Plant.Name +
+        (HarvestedCount === 1
+            ? " plant"
+            : " plants") +
+        " for " +
+        RewardAmount.toLocaleString() +
+        " Dew."
     );
 
     CheckGardenMutations(
