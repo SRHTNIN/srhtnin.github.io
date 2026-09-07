@@ -122,6 +122,13 @@ function BindAdminMutationEditor() {
     );
 
     document.getElementById(
+        "AdminMutationAllowImmature"
+    ).addEventListener(
+        "change",
+        RenderAdminMutationGrids
+    );
+
+    document.getElementById(
         "AdminMutationForm"
     ).addEventListener(
         "submit",
@@ -2038,18 +2045,25 @@ function RenderAdminMutationGrids() {
             AdminMutationResult
         );
 
+    const AllowImmature =
+        document.getElementById(
+            "AdminMutationAllowImmature"
+        ).checked;
+
     RenderAdminMutationGrid(
         "AdminMutationPatternGrid",
         "Pattern",
         AdminMutationPattern,
-        ListOffsets.Pattern
+        ListOffsets.Pattern,
+        AllowImmature
     );
 
     RenderAdminMutationGrid(
         "AdminMutationResultGrid",
         "Result",
         AdminMutationResult,
-        ListOffsets.Result
+        ListOffsets.Result,
+        false
     );
 }
 
@@ -2058,7 +2072,8 @@ function RenderAdminMutationGrid(
     ContainerId,
     Mode,
     Matrix,
-    ListOffsets
+    ListOffsets,
+    CyclePlantStages = false
 ) {
     const Grid =
         document.getElementById(
@@ -2090,7 +2105,8 @@ function RenderAdminMutationGrid(
                     X,
                     Y,
                     Matrix[Y][X],
-                    ListOffsets?.[Y]?.[X]
+                    ListOffsets?.[Y]?.[X],
+                    CyclePlantStages
                 )
             );
         }
@@ -2103,7 +2119,8 @@ function CreateAdminMutationGridCell(
     X,
     Y,
     Value,
-    ListOffset
+    ListOffset,
+    CyclePlantStages = false
 ) {
     const Button =
         document.createElement(
@@ -2192,8 +2209,36 @@ function CreateAdminMutationGridCell(
             ListNumber,
             ListOffset,
             AdminMutationPlantCatalogue,
-            "GuideRecipeLabel"
+            "GuideRecipeLabel",
+            Mode === "Pattern" &&
+                CyclePlantStages
         );
+    } else if (
+        Mode === "Pattern" &&
+        CyclePlantStages === true
+    ) {
+        const PlantKey =
+            typeof Value === "string"
+                ? Value
+                : Value !== null &&
+                    typeof Value === "object" &&
+                    typeof Value.Plant === "string"
+                    ? Value.Plant
+                    : null;
+
+        if (
+            PlantKey !== null &&
+            AdminMutationPlantCatalogue[
+                PlantKey
+            ] !== undefined
+        ) {
+            RegisterMutationRecipePreviewPlantStageCell(
+                Button,
+                AdminMutationPlantCatalogue[
+                    PlantKey
+                ]
+            );
+        }
     }
 
     Button.addEventListener(

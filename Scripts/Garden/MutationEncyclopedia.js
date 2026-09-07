@@ -1152,7 +1152,8 @@ function CreateMutationRecipeFlow(
             Pattern,
             "Pattern",
             Mutation.Lists,
-            ListOffsets.Pattern
+            ListOffsets.Pattern,
+            Mutation.AllowImmature === true
         );
 
     const Arrow =
@@ -1178,7 +1179,8 @@ function CreateMutationRecipeFlow(
             Success,
             "Result",
             Mutation.Lists,
-            ListOffsets.Result
+            ListOffsets.Result,
+            false
         );
 
 
@@ -1300,7 +1302,8 @@ function CreateMutationRecipePanel(
     Matrix,
     Mode,
     Lists,
-    ListOffsets
+    ListOffsets,
+    CyclePlantStages = false
 ) {
     const Panel =
         document.createElement(
@@ -1357,7 +1360,8 @@ function CreateMutationRecipePanel(
                     Value,
                     Mode,
                     Lists,
-                    ListOffsets?.[Y]?.[X]
+                    ListOffsets?.[Y]?.[X],
+                    CyclePlantStages
                 );
 
             Grid.appendChild(
@@ -1393,7 +1397,8 @@ function CreateMutationRecipeCell(
     Value,
     Mode,
     Lists,
-    ListOffset
+    ListOffset,
+    CyclePlantStages = false
 ) {
     if (Mode === "Result") {
         return CreateMutationResultCell(
@@ -1406,7 +1411,8 @@ function CreateMutationRecipeCell(
     return CreateMutationPatternCell(
         Value,
         Lists,
-        ListOffset
+        ListOffset,
+        CyclePlantStages
     );
 }
 
@@ -1414,7 +1420,8 @@ function CreateMutationRecipeCell(
 function CreateMutationPatternCell(
     Matcher,
     Lists,
-    ListOffset
+    ListOffset,
+    CyclePlantStages = false
 ) {
     if (
         Matcher === null ||
@@ -1456,14 +1463,17 @@ function CreateMutationPatternCell(
                 Lists?.[ListNumber - 1],
                 ListNumber,
                 ListOffset,
-                Plants
+                Plants,
+                "MutationRecipeText",
+                CyclePlantStages
             );
 
             return Cell;
         }
 
         return CreateMutationPlantCell(
-            Matcher
+            Matcher,
+            CyclePlantStages
         );
     }
 
@@ -1485,7 +1495,8 @@ function CreateMutationPatternCell(
         "string"
     ) {
         return CreateMutationPlantCell(
-            Matcher.Plant
+            Matcher.Plant,
+            CyclePlantStages
         );
     }
 
@@ -1677,7 +1688,8 @@ function CreateMutationResultCell(
 
 
 function CreateMutationPlantCell(
-    PlantKey
+    PlantKey,
+    CyclePlantStages = false
 ) {
     const Plant =
         Plants[PlantKey];
@@ -1742,6 +1754,14 @@ function CreateMutationPlantCell(
     Element.appendChild(
         Label
     );
+
+
+    if (CyclePlantStages === true) {
+        RegisterMutationRecipePreviewPlantStageCell(
+            Element,
+            Plant
+        );
+    }
 
 
     return {

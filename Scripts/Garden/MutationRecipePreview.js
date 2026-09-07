@@ -4,6 +4,7 @@ let MutationRecipePreviewFrame = 0;
 let MutationRecipePreviewTimer = null;
 
 const MutationRecipePreviewCells = new Set();
+const MutationRecipePreviewPlantStageCells = new Set();
 const MutationRecipePreviewPermutations = new Map();
 
 
@@ -261,7 +262,8 @@ function RegisterMutationRecipePreviewListCell(
     ListNumber,
     Offset,
     PlantCatalogue,
-    TextClassName = "MutationRecipeText"
+    TextClassName = "MutationRecipeText",
+    CyclePlantStages = false
 ) {
     const Entry = {
         Element: Element,
@@ -273,7 +275,9 @@ function RegisterMutationRecipePreviewListCell(
                 : 0,
         PlantCatalogue:
             PlantCatalogue ?? {},
-        TextClassName: TextClassName
+        TextClassName: TextClassName,
+        CyclePlantStages:
+            CyclePlantStages === true
     };
 
     MutationRecipePreviewCells.add(
@@ -289,10 +293,44 @@ function RegisterMutationRecipePreviewListCell(
 }
 
 
+function RegisterMutationRecipePreviewPlantStageCell(
+    Element,
+    PlantOrKey
+) {
+    const Images =
+        GetMutationRecipePreviewPlantStageImages(
+            PlantOrKey
+        );
+
+    if (Images.length <= 1) {
+        return;
+    }
+
+    const Entry = {
+        Element: Element,
+        Images: Images
+    };
+
+    MutationRecipePreviewPlantStageCells.add(
+        Entry
+    );
+
+    RenderMutationRecipePreviewPlantStageCell(
+        Entry,
+        MutationRecipePreviewFrame
+    );
+
+    StartMutationRecipePreviewTimer();
+}
+
+
 function StartMutationRecipePreviewTimer() {
     if (
         MutationRecipePreviewTimer !== null ||
-        MutationRecipePreviewCells.size === 0
+        (
+            MutationRecipePreviewCells.size === 0 &&
+            MutationRecipePreviewPlantStageCells.size === 0
+        )
     ) {
         return;
     }
@@ -335,8 +373,28 @@ function AdvanceMutationRecipePreviewFrame() {
         );
     }
 
+    for (
+        const Entry
+        of Array.from(
+            MutationRecipePreviewPlantStageCells
+        )
+    ) {
+        if (!Entry.Element.isConnected) {
+            MutationRecipePreviewPlantStageCells.delete(
+                Entry
+            );
+            continue;
+        }
+
+        RenderMutationRecipePreviewPlantStageCell(
+            Entry,
+            MutationRecipePreviewFrame
+        );
+    }
+
     if (
         MutationRecipePreviewCells.size === 0 &&
+        MutationRecipePreviewPlantStageCells.size === 0 &&
         MutationRecipePreviewTimer !== null
     ) {
         window.clearInterval(
@@ -384,7 +442,9 @@ function RenderMutationRecipePreviewListCell(
         Entry,
         GetMutationRecipePreviewItemDisplay(
             Items[ItemIndex],
-            Entry.PlantCatalogue
+            Entry.PlantCatalogue,
+            Entry.CyclePlantStages,
+            Frame
         )
     );
 }
@@ -514,7 +574,9 @@ function CreateMutationRecipePreviewPermutation(
 
 function GetMutationRecipePreviewItemDisplay(
     Item,
-    PlantCatalogue
+    PlantCatalogue,
+    CyclePlantStages = false,
+    Frame = 0
 ) {
     if (Item?.Type === "Plant") {
         const Plant =
@@ -538,8 +600,10 @@ function GetMutationRecipePreviewItemDisplay(
                 Plant.Name ??
                 Item.Value,
             Image:
-                GetPlantMatureImageSource(
-                    Plant
+                GetMutationRecipePreviewPlantImageSource(
+                    Plant,
+                    CyclePlantStages,
+                    Frame
                 ),
             ClassName:
                 "GuideRecipePlant"
@@ -571,6 +635,65 @@ function GetMutationRecipePreviewItemDisplay(
         ClassName:
             "MutationRecipeAny"
     };
+}
+
+
+function GetMutationRecipePreviewPlantStageImages(
+    PlantOrKey
+) {
+    return GetPlantImageSources(
+        PlantOrKey
+    ).filter(
+        Image =>
+            typeof Image === "string" &&
+            Image.length > 0
+    );
+}
+
+
+function GetMutationRecipePreviewPlantImageSource(
+    PlantOrKey,
+    CyclePlantStages,
+    Frame
+) {
+    if (CyclePlantStages !== true) {
+        return GetPlantMatureImageSource(
+            PlantOrKey
+        );
+    }
+
+    const Images =
+        GetMutationRecipePreviewPlantStageImages(
+            PlantOrKey
+        );
+
+    if (Images.length === 0) {
+        return null;
+    }
+
+    return Images[
+        Frame % Images.length
+    ];
+}
+
+
+function RenderMutationRecipePreviewPlantStageCell(
+    Entry,
+    Frame
+) {
+    const Image =
+        Entry.Element.querySelector(
+            "img.GuideRecipeImage"
+        );
+
+    if (Image === null) {
+        return;
+    }
+
+    Image.src =
+        Entry.Images[
+            Frame % Entry.Images.length
+        ];
 }
 
 

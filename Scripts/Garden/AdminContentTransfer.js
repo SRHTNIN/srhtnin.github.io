@@ -2638,7 +2638,8 @@ function CreateAdminTransferMutationRecipe(
             "Pattern",
             PlantCatalogue,
             Mutation.Lists,
-            ListOffsets.Pattern
+            ListOffsets.Pattern,
+            Mutation.AllowImmature === true
         ),
         Arrow,
         CreateAdminTransferMutationRecipePanel(
@@ -2647,7 +2648,8 @@ function CreateAdminTransferMutationRecipe(
             "Result",
             PlantCatalogue,
             Mutation.Lists,
-            ListOffsets.Result
+            ListOffsets.Result,
+            false
         )
     );
 
@@ -2762,7 +2764,8 @@ function CreateAdminTransferMutationRecipePanel(
     Mode,
     PlantCatalogue,
     Lists,
-    ListOffsets
+    ListOffsets,
+    CyclePlantStages = false
 ) {
     const Panel =
         document.createElement(
@@ -2810,7 +2813,8 @@ function CreateAdminTransferMutationRecipePanel(
                 CreateAdminTransferMutationCell(
                     Value,
                     Mode,
-                    PlantCatalogue
+                    PlantCatalogue,
+                    CyclePlantStages
                 );
 
             const ListNumber =
@@ -2824,7 +2828,10 @@ function CreateAdminTransferMutationRecipePanel(
                     Lists?.[ListNumber - 1],
                     ListNumber,
                     ListOffsets?.[Y]?.[X],
-                    PlantCatalogue
+                    PlantCatalogue,
+                    "MutationRecipeText",
+                    Mode === "Pattern" &&
+                        CyclePlantStages
                 );
             }
 
@@ -2844,7 +2851,8 @@ function CreateAdminTransferMutationRecipePanel(
 function CreateAdminTransferMutationCell(
     Value,
     Mode,
-    PlantCatalogue
+    PlantCatalogue,
+    CyclePlantStages = false
 ) {
     if (Mode === "Result") {
         if (
@@ -2903,7 +2911,8 @@ function CreateAdminTransferMutationCell(
 
         return CreateAdminTransferPlantCell(
             PlantValue,
-            PlantCatalogue
+            PlantCatalogue,
+            CyclePlantStages
         );
     }
 
@@ -2939,7 +2948,8 @@ function CreateAdminTransferMutationCell(
 
         return CreateAdminTransferPlantCell(
             Value,
-            PlantCatalogue
+            PlantCatalogue,
+            CyclePlantStages
         );
     }
 
@@ -2953,7 +2963,8 @@ function CreateAdminTransferMutationCell(
     if (typeof Value.Plant === "string") {
         return CreateAdminTransferPlantCell(
             Value.Plant,
-            PlantCatalogue
+            PlantCatalogue,
+            CyclePlantStages
         );
     }
 
@@ -3004,7 +3015,8 @@ function CreateAdminTransferMutationCell(
 
 function CreateAdminTransferPlantCell(
     PlantKey,
-    PlantCatalogue
+    PlantCatalogue,
+    CyclePlantStages = false
 ) {
     const Plant =
         PlantCatalogue[PlantKey];
@@ -3054,6 +3066,14 @@ function CreateAdminTransferPlantCell(
         PlantKey;
 
     Element.appendChild(Label);
+
+    if (CyclePlantStages === true) {
+        RegisterMutationRecipePreviewPlantStageCell(
+            Element,
+            Plant
+        );
+    }
+
     return Element;
 }
 
