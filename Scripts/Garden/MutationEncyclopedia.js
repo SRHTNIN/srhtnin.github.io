@@ -1130,6 +1130,12 @@ function CreateMutationRecipeFlow(
             "Keep"
         );
 
+    const ListOffsets =
+        CreateMutationRecipePreviewOffsets(
+            Pattern,
+            Success
+        );
+
 
     const Flow =
         document.createElement(
@@ -1144,7 +1150,9 @@ function CreateMutationRecipeFlow(
         CreateMutationRecipePanel(
             "Arrange",
             Pattern,
-            "Pattern"
+            "Pattern",
+            Mutation.Lists,
+            ListOffsets.Pattern
         );
 
     const Arrow =
@@ -1168,7 +1176,9 @@ function CreateMutationRecipeFlow(
         CreateMutationRecipePanel(
             "Result",
             Success,
-            "Result"
+            "Result",
+            Mutation.Lists,
+            ListOffsets.Result
         );
 
 
@@ -1288,7 +1298,9 @@ function GetMutationRecipeListItemLabel(
 function CreateMutationRecipePanel(
     Heading,
     Matrix,
-    Mode
+    Mode,
+    Lists,
+    ListOffsets
 ) {
     const Panel =
         document.createElement(
@@ -1328,17 +1340,24 @@ function CreateMutationRecipePanel(
 
 
     for (
-        const Row
-        of Matrix
+        let Y = 0;
+        Y < Matrix.length;
+        Y++
     ) {
         for (
-            const Value
-            of Row
+            let X = 0;
+            X < Matrix[Y].length;
+            X++
         ) {
+            const Value =
+                Matrix[Y][X];
+
             const Cell =
                 CreateMutationRecipeCell(
                     Value,
-                    Mode
+                    Mode,
+                    Lists,
+                    ListOffsets?.[Y]?.[X]
                 );
 
             Grid.appendChild(
@@ -1372,22 +1391,30 @@ function CreateMutationRecipePanel(
 
 function CreateMutationRecipeCell(
     Value,
-    Mode
+    Mode,
+    Lists,
+    ListOffset
 ) {
     if (Mode === "Result") {
         return CreateMutationResultCell(
-            Value
+            Value,
+            Lists,
+            ListOffset
         );
     }
 
     return CreateMutationPatternCell(
-        Value
+        Value,
+        Lists,
+        ListOffset
     );
 }
 
 
 function CreateMutationPatternCell(
-    Matcher
+    Matcher,
+    Lists,
+    ListOffset
 ) {
     if (
         Matcher === null ||
@@ -1418,10 +1445,21 @@ function CreateMutationPatternCell(
             );
 
         if (ListNumber !== null) {
-            return CreateMutationTextCell(
+            const Cell =
+                CreateMutationTextCell(
                 "List " + ListNumber,
                 "MutationRecipeMatcher"
             );
+
+            RegisterMutationRecipePreviewListCell(
+                Cell.Element,
+                Lists?.[ListNumber - 1],
+                ListNumber,
+                ListOffset,
+                Plants
+            );
+
+            return Cell;
         }
 
         return CreateMutationPlantCell(
@@ -1517,7 +1555,9 @@ function CreateMutationPatternCell(
 
 
 function CreateMutationResultCell(
-    Result
+    Result,
+    Lists,
+    ListOffset
 ) {
     if (
         Result === null ||
@@ -1559,10 +1599,21 @@ function CreateMutationResultCell(
             );
 
         if (ListNumber !== null) {
-            return CreateMutationTextCell(
+            const Cell =
+                CreateMutationTextCell(
                 "List " + ListNumber,
                 "MutationRecipeMatcher"
             );
+
+            RegisterMutationRecipePreviewListCell(
+                Cell.Element,
+                Lists?.[ListNumber - 1],
+                ListNumber,
+                ListOffset,
+                Plants
+            );
+
+            return Cell;
         }
 
         return CreateMutationPlantCell(
@@ -1587,6 +1638,29 @@ function CreateMutationResultCell(
                 Result.Plant.slice(1),
                 "MutationRecipeCapture"
             );
+        }
+
+        const ListNumber =
+            GetMutationDisplayListReference(
+                Result.Plant
+            );
+
+        if (ListNumber !== null) {
+            const Cell =
+                CreateMutationTextCell(
+                    "List " + ListNumber,
+                    "MutationRecipeMatcher"
+                );
+
+            RegisterMutationRecipePreviewListCell(
+                Cell.Element,
+                Lists?.[ListNumber - 1],
+                ListNumber,
+                ListOffset,
+                Plants
+            );
+
+            return Cell;
         }
 
         return CreateMutationPlantCell(

@@ -67,6 +67,7 @@ $PageSection = "Mutations";
         <script src="/Scripts/Garden/PlantImages.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
+        <script src="/Scripts/Garden/MutationRecipePreview.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>

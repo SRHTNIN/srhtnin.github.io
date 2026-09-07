@@ -2604,6 +2604,12 @@ function CreateAdminTransferMutationRecipe(
             "Keep"
         );
 
+    const ListOffsets =
+        CreateMutationRecipePreviewOffsets(
+            Pattern,
+            Success
+        );
+
     const Flow =
         document.createElement(
             "div"
@@ -2630,14 +2636,18 @@ function CreateAdminTransferMutationRecipe(
             "Arrange",
             Pattern,
             "Pattern",
-            PlantCatalogue
+            PlantCatalogue,
+            Mutation.Lists,
+            ListOffsets.Pattern
         ),
         Arrow,
         CreateAdminTransferMutationRecipePanel(
             "Result",
             Success,
             "Result",
-            PlantCatalogue
+            PlantCatalogue,
+            Mutation.Lists,
+            ListOffsets.Result
         )
     );
 
@@ -2750,7 +2760,9 @@ function CreateAdminTransferMutationRecipePanel(
     Heading,
     Matrix,
     Mode,
-    PlantCatalogue
+    PlantCatalogue,
+    Lists,
+    ListOffsets
 ) {
     const Panel =
         document.createElement(
@@ -2781,15 +2793,42 @@ function CreateAdminTransferMutationRecipePanel(
         )
     );
 
-    for (const Row of Matrix) {
-        for (const Value of Row) {
-            Grid.appendChild(
+    for (
+        let Y = 0;
+        Y < Matrix.length;
+        Y++
+    ) {
+        for (
+            let X = 0;
+            X < Matrix[Y].length;
+            X++
+        ) {
+            const Value =
+                Matrix[Y][X];
+
+            const Cell =
                 CreateAdminTransferMutationCell(
                     Value,
                     Mode,
                     PlantCatalogue
-                )
-            );
+                );
+
+            const ListNumber =
+                GetMutationRecipePreviewListReference(
+                    Value
+                );
+
+            if (ListNumber !== null) {
+                RegisterMutationRecipePreviewListCell(
+                    Cell,
+                    Lists?.[ListNumber - 1],
+                    ListNumber,
+                    ListOffsets?.[Y]?.[X],
+                    PlantCatalogue
+                );
+            }
+
+            Grid.appendChild(Cell);
         }
     }
 

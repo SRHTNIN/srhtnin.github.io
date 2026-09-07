@@ -2032,16 +2032,24 @@ function ResizeAdminMutationRecipe() {
 
 
 function RenderAdminMutationGrids() {
+    const ListOffsets =
+        CreateMutationRecipePreviewOffsets(
+            AdminMutationPattern,
+            AdminMutationResult
+        );
+
     RenderAdminMutationGrid(
         "AdminMutationPatternGrid",
         "Pattern",
-        AdminMutationPattern
+        AdminMutationPattern,
+        ListOffsets.Pattern
     );
 
     RenderAdminMutationGrid(
         "AdminMutationResultGrid",
         "Result",
-        AdminMutationResult
+        AdminMutationResult,
+        ListOffsets.Result
     );
 }
 
@@ -2049,7 +2057,8 @@ function RenderAdminMutationGrids() {
 function RenderAdminMutationGrid(
     ContainerId,
     Mode,
-    Matrix
+    Matrix,
+    ListOffsets
 ) {
     const Grid =
         document.getElementById(
@@ -2080,7 +2089,8 @@ function RenderAdminMutationGrid(
                     Mode,
                     X,
                     Y,
-                    Matrix[Y][X]
+                    Matrix[Y][X],
+                    ListOffsets?.[Y]?.[X]
                 )
             );
         }
@@ -2092,7 +2102,8 @@ function CreateAdminMutationGridCell(
     Mode,
     X,
     Y,
-    Value
+    Value,
+    ListOffset
 ) {
     const Button =
         document.createElement(
@@ -2166,6 +2177,24 @@ function CreateAdminMutationGridCell(
 
     Button.title =
         Display.Label;
+
+    const ListNumber =
+        GetMutationRecipePreviewListReference(
+            Value
+        );
+
+    if (ListNumber !== null) {
+        RegisterMutationRecipePreviewListCell(
+            Button,
+            AdminMutationLists[
+                ListNumber - 1
+            ],
+            ListNumber,
+            ListOffset,
+            AdminMutationPlantCatalogue,
+            "GuideRecipeLabel"
+        );
+    }
 
     Button.addEventListener(
         "click",
