@@ -1,5 +1,14 @@
 const DefaultColourPickerValue = "#000000";
 
+const DefaultGardenerProfilePicture = Object.freeze({
+    PlantKey: "RedRose",
+    GrowthStage: 3
+});
+
+let PlayerCommentUsername = null;
+let PlayerCommentOffset = 0;
+const PlayerCommentPageSize = 20;
+
 
 function RenderGardenOwnerHeading(
     Username
@@ -194,20 +203,19 @@ function ApplyPlayerColour(
 function GetGardenerProfilePictureSource(
     ProfilePicture
 ) {
-    if (
-        ProfilePicture === null ||
-        typeof ProfilePicture !== "object" ||
-        Array.isArray(ProfilePicture) ||
-        typeof ProfilePicture.PlantKey !==
-            "string" ||
-        !Number.isInteger(
+    const Candidate =
+        ProfilePicture !== null &&
+        typeof ProfilePicture === "object" &&
+        !Array.isArray(ProfilePicture) &&
+        typeof ProfilePicture.PlantKey ===
+            "string" &&
+        Number.isInteger(
             Number(
                 ProfilePicture.GrowthStage
             )
         )
-    ) {
-        return null;
-    }
+            ? ProfilePicture
+            : DefaultGardenerProfilePicture;
 
     if (
         typeof Plants === "undefined" ||
@@ -217,10 +225,23 @@ function GetGardenerProfilePictureSource(
         return null;
     }
 
-    const Plant =
-        Plants[
-            ProfilePicture.PlantKey
+    let Plant =
+        Plants[Candidate.PlantKey];
+
+    let GrowthStage = Number(
+        Candidate.GrowthStage
+    );
+
+    if (Plant === undefined) {
+        Plant = Plants[
+            DefaultGardenerProfilePicture
+                .PlantKey
         ];
+
+        GrowthStage =
+            DefaultGardenerProfilePicture
+                .GrowthStage;
+    }
 
     if (Plant === undefined) {
         return null;
@@ -230,10 +251,6 @@ function GetGardenerProfilePictureSource(
         GetPlantImageSources(
             Plant
         );
-
-    const GrowthStage = Number(
-        ProfilePicture.GrowthStage
-    );
 
     const RequestedSource =
         Images[GrowthStage - 1];
@@ -258,6 +275,15 @@ function GetGardenerProfilePictureSource(
         ) {
             return Images[Index];
         }
+    }
+
+    if (
+        Candidate !==
+            DefaultGardenerProfilePicture
+    ) {
+        return GetGardenerProfilePictureSource(
+            DefaultGardenerProfilePicture
+        );
     }
 
     return null;
@@ -404,6 +430,163 @@ function CreateGardenerIdentity(
 }
 
 
+function CreateGardenerCommentCard(
+    Comment,
+    DeleteHandler = null
+) {
+    const Article =
+        document.createElement(
+            "article"
+        );
+
+    Article.className =
+        "PlantTile GardenerComment";
+
+    Article.dataset.commentId =
+        String(Comment.Id);
+
+    const Header =
+        document.createElement(
+            "div"
+        );
+
+    Header.className =
+        "GardenerCommentHeader";
+
+    const Identity =
+        CreateGardenerIdentity(
+            Comment.Username,
+            Comment.Colour,
+            Comment.ProfilePicture
+        );
+
+    const Time =
+        document.createElement(
+            "time"
+        );
+
+    Time.className =
+        "GardenerCommentTime";
+
+    const CreatedAt = Number(
+        Comment.CreatedAt
+    );
+
+    if (Number.isFinite(CreatedAt)) {
+        const DateValue =
+            new Date(CreatedAt);
+
+        Time.dateTime =
+            DateValue.toISOString();
+
+        Time.textContent =
+            DateValue.toLocaleString();
+    }
+
+    Header.append(
+        Identity,
+        Time
+    );
+
+    const Text =
+        document.createElement(
+            "p"
+        );
+
+    Text.className =
+        "GardenerCommentText";
+
+    Text.textContent =
+        Comment.Text ?? "";
+
+    Article.append(
+        Header,
+        Text
+    );
+
+    if (
+        Comment.CanDelete === true &&
+        typeof DeleteHandler ===
+            "function"
+    ) {
+        const DeleteButton =
+            document.createElement(
+                "button"
+            );
+
+        DeleteButton.type = "button";
+        DeleteButton.className =
+            "ActionButton GardenerCommentDelete";
+        DeleteButton.textContent =
+            "Delete";
+
+        DeleteButton.addEventListener(
+            "click",
+            () => DeleteHandler(
+                Number(Comment.Id),
+                DeleteButton
+            )
+        );
+
+        Article.appendChild(
+            DeleteButton
+        );
+    }
+
+    return Article;
+}
+
+
+async function GetGardenerComments(
+    Username,
+    Offset = 0,
+    Limit = 20
+) {
+    const Response = await fetch(
+        ApiUrl + "/Comments.php",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+                Action: "List",
+                SaveKey: GetSaveKey(),
+                Username: Username,
+                Offset: Offset,
+                Limit: Limit
+            })
+        }
+    );
+
+    return await Response.json();
+}
+
+
+async function DeleteGardenerCommentRequest(
+    CommentId
+) {
+    const Response = await fetch(
+        ApiUrl + "/Comments.php",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+                Action: "Delete",
+                SaveKey: GetSaveKey(),
+                CommentId: CommentId
+            })
+        }
+    );
+
+    return await Response.json();
+}
+
+
 async function GetProfile() {
     const Response = await fetch(
         ApiUrl + "/Profile.php",
@@ -501,9 +684,9 @@ async function RenderUser() {
     const Profile =
         await GetProfile();
 
-    const UsernameDisplay =
+    const PlayerIdentity =
         document.getElementById(
-            "UsernameDisplay"
+            "PlayerIdentity"
         );
 
     const UsernameForm =
@@ -515,13 +698,29 @@ async function RenderUser() {
         Profile.Success &&
         Profile.Username !== null
     ) {
-        UsernameDisplay.textContent =
-            Profile.Username;
+        if (PlayerIdentity !== null) {
+            const Identity =
+                CreateGardenerIdentity(
+                    Profile.Username,
+                    Profile.Colour,
+                    Profile.ProfilePicture,
+                    false
+                );
 
-        ApplyPlayerColour(
-            UsernameDisplay,
-            Profile.Colour
-        );
+            Identity.classList.add(
+                "GardenPlayerIdentityContent"
+            );
+
+            Identity.querySelector(
+                ".GardenerAvatar"
+            )?.classList.add(
+                "GardenerAvatarLarge"
+            );
+
+            PlayerIdentity.replaceChildren(
+                Identity
+            );
+        }
 
         UsernameForm.hidden = true;
 
@@ -529,22 +728,250 @@ async function RenderUser() {
             Profile.Username
         );
 
+        await LoadPlayerComments(
+            Profile.Username,
+            true
+        );
+
         return;
     }
 
-    UsernameDisplay.textContent =
-        "Unnamed";
+    if (PlayerIdentity !== null) {
+        const Identity =
+            CreateGardenerIdentity(
+                "Unnamed",
+                null,
+                null,
+                false
+            );
 
-    ApplyPlayerColour(
-        UsernameDisplay,
-        null
-    );
+        Identity.classList.add(
+            "GardenPlayerIdentityContent"
+        );
+
+        Identity.querySelector(
+            ".GardenerAvatar"
+        )?.classList.add(
+            "GardenerAvatarLarge"
+        );
+
+        PlayerIdentity.replaceChildren(
+            Identity
+        );
+    }
 
     UsernameForm.hidden = false;
 
     RenderGardenOwnerHeading(
         null
     );
+
+    PlayerCommentUsername = null;
+    PlayerCommentOffset = 0;
+
+    const CommentList =
+        document.getElementById(
+            "PlayerCommentList"
+        );
+
+    const CommentMessage =
+        document.getElementById(
+            "PlayerCommentMessage"
+        );
+
+    const LoadMoreButton =
+        document.getElementById(
+            "LoadMorePlayerCommentsButton"
+        );
+
+    CommentList?.replaceChildren();
+
+    if (CommentMessage !== null) {
+        CommentMessage.textContent =
+            "Set a username to receive comments.";
+    }
+
+    if (LoadMoreButton !== null) {
+        LoadMoreButton.hidden = true;
+    }
+}
+
+
+async function LoadPlayerComments(
+    Username,
+    Reset
+) {
+    const List =
+        document.getElementById(
+            "PlayerCommentList"
+        );
+
+    const Message =
+        document.getElementById(
+            "PlayerCommentMessage"
+        );
+
+    const LoadMoreButton =
+        document.getElementById(
+            "LoadMorePlayerCommentsButton"
+        );
+
+    if (List === null) {
+        return;
+    }
+
+    if (Reset) {
+        PlayerCommentUsername = Username;
+        PlayerCommentOffset = 0;
+        List.replaceChildren();
+    }
+
+    if (
+        typeof PlayerCommentUsername !==
+            "string" ||
+        PlayerCommentUsername.length === 0
+    ) {
+        if (Message !== null) {
+            Message.textContent =
+                "Set a username to receive comments.";
+        }
+
+        if (LoadMoreButton !== null) {
+            LoadMoreButton.hidden = true;
+        }
+
+        return;
+    }
+
+    if (LoadMoreButton !== null) {
+        LoadMoreButton.disabled = true;
+    }
+
+    try {
+        const Result =
+            await GetGardenerComments(
+                PlayerCommentUsername,
+                PlayerCommentOffset,
+                PlayerCommentPageSize
+            );
+
+        if (!Result.Success) {
+            throw new Error(
+                Result.Error ??
+                "Couldn't load comments."
+            );
+        }
+
+        const Comments =
+            Array.isArray(Result.Comments)
+                ? Result.Comments
+                : [];
+
+        for (const Comment of Comments) {
+            List.appendChild(
+                CreateGardenerCommentCard(
+                    Comment,
+                    DeletePlayerComment
+                )
+            );
+        }
+
+        PlayerCommentOffset +=
+            Comments.length;
+
+        if (
+            Reset &&
+            Comments.length === 0
+        ) {
+            const Empty =
+                document.createElement(
+                    "p"
+                );
+
+            Empty.className =
+                "GardenerCommentsEmpty";
+
+            Empty.textContent =
+                "No comments yet.";
+
+            List.appendChild(
+                Empty
+            );
+        }
+
+        if (Message !== null) {
+            Message.textContent = "";
+        }
+
+        if (LoadMoreButton !== null) {
+            LoadMoreButton.hidden =
+                Result.HasMore !== true;
+        }
+    } catch (Error) {
+        console.error(
+            "Couldn't load player comments:",
+            Error
+        );
+
+        if (Message !== null) {
+            Message.textContent =
+                "Couldn't load comments.";
+        }
+    } finally {
+        if (LoadMoreButton !== null) {
+            LoadMoreButton.disabled = false;
+        }
+    }
+}
+
+
+async function DeletePlayerComment(
+    CommentId,
+    Button
+) {
+    Button.disabled = true;
+
+    const Message =
+        document.getElementById(
+            "PlayerCommentMessage"
+        );
+
+    try {
+        const Result =
+            await DeleteGardenerCommentRequest(
+                CommentId
+            );
+
+        if (!Result.Success) {
+            throw new Error(
+                Result.Error ??
+                "Couldn't delete comment."
+            );
+        }
+
+        await LoadPlayerComments(
+            PlayerCommentUsername,
+            true
+        );
+
+        if (Message !== null) {
+            Message.textContent =
+                "Comment deleted.";
+        }
+    } catch (Error) {
+        console.error(
+            "Couldn't delete player comment:",
+            Error
+        );
+
+        if (Message !== null) {
+            Message.textContent =
+                Error.message ??
+                "Couldn't delete comment.";
+        }
+
+        Button.disabled = false;
+    }
 }
 
 
@@ -596,5 +1023,15 @@ document.addEventListener(
                 SubmitUsername
             );
         }
+
+        document.getElementById(
+            "LoadMorePlayerCommentsButton"
+        )?.addEventListener(
+            "click",
+            () => LoadPlayerComments(
+                PlayerCommentUsername,
+                false
+            )
+        );
     }
 );

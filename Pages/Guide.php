@@ -336,7 +336,8 @@ $PageSection = "Guide";
                     The <a href="/Pages/Social.html">Social</a> page lets
                     you search for other gardeners by username and open their
                     public Gardener page. Gardener profile pictures use a plant
-                    and growth stage the player has discovered.
+                    and growth stage the player has discovered. Gardeners who
+                    have not chosen one yet use a mature Red Rose by default.
                 </p>
 
                 <p>
@@ -350,7 +351,9 @@ $PageSection = "Guide";
                 <p>
                     Comments are simple messages left on a Gardener page. A
                     comment can be deleted by its author or by the owner of the
-                    Gardener page. Dew donations transfer spendable Dew between
+                    Gardener page. Your own received comments are also shown in
+                    the Player panel on your Garden, even while public comments
+                    are disabled. Dew donations transfer spendable Dew between
                     accounts, but donated Dew does not increase the recipient's
                     Lifetime Dew.
                 </p>

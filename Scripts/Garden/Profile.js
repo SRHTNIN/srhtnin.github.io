@@ -1194,6 +1194,10 @@ function InitialiseProfilePictureChooser() {
                 SavedProfilePicture.GrowthStage
             );
     } else {
+        const DefaultPlantKey =
+            DefaultGardenerProfilePicture
+                .PlantKey;
+
         const FirstEntry =
             GetProfilePicturePlantEntries()
                 .sort(
@@ -1203,11 +1207,19 @@ function InitialiseProfilePictureChooser() {
                 )[0] ?? null;
 
         ProfilePictureSelectedPlantKey =
-            FirstEntry?.PlantKey ??
-            null;
+            IsProfilePicturePlantAvailable(
+                DefaultPlantKey
+            )
+                ? DefaultPlantKey
+                : FirstEntry?.PlantKey ??
+                    null;
 
         ProfilePictureSelectedGrowthStage =
-            null;
+            ProfilePictureSelectedPlantKey ===
+                DefaultPlantKey
+                ? DefaultGardenerProfilePicture
+                    .GrowthStage
+                : null;
     }
 
     RenderProfilePictureChooser();

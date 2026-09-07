@@ -1084,29 +1084,12 @@ async function LoadGardenerComments(
     }
 
     try {
-        const Response = await fetch(
-            ApiUrl + "/Comments.php",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-                body: JSON.stringify({
-                    Action: "List",
-                    SaveKey: GetSaveKey(),
-                    Username:
-                        GardenerData.Username,
-                    Offset:
-                        GardenerCommentOffset,
-                    Limit:
-                        GardenerCommentPageSize
-                })
-            }
-        );
-
         const Result =
-            await Response.json();
+            await GetGardenerComments(
+                GardenerData.Username,
+                GardenerCommentOffset,
+                GardenerCommentPageSize
+            );
 
         if (!Result.Success) {
             throw new Error(
@@ -1186,102 +1169,10 @@ async function LoadGardenerComments(
 function CreateGardenerComment(
     Comment
 ) {
-    const Article =
-        document.createElement(
-            "article"
-        );
-
-    Article.className =
-        "PlantTile GardenerComment";
-
-    Article.dataset.commentId =
-        String(Comment.Id);
-
-    const Header =
-        document.createElement(
-            "div"
-        );
-
-    Header.className =
-        "GardenerCommentHeader";
-
-    const Identity =
-        CreateGardenerIdentity(
-            Comment.Username,
-            Comment.Colour,
-            Comment.ProfilePicture
-        );
-
-    const Time =
-        document.createElement(
-            "time"
-        );
-
-    Time.className =
-        "GardenerCommentTime";
-
-    const CreatedAt = Number(
-        Comment.CreatedAt
+    return CreateGardenerCommentCard(
+        Comment,
+        DeleteGardenerComment
     );
-
-    if (Number.isFinite(CreatedAt)) {
-        const DateValue =
-            new Date(CreatedAt);
-
-        Time.dateTime =
-            DateValue.toISOString();
-
-        Time.textContent =
-            DateValue.toLocaleString();
-    }
-
-    Header.append(
-        Identity,
-        Time
-    );
-
-    const Text =
-        document.createElement(
-            "p"
-        );
-
-    Text.className =
-        "GardenerCommentText";
-
-    Text.textContent =
-        Comment.Text ?? "";
-
-    Article.append(
-        Header,
-        Text
-    );
-
-    if (Comment.CanDelete === true) {
-        const DeleteButton =
-            document.createElement(
-                "button"
-            );
-
-        DeleteButton.type = "button";
-        DeleteButton.className =
-            "ActionButton GardenerCommentDelete";
-        DeleteButton.textContent =
-            "Delete";
-
-        DeleteButton.addEventListener(
-            "click",
-            () => DeleteGardenerComment(
-                Number(Comment.Id),
-                DeleteButton
-            )
-        );
-
-        Article.appendChild(
-            DeleteButton
-        );
-    }
-
-    return Article;
 }
 
 
@@ -1402,24 +1293,10 @@ async function DeleteGardenerComment(
         );
 
     try {
-        const Response = await fetch(
-            ApiUrl + "/Comments.php",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-                body: JSON.stringify({
-                    Action: "Delete",
-                    SaveKey: GetSaveKey(),
-                    CommentId: CommentId
-                })
-            }
-        );
-
         const Result =
-            await Response.json();
+            await DeleteGardenerCommentRequest(
+                CommentId
+            );
 
         if (!Result.Success) {
             throw new Error(

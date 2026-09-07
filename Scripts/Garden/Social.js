@@ -263,7 +263,7 @@ function CreateGardenerSearchResult(
         CreateGardenerAvatar(
             Gardener.ProfilePicture,
             Gardener.Username,
-            "GardenerAvatarSearch"
+            "GardenerAvatarLarge"
         );
 
     const Details =

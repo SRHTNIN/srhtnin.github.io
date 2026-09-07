@@ -256,12 +256,12 @@ $PageSection = "Garden";
             >
                 <h2 class="PanelHeader PanelHeaderInset">Player</h2>
 
-                <p>
-                    Username:
-                    <strong id="UsernameDisplay">
-                        Loading...
-                    </strong>
-                </p>
+                <div
+                    id="PlayerIdentity"
+                    class="GardenPlayerIdentity"
+                >
+                    Loading...
+                </div>
 
                 <form
                     id="UsernameForm"
@@ -283,6 +283,28 @@ $PageSection = "Garden";
 
                     <p id="UsernameMessage"></p>
                 </form>
+
+                <h3>Comments</h3>
+
+                <p
+                    id="PlayerCommentMessage"
+                    class="ProfileMessage"
+                    aria-live="polite"
+                ></p>
+
+                <div
+                    id="PlayerCommentList"
+                    class="GardenerCommentList"
+                ></div>
+
+                <button
+                    id="LoadMorePlayerCommentsButton"
+                    class="ActionButton GardenerLoadMoreButton"
+                    type="button"
+                    hidden
+                >
+                    Load more comments
+                </button>
             </section>
 
         </main>

@@ -1025,7 +1025,7 @@ input, button, textarea, select {
     padding: 0.75rem;
 }
 
-.ProfileSection h3:not(.PanelHeader) {
+.GardenUser h3:not(.PanelHeader), .ProfileSection h3:not(.PanelHeader) {
     margin-top: 1.5rem;
 }
 
@@ -1643,8 +1643,16 @@ input, button, textarea, select {
     white-space: nowrap;
 }
 
-.GardenerIdentity:hover .GardenerIdentityName {
+a.GardenerIdentity:hover .GardenerIdentityName {
     text-decoration: underline;
+}
+
+.GardenPlayerIdentity {
+    min-height: 4.25rem;
+}
+
+.GardenPlayerIdentityContent {
+    font-size: 1.35rem;
 }
 
 .GardenerSearchResults {
@@ -1671,7 +1679,7 @@ input, button, textarea, select {
     box-shadow: 2px 2px 0 var(--Crust);
 }
 
-.GardenerAvatarSearch {
+.GardenerAvatarLarge {
     width: 4.25rem;
     height: 4.25rem;
     flex-basis: 4.25rem;
@@ -1813,7 +1821,7 @@ input, button, textarea, select {
     overflow-wrap: anywhere;
 }
 
-.InteractivePanel .GardenerCommentDelete {
+.GardenerCommentDelete {
     width: auto;
     margin-top: 0.75rem;
 }
