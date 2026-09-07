@@ -25,7 +25,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Player"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h2 class="PanelHeader PanelHeaderInset">Player</h2>
 
@@ -101,7 +101,7 @@ $PageTitle = "Profile";
 
             <section
                 id="GardenerProfile"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h2 class="PanelHeader PanelHeaderInset">Gardener profile</h2>
 
@@ -226,6 +226,8 @@ $PageTitle = "Profile";
                 <p>
                     Choose which parts of your Gardener profile
                     other players will be able to use or view.
+                    Hiding statistics also removes you from the
+                    public Dew leaderboard.
                 </p>
 
                 <div class="ProfileButtonRow">
@@ -267,7 +269,7 @@ $PageTitle = "Profile";
 
             <section
                 id="GardenDisplay"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h2 class="PanelHeader PanelHeaderInset">Garden display</h2>
 
@@ -411,7 +413,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Statistics"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h3 class="PanelHeader PanelHeaderInset">Statistics</h3>
 
@@ -481,7 +483,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Contact"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h2 class="PanelHeader PanelHeaderInset">Contact</h2>
 
@@ -501,7 +503,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Account"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h2 class="PanelHeader PanelHeaderInset">Account</h2>
 
@@ -610,7 +612,7 @@ $PageTitle = "Profile";
 
             <section
                 id="Import"
-                class="Panel ProfileSection"
+                class="Panel ProfileSection InteractivePanel"
             >
                 <h3 class="PanelHeader PanelHeaderInset">Import Account</h3>
 

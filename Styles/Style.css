@@ -1020,7 +1020,7 @@ input, button, textarea, select {
     text-align: right;
 }
 
-.ProfileSection {
+.ProfileSection, .SocialSection {
     margin-top: 1.5rem;
     padding: 0.75rem;
 }
@@ -1029,7 +1029,7 @@ input, button, textarea, select {
     margin-top: 1.5rem;
 }
 
-.ProfileFormRow, .ProfileButtonRow {
+.FormRow, .ProfileFormRow, .ProfileButtonRow {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -1040,13 +1040,13 @@ input, button, textarea, select {
     margin-top: 0.75rem;
 }
 
-.ProfileSection label {
+.InteractivePanel label {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--Blue);
 }
 
-.ProfileSection input, .ProfileSection textarea, .ProfileSection select, .ProfileSection button {
+.InteractivePanel input, .InteractivePanel textarea, .InteractivePanel select, .InteractivePanel button {
     font-size: 1rem;
     color: var(--Text);
     background-color: var(--Surface0);
@@ -1055,46 +1055,46 @@ input, button, textarea, select {
     appearance: none;
 }
 
-.ProfileSection input, .ProfileSection textarea, .ProfileSection select {
+.InteractivePanel input, .InteractivePanel textarea, .InteractivePanel select {
     padding: 0.6rem;
     outline: none;
 }
 
-.ProfileSection input {
+.InteractivePanel input {
     min-width: 12rem;
 }
 
-.ProfileSection select {
+.InteractivePanel select {
     appearance: auto;
 }
 
-.ProfileSection textarea {
+.InteractivePanel textarea {
     width: 100%;
     max-width: 24rem;
     resize: vertical;
 }
 
-.ProfileSection input::placeholder, .ProfileSection textarea::placeholder {
+.InteractivePanel input::placeholder, .InteractivePanel textarea::placeholder {
     color: var(--Overlay1);
 }
 
-.ProfileSection input:hover, .ProfileSection textarea:hover, .ProfileSection select:hover {
+.InteractivePanel input:hover, .InteractivePanel textarea:hover, .InteractivePanel select:hover {
     background-color: var(--Surface1);
     border-color: var(--Overlay2);
 }
 
-.ProfileSection input:focus, .ProfileSection textarea:focus, .ProfileSection select:focus {
+.InteractivePanel input:focus, .InteractivePanel textarea:focus, .InteractivePanel select:focus {
     background-color: var(--Surface1);
     border-color: var(--Sky);
 }
 
-.ProfileSection button {
+.InteractivePanel button {
     padding: 0.6rem 0.8rem;
     cursor: pointer;
     box-shadow: 3px 3px 0 var(--Crust);
 }
 
-.ProfileSection button:hover {
+.InteractivePanel button:hover:not(:disabled) {
     color: var(--Sky);
     background-color: var(--Surface1);
     border-color: var(--Sky);
@@ -1102,7 +1102,7 @@ input, button, textarea, select {
     box-shadow: 2px 2px 0 var(--Crust);
 }
 
-.ProfileSection button:disabled {
+.InteractivePanel button:disabled {
     cursor: not-allowed;
     color: var(--Overlay1);
     background-color: var(--Surface0);
@@ -1110,7 +1110,7 @@ input, button, textarea, select {
     box-shadow: none;
 }
 
-.ProfileSection button:active {
+.InteractivePanel button:active:not(:disabled) {
     color: var(--Green);
     background-color: var(--Surface2);
     border-color: var(--Green);
@@ -1118,7 +1118,7 @@ input, button, textarea, select {
     box-shadow: 1px 1px 0 var(--Crust);
 }
 
-.ProfileSection button:focus-visible, .ProfileSection summary:focus-visible {
+.InteractivePanel button:focus-visible, .InteractivePanel summary:focus-visible {
     outline: 3px solid var(--Yellow);
     outline-offset: 3px;
 }
@@ -1259,12 +1259,12 @@ input, button, textarea, select {
         overflow-wrap: anywhere;
     }
 
-    .ProfileFormRow, .ProfileButtonRow {
+    .FormRow, .ProfileFormRow, .ProfileButtonRow {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .ProfileSection input, .ProfileSection textarea, .ProfileSection select, .ProfileSection button {
+    .InteractivePanel input, .InteractivePanel textarea, .InteractivePanel select, .InteractivePanel button {
         width: 100%;
     }
 
@@ -1606,6 +1606,264 @@ input, button, textarea, select {
 
     .ProfilePictureSelectionRow > :first-child {
         grid-column: 1 / -1;
+    }
+}
+
+
+/* * Garden social */
+
+.GardenerAvatar {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 3rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.GardenerAvatarPlaceholder {
+    color: var(--Overlay1);
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.GardenerIdentity {
+    display: inline-flex;
+    min-width: 0;
+    gap: 0.65rem;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+}
+
+.GardenerIdentityName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.GardenerIdentity:hover .GardenerIdentityName {
+    text-decoration: underline;
+}
+
+.GardenerSearchResults {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.GardenerSearchResult {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.85rem;
+    padding: 0.75rem;
+    align-items: center;
+    color: var(--Text);
+    text-decoration: none;
+    box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.GardenerSearchResult:hover {
+    color: var(--Text);
+    background-color: var(--Surface1);
+    border-color: var(--Sky);
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 var(--Crust);
+}
+
+.GardenerAvatarSearch {
+    width: 4.25rem;
+    height: 4.25rem;
+    flex-basis: 4.25rem;
+}
+
+.GardenerSearchResultDetails {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.GardenerSearchResultName {
+    overflow: hidden;
+    font-size: 1.35rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.GardenerSearchResultDescription {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--Subtext1);
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.GardenerBackLink {
+    margin-bottom: 1rem;
+}
+
+.GardenerHero {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+}
+
+.GardenerHeroText {
+    min-width: 0;
+}
+
+.GardenerHeroText h1 {
+    margin-bottom: 0.5rem;
+}
+
+.GardenerHeroText p {
+    margin-bottom: 0;
+    white-space: pre-wrap;
+}
+
+.GardenerAvatarHero {
+    width: 7rem;
+    height: 7rem;
+    flex-basis: 7rem;
+}
+
+.GardenerSectionHeader {
+    justify-content: space-between;
+}
+
+.GardenerGardenControls {
+    display: grid;
+    grid-template-columns: minmax(7rem, auto) minmax(0, 1fr) minmax(7rem, auto);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.GardenerGardenTitle {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+    text-align: center;
+}
+
+.GardenerGardenTitle strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.GardenerGardenTitle span,
+.GardenerSectionHeader span {
+    color: var(--Subtext1);
+}
+
+.GardenPlotReadOnly,
+.GardenPlotReadOnly:hover {
+    cursor: default;
+    transform: none;
+    box-shadow: 3px 3px 0 var(--Crust);
+}
+
+.GardenPlotReadOnly:hover {
+    --TileBackground: var(--Surface0);
+    --PlotBorderColour: var(--Surface2);
+}
+
+.GardenPlotReadOnly.GardenPlotEmpty:hover {
+    --TileBackground: var(--Mantle);
+}
+
+.GardenPlotReadOnly.GardenPlotMature:hover {
+    --GrowthColour: var(--Green);
+}
+
+.GardenerCommentList {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.GardenerComment {
+    padding: 0.75rem;
+}
+
+.GardenerCommentHeader {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.GardenerCommentTime {
+    flex: 0 0 auto;
+    color: var(--Overlay1);
+    font-size: 0.85rem;
+    text-align: right;
+}
+
+.GardenerCommentText {
+    margin: 0.75rem 0 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.InteractivePanel .GardenerCommentDelete {
+    width: auto;
+    margin-top: 0.75rem;
+}
+
+.GardenerCommentsEmpty {
+    margin: 0;
+    color: var(--Subtext1);
+}
+
+.GardenerLoadMoreButton {
+    margin-top: 0.75rem;
+}
+
+.LeaderboardTable {
+    font-size: 1.35rem;
+}
+
+.LeaderboardUsername .GardenerAvatar {
+    width: 3.25rem;
+    height: 3.25rem;
+    flex-basis: 3.25rem;
+}
+
+.LeaderboardUsername .GardenerIdentity {
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .GardenerAvatarHero {
+        width: 5.5rem;
+        height: 5.5rem;
+        flex-basis: 5.5rem;
+    }
+
+    .GardenerGardenControls {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .GardenerGardenTitle {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+
+    .GardenerCommentHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .GardenerCommentTime {
+        text-align: left;
     }
 }
 

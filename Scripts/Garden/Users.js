@@ -191,6 +191,219 @@ function ApplyPlayerColour(
 }
 
 
+function GetGardenerProfilePictureSource(
+    ProfilePicture
+) {
+    if (
+        ProfilePicture === null ||
+        typeof ProfilePicture !== "object" ||
+        Array.isArray(ProfilePicture) ||
+        typeof ProfilePicture.PlantKey !==
+            "string" ||
+        !Number.isInteger(
+            Number(
+                ProfilePicture.GrowthStage
+            )
+        )
+    ) {
+        return null;
+    }
+
+    if (
+        typeof Plants === "undefined" ||
+        typeof GetPlantImageSources !==
+            "function"
+    ) {
+        return null;
+    }
+
+    const Plant =
+        Plants[
+            ProfilePicture.PlantKey
+        ];
+
+    if (Plant === undefined) {
+        return null;
+    }
+
+    const Images =
+        GetPlantImageSources(
+            Plant
+        );
+
+    const GrowthStage = Number(
+        ProfilePicture.GrowthStage
+    );
+
+    const RequestedSource =
+        Images[GrowthStage - 1];
+
+    if (
+        typeof RequestedSource ===
+            "string" &&
+        RequestedSource.length > 0
+    ) {
+        return RequestedSource;
+    }
+
+    for (
+        let Index = Images.length - 1;
+        Index >= 0;
+        Index--
+    ) {
+        if (
+            typeof Images[Index] ===
+                "string" &&
+            Images[Index].length > 0
+        ) {
+            return Images[Index];
+        }
+    }
+
+    return null;
+}
+
+
+function CreateGardenerAvatar(
+    ProfilePicture,
+    Username = "",
+    AdditionalClass = null
+) {
+    const Avatar =
+        document.createElement(
+            "span"
+        );
+
+    Avatar.className =
+        "PlantTile GardenerAvatar";
+
+    if (
+        typeof AdditionalClass ===
+            "string" &&
+        AdditionalClass.length > 0
+    ) {
+        Avatar.classList.add(
+            AdditionalClass
+        );
+    }
+
+    if (Username.length > 0) {
+        Avatar.title =
+            Username +
+            "'s profile picture";
+    }
+
+    const ImageSource =
+        GetGardenerProfilePictureSource(
+            ProfilePicture
+        );
+
+    if (ImageSource !== null) {
+        const Image =
+            document.createElement(
+                "img"
+            );
+
+        Image.className =
+            "PlantSprite";
+
+        Image.src = ImageSource;
+        Image.alt = "";
+        Image.draggable = false;
+
+        Avatar.appendChild(
+            Image
+        );
+
+        return Avatar;
+    }
+
+    const Placeholder =
+        document.createElement(
+            "span"
+        );
+
+    Placeholder.className =
+        "GardenerAvatarPlaceholder";
+
+    Placeholder.textContent = "□";
+
+    Avatar.appendChild(
+        Placeholder
+    );
+
+    return Avatar;
+}
+
+
+function GetGardenerPageUrl(
+    Username
+) {
+    const Query =
+        new URLSearchParams({
+            Username: Username
+        });
+
+    return (
+        "/Pages/Gardener.html?" +
+        Query.toString()
+    );
+}
+
+
+function CreateGardenerIdentity(
+    Username,
+    Colour,
+    ProfilePicture,
+    LinkToGardener = true
+) {
+    const Container =
+        document.createElement(
+            LinkToGardener
+                ? "a"
+                : "span"
+        );
+
+    Container.className =
+        "GardenerIdentity";
+
+    if (LinkToGardener) {
+        Container.href =
+            GetGardenerPageUrl(
+                Username
+            );
+    }
+
+    const Avatar =
+        CreateGardenerAvatar(
+            ProfilePicture,
+            Username
+        );
+
+    const Name =
+        document.createElement(
+            "span"
+        );
+
+    Name.className =
+        "GardenerIdentityName";
+
+    Name.textContent = Username;
+
+    ApplyPlayerColour(
+        Name,
+        Colour
+    );
+
+    Container.append(
+        Avatar,
+        Name
+    );
+
+    return Container;
+}
+
+
 async function GetProfile() {
     const Response = await fetch(
         ApiUrl + "/Profile.php",

@@ -147,12 +147,12 @@ async function RenderLeaderboard(
             Rank.textContent =
                 Player.Rank + ".";
 
-            Username.textContent =
-                Player.Username;
-
-            ApplyPlayerColour(
-                Username,
-                Player.Colour
+            Username.appendChild(
+                CreateGardenerIdentity(
+                    Player.Username,
+                    Player.Colour,
+                    Player.ProfilePicture
+                )
             );
 
             Dew.textContent =

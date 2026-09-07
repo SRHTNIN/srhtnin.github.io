@@ -312,16 +312,47 @@ $PageSection = "Guide";
 
                 <p>
                     Your <a href="/Pages/Profile.html">Profile</a>
-                    contains your username, colour, Garden display settings,
-                    statistics, and Account Key. Garden saves can sync through
-                    the API, while the Account Key lets you use the same Garden
-                    in another browser or on another device. It's basically
-                    just like logging into an account.
+                    contains your username, colour, Gardener description,
+                    plant profile picture, privacy settings, Garden display
+                    settings, statistics, and Account Key. Garden saves can
+                    sync through the API, while the Account Key lets you use
+                    the same Garden in another browser or on another device.
+                    It's basically just like logging into an account.
                 </p>
 
                 <p>
                     Treat your Account Key like a password. Anyone who
                     has it can load the same Garden account and mess stuff up.
+                </p>
+            </section>
+
+            <section
+                id="Social"
+                class="GuideSection"
+            >
+                <h2>Social and Gardener profiles</h2>
+
+                <p>
+                    The <a href="/Pages/Social.html">Social</a> page lets
+                    you search for other gardeners by username and open their
+                    public Gardener page. Gardener profile pictures use a plant
+                    and growth stage the player has discovered.
+                </p>
+
+                <p>
+                    Gardener pages can show statistics and read-only previews
+                    of every Garden the player owns. Players can independently
+                    disable Garden previews, comments, Dew donations, and
+                    public statistics from their Profile. Disabling public
+                    statistics also hides the player from the Dew leaderboard.
+                </p>
+
+                <p>
+                    Comments are simple messages left on a Gardener page. A
+                    comment can be deleted by its author or by the owner of the
+                    Gardener page. Dew donations transfer spendable Dew between
+                    accounts, but donated Dew does not increase the recipient's
+                    Lifetime Dew.
                 </p>
             </section>
 
@@ -343,9 +374,12 @@ $PageSection = "Guide";
                 <p>
                     This browser stores your Account Key and a local copy
                     of your Garden save so the same account can keep working
-                    between visits. If you set a username, some profile
-                    information and statistics can also appear on the
-                    public leaderboard.
+                    between visits. If you set a username, your Gardener can
+                    be found through Social. Your username, profile colour,
+                    description, and selected plant profile picture form the
+                    basic public Gardener profile; the separate privacy
+                    settings control Garden previews, comments, Dew donations,
+                    and public statistics.
                 </p>
 
                 <p>
