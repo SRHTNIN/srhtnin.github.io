@@ -281,6 +281,29 @@ $PageSection = "Admin";
                             </div>
                         </div>
 
+                        <div class="AdminMutationListsPanel">
+                            <div class="AdminMutationListsHeader">
+                                <div>
+                                    <h3>Lists</h3>
+                                    <p>
+                                        Lists are numbered by their position. Every reference to the same list uses that list's Once or Any mode.
+                                    </p>
+                                </div>
+
+                                <button
+                                    id="AdminMutationAddListButton"
+                                    class="ActionButton AdminInlineButton"
+                                    type="button"
+                                >
+                                    Add list
+                                </button>
+                            </div>
+
+                            <ol id="AdminMutationLists" class="AdminMutationLists"></ol>
+
+                            <datalist id="AdminMutationTagOptions"></datalist>
+                        </div>
+
                         <div class="AdminMutationRecipeFlow">
                             <div class="AdminMutationGridPanel">
                                 <h3>Arrange</h3>
@@ -323,6 +346,7 @@ $PageSection = "Admin";
                                         <option value="Empty">Empty</option>
                                         <option value="Plant">Exact plant</option>
                                         <option value="Matcher">Tag matcher</option>
+                                        <option value="List">List</option>
                                     </select>
                                 </label>
 
@@ -333,6 +357,15 @@ $PageSection = "Admin";
                                 >
                                     <span>Plant</span>
                                     <select id="AdminMutationPatternPlant"></select>
+                                </label>
+
+                                <label
+                                    id="AdminMutationPatternListRow"
+                                    class="AdminEditorField"
+                                    hidden
+                                >
+                                    <span>List</span>
+                                    <select id="AdminMutationPatternList"></select>
                                 </label>
 
                                 <div
@@ -392,6 +425,7 @@ $PageSection = "Admin";
                                         <option value="Empty">Empty</option>
                                         <option value="Plant">Plant</option>
                                         <option value="Capture">Captured plant</option>
+                                        <option value="List">List</option>
                                     </select>
                                 </label>
 
@@ -402,6 +436,15 @@ $PageSection = "Admin";
                                 >
                                     <span>Plant</span>
                                     <select id="AdminMutationResultPlant"></select>
+                                </label>
+
+                                <label
+                                    id="AdminMutationResultListRow"
+                                    class="AdminEditorField"
+                                    hidden
+                                >
+                                    <span>List</span>
+                                    <select id="AdminMutationResultList"></select>
                                 </label>
 
                                 <label

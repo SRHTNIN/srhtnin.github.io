@@ -161,6 +161,9 @@ function UpdateAdminMassMutationFieldStates() {
         AllowImmature: [
             "AdminMassMutationAllowImmature"
         ],
+        Lists: [
+            "AdminMassMutationLists"
+        ],
         Pattern: [
             "AdminMassMutationPattern"
         ],
@@ -401,6 +404,18 @@ function GetAdminMassMutationPatch() {
 
     if (
         AdminMassMutationFieldEnabled(
+            "Lists"
+        )
+    ) {
+        Patch.Lists =
+            ParseAdminMassMutationJson(
+                "AdminMassMutationLists",
+                "Lists JSON"
+            );
+    }
+
+    if (
+        AdminMassMutationFieldEnabled(
             "Pattern"
         )
     ) {
@@ -489,6 +504,12 @@ function BuildAdminMassMutationPayload(
             Source.Rotation ?? "None",
         AllowImmature:
             Source.AllowImmature === true,
+        Lists:
+            JSON.parse(
+                JSON.stringify(
+                    Source.Lists ?? []
+                )
+            ),
         Pattern:
             JSON.parse(
                 JSON.stringify(

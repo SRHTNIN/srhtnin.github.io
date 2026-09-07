@@ -744,6 +744,10 @@ function NormalizeAdminTransferMutation(
         AllowImmature:
             Imported.AllowImmature ===
             true,
+        Lists:
+            CloneAdminTransferValue(
+                Imported.Lists ?? []
+            ),
         Pattern:
             CloneAdminTransferValue(
                 Imported.Pattern
@@ -1908,6 +1912,10 @@ function GetAdminTransferPortableMutation(
         AllowImmature:
             Mutation.AllowImmature ===
             true,
+        Lists:
+            CloneAdminTransferValue(
+                Mutation.Lists ?? []
+            ),
         Pattern:
             CloneAdminTransferValue(
                 Mutation.Pattern
@@ -2638,7 +2646,103 @@ function CreateAdminTransferMutationRecipe(
         Flow
     );
 
+    const Lists =
+        CreateAdminTransferMutationLists(
+            Mutation.Lists,
+            PlantCatalogue
+        );
+
+    if (Lists !== null) {
+        Section.appendChild(Lists);
+    }
+
     return Section;
+}
+
+
+function CreateAdminTransferMutationLists(
+    Lists,
+    PlantCatalogue
+) {
+    if (
+        !Array.isArray(Lists) ||
+        Lists.length === 0
+    ) {
+        return null;
+    }
+
+    const Container =
+        document.createElement("div");
+
+    Container.className =
+        "MutationRecipeLists";
+
+    const Heading =
+        document.createElement("h4");
+
+    Heading.textContent = "Lists";
+
+    const OrderedList =
+        document.createElement("ol");
+
+    for (const List of Lists) {
+        const ListItem =
+            document.createElement("li");
+
+        const Mode =
+            document.createElement("strong");
+
+        Mode.textContent =
+            List?.Mode === "Any"
+                ? "Any: "
+                : "Once: ";
+
+        const Labels =
+            Array.isArray(List?.Items)
+                ? List.Items.map(
+                    Item => {
+                        if (Item?.Type === "Plant") {
+                            return PlantCatalogue?.[
+                                Item.Value
+                            ]?.Name ??
+                                Item.Value ??
+                                "Unknown plant";
+                        }
+
+                        if (Item?.Type === "Tag") {
+                            return "Tag: " +
+                                (Item.Value ?? "");
+                        }
+
+                        if (Item?.Type === "Empty") {
+                            return "Empty";
+                        }
+
+                        return "Any";
+                    }
+                )
+                : [];
+
+        ListItem.append(
+            Mode,
+            document.createTextNode(
+                Labels.length > 0
+                    ? Labels.join(", ")
+                    : "Empty list"
+            )
+        );
+
+        OrderedList.appendChild(
+            ListItem
+        );
+    }
+
+    Container.append(
+        Heading,
+        OrderedList
+    );
+
+    return Container;
 }
 
 
@@ -2746,6 +2850,18 @@ function CreateAdminTransferMutationCell(
             );
         }
 
+        const ListMatch =
+            /^List:([1-9][0-9]*)$/.exec(
+                PlantValue
+            );
+
+        if (ListMatch !== null) {
+            return CreateAdminTransferTextCell(
+                "List " + ListMatch[1],
+                "MutationRecipeMatcher"
+            );
+        }
+
         return CreateAdminTransferPlantCell(
             PlantValue,
             PlantCatalogue
@@ -2770,6 +2886,18 @@ function CreateAdminTransferMutationCell(
     }
 
     if (typeof Value === "string") {
+        const ListMatch =
+            /^List:([1-9][0-9]*)$/.exec(
+                Value
+            );
+
+        if (ListMatch !== null) {
+            return CreateAdminTransferTextCell(
+                "List " + ListMatch[1],
+                "MutationRecipeMatcher"
+            );
+        }
+
         return CreateAdminTransferPlantCell(
             Value,
             PlantCatalogue

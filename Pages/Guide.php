@@ -132,6 +132,15 @@ $PageSection = "Guide";
                     that same area can try mutating again.
                 </p>
 
+                <p>
+                    Some recipes use numbered lists instead of one exact
+                    plant in a slot. A <strong>Once</strong> list can use
+                    each of its entries at most once across the whole
+                    recipe, while an <strong>Any</strong> list can reuse a
+                    matching entry. This lets a recipe care about a set of
+                    plants without caring which order they are arranged in.
+                </p>
+
                 <div class="GuideTip">
                     <strong>
                         Since you were good and actually read this...

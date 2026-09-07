@@ -355,6 +355,7 @@ function CreateMutationCandidate(
 ) {
     const Captures = {};
     const Cells = [];
+    const ListReferences = {};
 
 
     for (
@@ -395,6 +396,24 @@ function CreateMutationCandidate(
                 PlotIndex
             );
 
+            const ListNumber =
+                GetMutationListReference(
+                    Matcher
+                );
+
+            if (ListNumber !== null) {
+                ListReferences[ListNumber] ??= [];
+
+                ListReferences[ListNumber].push({
+                    PlotIndex: PlotIndex,
+                    LocalX: LocalX,
+                    LocalY: LocalY,
+                    Plot: Plot
+                });
+
+                continue;
+            }
+
 
             if (
                 !DoesPlotMatchMutationMatcher(
@@ -408,6 +427,18 @@ function CreateMutationCandidate(
                 return null;
             }
         }
+    }
+
+
+    const ListMatches =
+        MatchMutationLists(
+            ListReferences,
+            Mutation,
+            AtTime
+        );
+
+    if (ListMatches === null) {
+        return null;
     }
 
 
@@ -464,6 +495,7 @@ function CreateMutationCandidate(
 
         Cells: Cells,
         Captures: Captures,
+        ListMatches: ListMatches,
 
         Priority:
             Number(
@@ -472,7 +504,8 @@ function CreateMutationCandidate(
 
         Specificity:
             GetMutationPatternSpecificity(
-                Orientation.Pattern
+                Orientation.Pattern,
+                Mutation
             )
     };
 }
@@ -513,8 +546,271 @@ function DoesMutationCandidateStillMatch(
     Candidate.Captures =
         RefreshedCandidate.Captures;
 
+    Candidate.ListMatches =
+        RefreshedCandidate.ListMatches;
+
 
     return true;
+}
+
+
+function GetMutationListReference(
+    Value
+) {
+    if (typeof Value !== "string") {
+        return null;
+    }
+
+    const Match =
+        /^List:([1-9][0-9]*)$/.exec(
+            Value
+        );
+
+    return Match === null
+        ? null
+        : Number(Match[1]);
+}
+
+
+function MatchMutationLists(
+    ListReferences,
+    Mutation,
+    AtTime
+) {
+    const Matches = {};
+    const Lists =
+        Array.isArray(Mutation.Lists)
+            ? Mutation.Lists
+            : [];
+
+    for (
+        const [ListNumberText, References]
+        of Object.entries(ListReferences)
+    ) {
+        const ListNumber =
+            Number(ListNumberText);
+
+        const List =
+            Lists[ListNumber - 1];
+
+        if (
+            List === undefined ||
+            !Array.isArray(List.Items) ||
+            List.Items.length === 0
+        ) {
+            return null;
+        }
+
+        const CandidateItems =
+            References.map(
+                Reference =>
+                    List.Items.map(
+                        (Item, ItemIndex) => ({
+                            Item: Item,
+                            ItemIndex: ItemIndex
+                        })
+                    ).filter(
+                        Candidate =>
+                            DoesPlotMatchMutationListItem(
+                                Reference.Plot,
+                                Candidate.Item,
+                                Mutation,
+                                AtTime
+                            )
+                    )
+            );
+
+        if (
+            CandidateItems.some(
+                Items => Items.length === 0
+            )
+        ) {
+            return null;
+        }
+
+        let Assignments;
+
+        if (List.Mode === "Once") {
+            Assignments =
+                MatchMutationListOnce(
+                    CandidateItems
+                );
+
+            if (Assignments === null) {
+                return null;
+            }
+        } else {
+            Assignments =
+                CandidateItems.map(
+                    Items => Items[0]
+                );
+        }
+
+        Matches[ListNumber] =
+            References.map(
+                (Reference, Index) => ({
+                    PlotIndex:
+                        Reference.PlotIndex,
+                    LocalX:
+                        Reference.LocalX,
+                    LocalY:
+                        Reference.LocalY,
+                    Plot:
+                        CloneMutationPlot(
+                            Reference.Plot
+                        ),
+                    ItemIndex:
+                        Assignments[Index]
+                            .ItemIndex
+                })
+            );
+    }
+
+    return Matches;
+}
+
+
+function MatchMutationListOnce(
+    CandidateItems
+) {
+    const ItemToReference =
+        new Map();
+
+    const Assignments =
+        new Array(
+            CandidateItems.length
+        );
+
+    function TryAssign(
+        ReferenceIndex,
+        SeenItems
+    ) {
+        for (
+            const Candidate
+            of CandidateItems[
+                ReferenceIndex
+            ]
+        ) {
+            if (
+                SeenItems.has(
+                    Candidate.ItemIndex
+                )
+            ) {
+                continue;
+            }
+
+            SeenItems.add(
+                Candidate.ItemIndex
+            );
+
+            const PreviousReference =
+                ItemToReference.get(
+                    Candidate.ItemIndex
+                );
+
+            if (
+                PreviousReference === undefined ||
+                TryAssign(
+                    PreviousReference,
+                    SeenItems
+                )
+            ) {
+                ItemToReference.set(
+                    Candidate.ItemIndex,
+                    ReferenceIndex
+                );
+
+                Assignments[
+                    ReferenceIndex
+                ] = Candidate;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    for (
+        let ReferenceIndex = 0;
+        ReferenceIndex < CandidateItems.length;
+        ReferenceIndex++
+    ) {
+        if (
+            !TryAssign(
+                ReferenceIndex,
+                new Set()
+            )
+        ) {
+            return null;
+        }
+    }
+
+    return Assignments;
+}
+
+
+function DoesPlotMatchMutationListItem(
+    Plot,
+    Item,
+    Mutation,
+    AtTime
+) {
+    if (
+        Item === null ||
+        typeof Item !== "object"
+    ) {
+        return false;
+    }
+
+    if (Item.Type === "Any") {
+        return true;
+    }
+
+    if (Item.Type === "Empty") {
+        return Plot === null;
+    }
+
+    if (Plot === null) {
+        return false;
+    }
+
+    const Plant =
+        Plants[Plot.Plant];
+
+    if (Plant === undefined) {
+        return false;
+    }
+
+    if (
+        Mutation.AllowImmature !== true &&
+        !IsMutationPlantMature(
+            Plot,
+            Plant,
+            AtTime
+        )
+    ) {
+        return false;
+    }
+
+    if (Item.Type === "Plant") {
+        return (
+            typeof Item.Value === "string" &&
+            Plot.Plant === Item.Value
+        );
+    }
+
+    if (Item.Type === "Tag") {
+        return (
+            typeof Item.Value === "string" &&
+            Array.isArray(Plant.Tags) &&
+            Plant.Tags.includes(
+                Item.Value
+            )
+        );
+    }
+
+    return false;
 }
 
 
@@ -756,6 +1052,7 @@ function ApplyMutationResult(
 
 
     let Changed = false;
+    const UsedListResultMatches = {};
 
 
     for (
@@ -798,16 +1095,47 @@ function ApplyMutationResult(
                 );
 
 
-            const NewPlot =
-                CreateMutationResultPlot(
-                    ResultValue,
-                    Candidate.Captures,
-                    AtTime
+            const ListNumber =
+                GetMutationListReference(
+                    ResultValue
                 );
+
+            let NewPlot;
+
+            if (ListNumber !== null) {
+                const Match =
+                    GetMutationResultListMatch(
+                        Candidate,
+                        ListNumber,
+                        LocalX,
+                        LocalY,
+                        UsedListResultMatches
+                    );
+
+                if (Match === undefined) {
+                    continue;
+                }
+
+                NewPlot =
+                    CloneMutationPlot(
+                        Match.Plot
+                    );
+            } else {
+                NewPlot =
+                    CreateMutationResultPlot(
+                        ResultValue,
+                        Candidate.Captures,
+                        AtTime
+                    );
+            }
 
 
             if (
-                ResultValue === "Empty"
+                ResultValue === "Empty" ||
+                (
+                    ListNumber !== null &&
+                    NewPlot === null
+                )
             ) {
                 if (
                     SaveData.Garden.Plots[
@@ -878,6 +1206,50 @@ function ApplyMutationResult(
 
 
     return Changed;
+}
+
+
+function GetMutationResultListMatch(
+    Candidate,
+    ListNumber,
+    LocalX,
+    LocalY,
+    UsedMatches
+) {
+    const Matches =
+        Candidate.ListMatches?.[
+            ListNumber
+        ] ?? [];
+
+    UsedMatches[ListNumber] ??=
+        new Set();
+
+    const Used =
+        UsedMatches[ListNumber];
+
+    let MatchIndex =
+        Matches.findIndex(
+            (Match, Index) =>
+                !Used.has(Index) &&
+                Match.LocalX === LocalX &&
+                Match.LocalY === LocalY
+        );
+
+    if (MatchIndex < 0) {
+        MatchIndex =
+            Matches.findIndex(
+                (Match, Index) =>
+                    !Used.has(Index)
+            );
+    }
+
+    if (MatchIndex < 0) {
+        return undefined;
+    }
+
+    Used.add(MatchIndex);
+
+    return Matches[MatchIndex];
 }
 
 
@@ -1066,7 +1438,8 @@ function CompareMutationCandidates(
 
 
 function GetMutationPatternSpecificity(
-    Pattern
+    Pattern,
+    Mutation = null
 ) {
     let Specificity = 0;
 
@@ -1097,6 +1470,22 @@ function GetMutationPatternSpecificity(
                 typeof Matcher ===
                 "string"
             ) {
+                const ListNumber =
+                    GetMutationListReference(
+                        Matcher
+                    );
+
+                if (ListNumber !== null) {
+                    Specificity +=
+                        GetMutationListSpecificity(
+                            Mutation?.Lists?.[
+                                ListNumber - 1
+                            ]
+                        );
+
+                    continue;
+                }
+
                 Specificity += 8;
                 continue;
             }
@@ -1138,6 +1527,46 @@ function GetMutationPatternSpecificity(
 
 
     return Specificity;
+}
+
+
+function GetMutationListSpecificity(
+    List
+) {
+    if (
+        List === null ||
+        typeof List !== "object" ||
+        !Array.isArray(List.Items) ||
+        List.Items.length === 0
+    ) {
+        return 0;
+    }
+
+    const ItemSpecificities =
+        List.Items.map(
+            Item => {
+                if (Item?.Type === "Empty") {
+                    return 2;
+                }
+
+                if (Item?.Type === "Plant") {
+                    return 8;
+                }
+
+                if (Item?.Type === "Tag") {
+                    return 3;
+                }
+
+                return 0;
+            }
+        );
+
+    const Base = Math.min(
+        ...ItemSpecificities
+    );
+
+    return Base +
+        (List.Mode === "Once" ? 1 : 0);
 }
 
 

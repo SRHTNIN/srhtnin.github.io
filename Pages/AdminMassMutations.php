@@ -179,6 +179,17 @@ $PageSection = "Admin";
 
                         <div class="AdminMassField AdminEditorWideField">
                             <label class="AdminEditorCheckField AdminMassApplyField">
+                                <input type="checkbox" data-admin-mass-apply="Lists">
+                                <span>Apply</span>
+                            </label>
+                            <label class="AdminEditorField">
+                                <span>Lists JSON</span>
+                                <textarea id="AdminMassMutationLists" rows="7" spellcheck="false">[]</textarea>
+                            </label>
+                        </div>
+
+                        <div class="AdminMassField AdminEditorWideField">
+                            <label class="AdminEditorCheckField AdminMassApplyField">
                                 <input type="checkbox" data-admin-mass-apply="Pattern">
                                 <span>Apply</span>
                             </label>

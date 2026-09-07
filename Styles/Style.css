@@ -1840,6 +1840,26 @@ input, button, textarea, select {
     font-size: 2rem;
 }
 
+.MutationRecipeLists {
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    border-top: 2px solid var(--Surface1);
+}
+
+.MutationRecipeLists h4 {
+    margin-bottom: 0.4rem;
+    color: var(--Subtext1);
+}
+
+.MutationRecipeLists ol {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.MutationRecipeLists li + li {
+    margin-top: 0.35rem;
+}
+
 .MutationRecipeAny {
     color: var(--Overlay2);
     background-color: var(--Mantle);
@@ -2056,6 +2076,90 @@ input, button, textarea, select {
     margin-top: 1.5rem;
     padding-top: 1rem;
     border-top: 3px solid var(--Surface2);
+}
+
+.AdminMutationListsPanel {
+    margin-top: 1rem;
+    padding: 0.85rem;
+    background-color: var(--Base);
+    border: 3px solid var(--Surface2);
+}
+
+.AdminMutationListsHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+}
+
+.AdminMutationListsHeader h3 {
+    margin-bottom: 0.25rem;
+    color: var(--Peach);
+}
+
+.AdminMutationListsHeader p {
+    margin: 0;
+    color: var(--Subtext1);
+}
+
+.AdminMutationLists {
+    margin: 0.85rem 0 0;
+    padding-left: 2rem;
+}
+
+.AdminMutationList {
+    margin-bottom: 0.85rem;
+    padding: 0.75rem;
+    background-color: var(--Crust);
+    border: 2px solid var(--Surface1);
+}
+
+.AdminMutationList:last-child {
+    margin-bottom: 0;
+}
+
+.AdminMutationListHeader {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    align-items: end;
+    justify-content: space-between;
+}
+
+.AdminMutationListMode {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.AdminMutationListMode > span {
+    color: var(--Overlay2);
+    font-size: 0.9rem;
+}
+
+.AdminMutationListItems {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
+}
+
+.AdminMutationListItem {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.6fr) minmax(10rem, 1.4fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.AdminMutationListItemValue[hidden] {
+    display: none;
+}
+
+.AdminMutationListActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.65rem;
 }
 
 .AdminEditorPreview h2, .AdminMutationRecipeSection h2, .AdminMutationRelationsSection h2, .AdminMutationFailureSection h2 {
@@ -2287,6 +2391,15 @@ input, button, textarea, select {
 
     .AdminMutationDimensions input {
         width: 100%;
+    }
+
+    .AdminMutationListsHeader {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .AdminMutationListItem {
+        grid-template-columns: 1fr;
     }
 }
 

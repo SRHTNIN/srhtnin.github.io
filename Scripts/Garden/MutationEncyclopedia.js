@@ -458,17 +458,142 @@ function CanAttemptHintedMutation(
     }
 
 
-    return Mutation.Pattern.every(
-        Row =>
-            Array.isArray(Row) &&
-            Row.every(
-                Matcher =>
-                    IsHintMatcherAvailable(
-                        Matcher,
+    const ListReferenceCounts = {};
+
+    for (const Row of Mutation.Pattern) {
+        if (!Array.isArray(Row)) {
+            return false;
+        }
+
+        for (const Matcher of Row) {
+            const ListNumber =
+                GetMutationDisplayListReference(
+                    Matcher
+                );
+
+            if (ListNumber !== null) {
+                ListReferenceCounts[
+                    ListNumber
+                ] =
+                    (ListReferenceCounts[
+                        ListNumber
+                    ] ?? 0) + 1;
+
+                continue;
+            }
+
+            if (
+                !IsHintMatcherAvailable(
+                    Matcher,
+                    SaveData
+                )
+            ) {
+                return false;
+            }
+        }
+    }
+
+    for (
+        const [ListNumberText, Count]
+        of Object.entries(
+            ListReferenceCounts
+        )
+    ) {
+        const List =
+            Mutation.Lists?.[
+                Number(ListNumberText) - 1
+            ];
+
+        if (
+            List === undefined ||
+            !Array.isArray(List.Items)
+        ) {
+            return false;
+        }
+
+        const AvailableItems =
+            List.Items.filter(
+                Item =>
+                    IsHintListItemAvailable(
+                        Item,
                         SaveData
                     )
+            ).length;
+
+        if (
+            AvailableItems === 0 ||
+            (
+                List.Mode === "Once" &&
+                AvailableItems < Count
             )
-    );
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+function IsHintListItemAvailable(
+    Item,
+    SaveData
+) {
+    if (
+        Item?.Type === "Any" ||
+        Item?.Type === "Empty"
+    ) {
+        return true;
+    }
+
+    if (Item?.Type === "Plant") {
+        const Plant =
+            Plants[Item.Value];
+
+        return (
+            Plant !== undefined &&
+            HasDiscoveredPlant(
+                SaveData,
+                Plant.Id
+            )
+        );
+    }
+
+    if (Item?.Type === "Tag") {
+        return Object.values(
+            Plants
+        ).some(
+            Plant =>
+                HasDiscoveredPlant(
+                    SaveData,
+                    Plant.Id
+                ) &&
+                Array.isArray(Plant.Tags) &&
+                Plant.Tags.includes(
+                    Item.Value
+                )
+        );
+    }
+
+    return false;
+}
+
+
+function GetMutationDisplayListReference(
+    Value
+) {
+    if (typeof Value !== "string") {
+        return null;
+    }
+
+    const Match =
+        /^List:([1-9][0-9]*)$/.exec(
+            Value
+        );
+
+    return Match === null
+        ? null
+        : Number(Match[1]);
 }
 
 
@@ -1059,8 +1184,104 @@ function CreateMutationRecipeFlow(
         Flow
     );
 
+    const Lists =
+        CreateMutationRecipeLists(
+            Mutation.Lists
+        );
+
+    if (Lists !== null) {
+        Section.appendChild(Lists);
+    }
+
 
     return Section;
+}
+
+
+function CreateMutationRecipeLists(
+    Lists
+) {
+    if (
+        !Array.isArray(Lists) ||
+        Lists.length === 0
+    ) {
+        return null;
+    }
+
+    const Container =
+        document.createElement("div");
+
+    Container.className =
+        "MutationRecipeLists";
+
+    const Heading =
+        document.createElement("h4");
+
+    Heading.textContent = "Lists";
+
+    const OrderedList =
+        document.createElement("ol");
+
+    for (const List of Lists) {
+        const Item =
+            document.createElement("li");
+
+        const Mode =
+            document.createElement("strong");
+
+        Mode.textContent =
+            List?.Mode === "Any"
+                ? "Any: "
+                : "Once: ";
+
+        Item.appendChild(Mode);
+
+        const Labels =
+            Array.isArray(List?.Items)
+                ? List.Items.map(
+                    GetMutationRecipeListItemLabel
+                )
+                : [];
+
+        Item.append(
+            document.createTextNode(
+                Labels.length > 0
+                    ? Labels.join(", ")
+                    : "Empty list"
+            )
+        );
+
+        OrderedList.appendChild(Item);
+    }
+
+    Container.append(
+        Heading,
+        OrderedList
+    );
+
+    return Container;
+}
+
+
+function GetMutationRecipeListItemLabel(
+    Item
+) {
+    if (Item?.Type === "Plant") {
+        return Plants[Item.Value]?.Name ??
+            Item.Value ??
+            "Unknown plant";
+    }
+
+    if (Item?.Type === "Tag") {
+        return "Tag: " +
+            (Item.Value ?? "");
+    }
+
+    if (Item?.Type === "Empty") {
+        return "Empty";
+    }
+
+    return "Any";
 }
 
 
@@ -1191,6 +1412,18 @@ function CreateMutationPatternCell(
         typeof Matcher ===
         "string"
     ) {
+        const ListNumber =
+            GetMutationDisplayListReference(
+                Matcher
+            );
+
+        if (ListNumber !== null) {
+            return CreateMutationTextCell(
+                "List " + ListNumber,
+                "MutationRecipeMatcher"
+            );
+        }
+
         return CreateMutationPlantCell(
             Matcher
         );
@@ -1317,6 +1550,18 @@ function CreateMutationResultCell(
             return CreateMutationTextCell(
                 Result.slice(1),
                 "MutationRecipeCapture"
+            );
+        }
+
+        const ListNumber =
+            GetMutationDisplayListReference(
+                Result
+            );
+
+        if (ListNumber !== null) {
+            return CreateMutationTextCell(
+                "List " + ListNumber,
+                "MutationRecipeMatcher"
             );
         }
 

@@ -544,10 +544,293 @@ function ValidateAdminCaptureName(
 }
 
 
+function GetAdminValidationListReference(
+    Value
+) {
+    if (typeof Value !== "string") {
+        return null;
+    }
+
+    const Match =
+        /^List:([1-9][0-9]*)$/.exec(
+            Value
+        );
+
+    return Match === null
+        ? null
+        : Number(Match[1]);
+}
+
+
+function ValidateAdminMutationLists(
+    Lists,
+    PlantCatalogue
+) {
+    if (!Array.isArray(Lists)) {
+        throw new Error(
+            "Lists must be an array."
+        );
+    }
+
+    if (Lists.length > 64) {
+        throw new Error(
+            "A mutation can contain at most 64 lists."
+        );
+    }
+
+    const ValidTags =
+        new Set(
+            Object.values(
+                PlantCatalogue ?? {}
+            ).flatMap(
+                Plant =>
+                    Array.isArray(Plant?.Tags)
+                        ? Plant.Tags
+                        : []
+            ).filter(
+                Tag =>
+                    typeof Tag === "string" &&
+                    Tag.trim() !== ""
+            ).map(
+                Tag => Tag.trim()
+            )
+        );
+
+    for (
+        let ListIndex = 0;
+        ListIndex < Lists.length;
+        ListIndex++
+    ) {
+        const List = Lists[ListIndex];
+        const ListNumber = ListIndex + 1;
+
+        if (!IsAdminPlainObject(List)) {
+            throw new Error(
+                "List " +
+                ListNumber +
+                " is invalid."
+            );
+        }
+
+        if (
+            List.Mode !== "Once" &&
+            List.Mode !== "Any"
+        ) {
+            throw new Error(
+                "List " +
+                ListNumber +
+                " mode must be Once or Any."
+            );
+        }
+
+        if (
+            !Array.isArray(List.Items) ||
+            List.Items.length < 1 ||
+            List.Items.length > 64
+        ) {
+            throw new Error(
+                "List " +
+                ListNumber +
+                " must contain between 1 and 64 items."
+            );
+        }
+
+        for (
+            let ItemIndex = 0;
+            ItemIndex < List.Items.length;
+            ItemIndex++
+        ) {
+            const Item =
+                List.Items[ItemIndex];
+
+            const ItemName =
+                "List " +
+                ListNumber +
+                " item " +
+                (ItemIndex + 1);
+
+            if (!IsAdminPlainObject(Item)) {
+                throw new Error(
+                    ItemName +
+                    " is invalid."
+                );
+            }
+
+            if (
+                ![
+                    "Any",
+                    "Empty",
+                    "Plant",
+                    "Tag"
+                ].includes(Item.Type)
+            ) {
+                throw new Error(
+                    ItemName +
+                    " has an invalid type."
+                );
+            }
+
+            if (Item.Type === "Plant") {
+                if (
+                    typeof Item.Value !==
+                        "string" ||
+                    PlantCatalogue?.[
+                        Item.Value
+                    ] === undefined
+                ) {
+                    throw new Error(
+                        ItemName +
+                        " references an unknown plant."
+                    );
+                }
+            }
+
+            if (Item.Type === "Tag") {
+                const Tag =
+                    typeof Item.Value ===
+                        "string"
+                        ? Item.Value.trim()
+                        : "";
+
+                if (
+                    Tag.length === 0 ||
+                    Tag.length > 64
+                ) {
+                    throw new Error(
+                        ItemName +
+                        " contains an invalid tag."
+                    );
+                }
+
+                if (!ValidTags.has(Tag)) {
+                    throw new Error(
+                        ItemName +
+                        " references a tag that no plant has: " +
+                        Tag
+                    );
+                }
+            }
+        }
+    }
+}
+
+
+function GetAdminMutationListReferenceCounts(
+    Matrix
+) {
+    const Counts = new Map();
+
+    for (const Row of Matrix ?? []) {
+        if (!Array.isArray(Row)) {
+            continue;
+        }
+
+        for (const Cell of Row) {
+            const ListNumber =
+                GetAdminValidationListReference(
+                    Cell
+                );
+
+            if (ListNumber === null) {
+                continue;
+            }
+
+            Counts.set(
+                ListNumber,
+                (Counts.get(ListNumber) ?? 0) + 1
+            );
+        }
+    }
+
+    return Counts;
+}
+
+
+function ValidateAdminMutationResultListReferences(
+    Result,
+    Pattern,
+    Name
+) {
+    const PatternCounts =
+        GetAdminMutationListReferenceCounts(
+            Pattern
+        );
+
+    const ResultCounts =
+        GetAdminMutationListReferenceCounts(
+            Result
+        );
+
+    for (
+        const [ListNumber, Count]
+        of ResultCounts
+    ) {
+        const PatternCount =
+            PatternCounts.get(ListNumber) ?? 0;
+
+        if (Count > PatternCount) {
+            throw new Error(
+                Name +
+                " uses List:" +
+                ListNumber +
+                " " +
+                Count +
+                " times, but the pattern only matches it " +
+                PatternCount +
+                " times."
+            );
+        }
+    }
+}
+
+
+function ValidateAdminMutationOnceListCapacity(
+    Lists,
+    Pattern
+) {
+    const PatternCounts =
+        GetAdminMutationListReferenceCounts(
+            Pattern
+        );
+
+    for (
+        let ListIndex = 0;
+        ListIndex < Lists.length;
+        ListIndex++
+    ) {
+        const List = Lists[ListIndex];
+
+        if (List?.Mode !== "Once") {
+            continue;
+        }
+
+        const ListNumber = ListIndex + 1;
+        const ReferenceCount =
+            PatternCounts.get(ListNumber) ?? 0;
+
+        if (
+            ReferenceCount >
+            (List.Items?.length ?? 0)
+        ) {
+            throw new Error(
+                "List:" +
+                ListNumber +
+                " is Once and is referenced " +
+                ReferenceCount +
+                " times, but only has " +
+                (List.Items?.length ?? 0) +
+                " items."
+            );
+        }
+    }
+}
+
+
 function ValidateAdminMutationPatternCell(
     Cell,
     PlantCatalogue,
-    Captures
+    Captures,
+    ListCount
 ) {
     if (
         Cell === null ||
@@ -558,6 +841,25 @@ function ValidateAdminMutationPatternCell(
     }
 
     if (typeof Cell === "string") {
+        const ListNumber =
+            GetAdminValidationListReference(
+                Cell
+            );
+
+        if (ListNumber !== null) {
+            if (ListNumber > ListCount) {
+                throw new Error(
+                    "Pattern references list " +
+                    ListNumber +
+                    ", but only " +
+                    ListCount +
+                    " lists exist."
+                );
+            }
+
+            return;
+        }
+
         if (
             PlantCatalogue?.[Cell] ===
             undefined
@@ -623,7 +925,8 @@ function ValidateAdminMutationPatternCell(
 function ValidateAdminMutationResultCell(
     Cell,
     PlantCatalogue,
-    Captures
+    Captures,
+    ListCount
 ) {
     if (
         Cell === null ||
@@ -636,6 +939,25 @@ function ValidateAdminMutationResultCell(
     let PlantValue = null;
 
     if (typeof Cell === "string") {
+        const ListNumber =
+            GetAdminValidationListReference(
+                Cell
+            );
+
+        if (ListNumber !== null) {
+            if (ListNumber > ListCount) {
+                throw new Error(
+                    "Result references list " +
+                    ListNumber +
+                    ", but only " +
+                    ListCount +
+                    " lists exist."
+                );
+            }
+
+            return;
+        }
+
         PlantValue = Cell;
     } else if (
         IsAdminPlainObject(Cell) &&
@@ -882,6 +1204,14 @@ function ValidateAdminMutation(
         );
     }
 
+    ValidateAdminMutationLists(
+        Mutation.Lists ?? [],
+        PlantCatalogue
+    );
+
+    const ListCount =
+        (Mutation.Lists ?? []).length;
+
     const PatternSize =
         ValidateAdminMutationMatrix(
             Mutation.Pattern,
@@ -896,10 +1226,16 @@ function ValidateAdminMutation(
             ValidateAdminMutationPatternCell(
                 Cell,
                 PlantCatalogue,
-                Captures
+                Captures,
+                ListCount
             );
         }
     }
+
+    ValidateAdminMutationOnceListCapacity(
+        Mutation.Lists ?? [],
+        Mutation.Pattern
+    );
 
     ValidateAdminMutationMatrix(
         Mutation.Success,
@@ -913,10 +1249,17 @@ function ValidateAdminMutation(
             ValidateAdminMutationResultCell(
                 Cell,
                 PlantCatalogue,
-                Captures
+                Captures,
+                ListCount
             );
         }
     }
+
+    ValidateAdminMutationResultListReferences(
+        Mutation.Success,
+        Mutation.Pattern,
+        "Success result"
+    );
 
     if (
         Mutation.Failure !== "Keep" &&
@@ -934,10 +1277,17 @@ function ValidateAdminMutation(
                 ValidateAdminMutationResultCell(
                     Cell,
                     PlantCatalogue,
-                    Captures
+                    Captures,
+                    ListCount
                 );
             }
         }
+
+        ValidateAdminMutationResultListReferences(
+            Mutation.Failure,
+            Mutation.Pattern,
+            "Failure result"
+        );
     }
 
     ValidateAdminMutationRelations(

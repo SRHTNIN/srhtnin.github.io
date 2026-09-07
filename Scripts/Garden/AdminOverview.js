@@ -276,6 +276,40 @@ function GetAdminOverviewPatternPlantKeys(
 
         for (const Cell of Row) {
             if (
+                typeof Cell === "string"
+            ) {
+                const ListMatch =
+                    /^List:([1-9][0-9]*)$/.exec(
+                        Cell
+                    );
+
+                if (ListMatch !== null) {
+                    const List =
+                        Mutation.Lists?.[
+                            Number(ListMatch[1]) - 1
+                        ];
+
+                    for (
+                        const Item
+                        of List?.Items ?? []
+                    ) {
+                        if (
+                            Item?.Type === "Plant" &&
+                            AdminOverviewPlants[
+                                Item.Value
+                            ] !== undefined
+                        ) {
+                            PlantKeys.add(
+                                Item.Value
+                            );
+                        }
+                    }
+
+                    continue;
+                }
+            }
+
+            if (
                 typeof Cell === "string" &&
                 AdminOverviewPlants[
                     Cell
