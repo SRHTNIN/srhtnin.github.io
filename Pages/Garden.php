@@ -310,6 +310,7 @@ $PageSection = "Garden";
         </main>
 
         <script src="/Scripts/Garden/PlantImages.js"></script>
+        <script src="/Scripts/Garden/GardenView.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/FunctionalEffects.js"></script>

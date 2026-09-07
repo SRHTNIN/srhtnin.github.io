@@ -9,57 +9,6 @@ let QuickBuyAmountMode = "One";
 
 const GardenUpdateInterval = 1000;
 
-const GardenBorderColours = [
-    "var(--Rosewater)",
-    "var(--Flamingo)",
-    "var(--Pink)",
-    "var(--Mauve)",
-    "var(--Red)",
-    "var(--Maroon)",
-    "var(--Peach)",
-    "var(--Yellow)",
-    "var(--Green)",
-    "var(--Teal)",
-    "var(--Sky)",
-    "var(--Sapphire)",
-    "var(--Blue)",
-    "var(--Lavender)"
-];
-
-const GardenPlotDefaultRotation = "East";
-const GardenPlotRotations = [
-    "North",
-    "East",
-    "South",
-    "West"
-];
-const GardenPlotRotationLabels = {
-    North: "^",
-    East: "->",
-    South: "v",
-    West: "<-"
-};
-
-
-function GetGardenBorderColour(
-    GardenIndex
-) {
-    const ColourCount =
-        GardenBorderColours.length;
-
-    const NormalizedIndex =
-        (
-            Number(GardenIndex) %
-            ColourCount +
-            ColourCount
-        ) % ColourCount;
-
-    return GardenBorderColours[
-        NormalizedIndex
-    ];
-}
-
-
 async function StartGame() {
     try {
         await LoadGameContent();
@@ -1434,28 +1383,6 @@ function GetGardenDisplaySettings() {
 }
 
 
-function GetGardenPlotRotation(
-    Plot
-) {
-    return GardenPlotRotations.includes(
-        Plot?.Rotation
-    )
-        ? Plot.Rotation
-        : GardenPlotDefaultRotation;
-}
-
-
-function GetGardenPlotRotationLabel(
-    Plot
-) {
-    return GardenPlotRotationLabels[
-        GetGardenPlotRotation(
-            Plot
-        )
-    ] ?? "->";
-}
-
-
 async function RotateGardenPlot(
     PlotIndex
 ) {
@@ -1524,86 +1451,96 @@ function CreatePlotElement(
     DisplaySettings,
     IsPreview = false
 ) {
-    const Tile =
-        document.createElement(
-            "div"
-        );
-
-    Tile.className =
-        "PlantTile GardenPlot";
-
-    const MainButton =
-        document.createElement(
-            "button"
-        );
-
-    MainButton.className =
-        "GardenPlotMain";
-    MainButton.type = "button";
-
-
-    if (
-        DisplaySettings.ShowPlantNames
-    ) {
-        Tile.classList.add(
-            "GardenPlotWithName"
-        );
-    }
-
-
     const Plant =
         Plot === null
             ? null
             : Plants[Plot.Plant];
 
+    let Progress = 0;
+    let CooldownState = null;
+    let BorderProgress = 0;
+    let ImagePath = null;
+    let TimerText = "";
+
     if (
-        DisplaySettings.ShowPlantNames
+        Plot !== null &&
+        Plant !== undefined
     ) {
-        MainButton.appendChild(
-            CreateGardenPlotName(
+        Progress =
+            GetPlantGrowthProgress(
                 Plot,
                 Plant
-            )
-        );
+            );
+
+        CooldownState =
+            Progress >= 1 &&
+            typeof GetFunctionalPlantCooldownDisplayState ===
+                "function"
+                ? GetFunctionalPlantCooldownDisplayState(
+                    Plot,
+                    Plant,
+                    GetSimulationTime(
+                        GameSave
+                    )
+                )
+                : null;
+
+        BorderProgress =
+            CooldownState === null
+                ? Progress
+                : CooldownState.Progress;
+
+        ImagePath =
+            GetPlantImage(
+                Plot,
+                Plant
+            );
+
+        TimerText =
+            GetGardenPlotTimerText(
+                Plot,
+                Plant,
+                Progress,
+                GetSimulationTime(
+                    GameSave
+                ),
+                CooldownState
+            );
     }
 
+    const View =
+        CreateGardenPlotView({
+            Plot,
+            Plant,
+            Progress,
+            BorderProgress,
+            DisplaySettings,
+            ImagePath,
+            TimerText,
+            FunctionalCooldown:
+                CooldownState !== null,
+            ShowRotation:
+                Plot !== null &&
+                DisplaySettings
+                    .ShowPlotRotation &&
+                !IsPreview,
+            OnRotate: () => {
+                RotateGardenPlot(
+                    PlotIndex
+                );
+            }
+        });
 
-    const Visual =
-        document.createElement(
-            "span"
-        );
-
-    Visual.className =
-        "GardenPlotVisual";
-
-    MainButton.appendChild(
-        Visual
-    );
-
-    Tile.appendChild(
-        MainButton
-    );
+    const Tile = View.Tile;
+    const MainButton =
+        View.MainButton;
 
 
     if (Plot === null) {
-        Tile.classList.add(
-            "GardenPlotEmpty"
-        );
-
         MainButton.title =
             IsPreview
                 ? "Future Sight: empty plot"
                 : "Empty plot";
-
-        AppendGardenPlotFooter(
-            Tile,
-            null,
-            null,
-            0,
-            PlotIndex,
-            DisplaySettings,
-            IsPreview
-        );
 
         if (IsPreview) {
             MainButton.disabled = true;
@@ -1646,110 +1583,9 @@ function CreatePlotElement(
 
 
     if (Plant === undefined) {
-        Visual.textContent = "?";
-
-        AppendGardenPlotFooter(
-            Tile,
-            Plot,
-            null,
-            0,
-            PlotIndex,
-            DisplaySettings,
-            IsPreview
-        );
-
         MainButton.disabled = true;
         return Tile;
     }
-
-
-    const Progress =
-        GetPlantGrowthProgress(
-            Plot,
-            Plant
-        );
-
-    const CooldownState =
-        Progress >= 1 &&
-        typeof GetFunctionalPlantCooldownDisplayState ===
-            "function"
-            ? GetFunctionalPlantCooldownDisplayState(
-                Plot,
-                Plant,
-                GetSimulationTime(
-                    GameSave
-                )
-            )
-            : null;
-
-    const BorderProgress =
-        CooldownState === null
-            ? Progress
-            : CooldownState.Progress;
-
-    Tile.style.setProperty(
-        "--GrowthProgress",
-        `${BorderProgress * 100}%`
-    );
-
-    if (CooldownState !== null) {
-        Tile.classList.add(
-            "GardenPlotFunctionalCooldown"
-        );
-    }
-
-
-    const ImagePath =
-        GetPlantImage(
-            Plot,
-            Plant
-        );
-
-    if (ImagePath !== null) {
-        const Image =
-            document.createElement(
-                "img"
-            );
-
-        Image.className =
-            "PlantSprite";
-
-        Image.alt =
-            Plant.Name;
-
-        Image.src =
-            ImagePath;
-
-        Visual.appendChild(
-            Image
-        );
-    } else {
-        const MissingImage =
-            document.createElement(
-                "span"
-            );
-
-        MissingImage.className =
-            "GardenPlantMissing";
-
-        MissingImage.textContent =
-            Plant.Name;
-
-        Visual.appendChild(
-            MissingImage
-        );
-    }
-
-
-    AppendGardenPlotFooter(
-        Tile,
-        Plot,
-        Plant,
-        Progress,
-        PlotIndex,
-        DisplaySettings,
-        IsPreview
-    );
 
 
     if (IsPreview) {
@@ -1916,265 +1752,6 @@ function CreatePlotElement(
 
 
     return Tile;
-}
-
-
-function AppendGardenPlotFooter(
-    Tile,
-    Plot,
-    Plant,
-    Progress,
-    PlotIndex,
-    DisplaySettings,
-    IsPreview
-) {
-    const ShowTimer =
-        DisplaySettings.ShowGrowthTimers;
-
-    const ShowRotation =
-        Plot !== null &&
-        DisplaySettings.ShowPlotRotation &&
-        !IsPreview;
-
-    if (
-        !ShowTimer &&
-        !ShowRotation
-    ) {
-        return;
-    }
-
-    Tile.classList.add(
-        "GardenPlotWithFooter"
-    );
-
-    const Footer =
-        document.createElement(
-            "span"
-        );
-
-    Footer.className =
-        "GardenPlotFooter";
-
-    if (
-        ShowTimer &&
-        ShowRotation
-    ) {
-        Footer.classList.add(
-            "GardenPlotFooterSplit"
-        );
-    }
-
-    if (ShowTimer) {
-        Footer.appendChild(
-            CreateGardenPlotTimer(
-                Plot,
-                Plant,
-                Progress
-            )
-        );
-    }
-
-    if (ShowRotation) {
-        const RotateButton =
-            document.createElement(
-                "button"
-            );
-
-        RotateButton.className =
-            "GardenPlotRotationButton";
-        RotateButton.type = "button";
-        RotateButton.textContent =
-            GetGardenPlotRotationLabel(
-                Plot
-            );
-        RotateButton.title =
-            "Rotate plot clockwise";
-        RotateButton.setAttribute(
-            "aria-label",
-            "Rotate " +
-            (Plant?.Name ?? "plot") +
-            " clockwise"
-        );
-
-        RotateButton.addEventListener(
-            "click",
-            () => {
-                RotateGardenPlot(
-                    PlotIndex
-                );
-            }
-        );
-
-        Footer.appendChild(
-            RotateButton
-        );
-    }
-
-    Tile.appendChild(Footer);
-}
-
-
-function CreateGardenPlotName(
-    Plot,
-    Plant
-) {
-    const Name =
-        document.createElement(
-            "span"
-        );
-
-    Name.className =
-        "GardenPlotName";
-
-    if (Plot === null) {
-        Name.textContent =
-            "Empty";
-    } else if (Plant === undefined) {
-        Name.textContent =
-            "Unknown";
-    } else {
-        Name.textContent =
-            Plant.Name;
-
-        Name.title =
-            Plant.Name;
-    }
-
-    return Name;
-}
-
-
-function CreateGardenPlotTimer(
-    Plot,
-    Plant,
-    Progress
-) {
-    const Timer =
-        document.createElement(
-            "span"
-        );
-
-    Timer.className =
-        "GardenPlotTimer";
-
-    if (
-        Plot === null ||
-        Plant === null ||
-        Plant === undefined
-    ) {
-        Timer.textContent = "";
-
-        return Timer;
-    }
-
-
-    if (
-        Progress >= 1 &&
-        typeof GetFunctionalPlantCooldownDisplayState ===
-            "function"
-    ) {
-        const CooldownState =
-            GetFunctionalPlantCooldownDisplayState(
-                Plot,
-                Plant,
-                GetSimulationTime(
-                    GameSave
-                )
-            );
-
-        if (CooldownState !== null) {
-            Timer.textContent =
-                FormatGardenRemainingTime(
-                    CooldownState.Remaining
-                );
-
-            return Timer;
-        }
-    }
-
-
-    if (Progress >= 1) {
-        Timer.textContent =
-            "Ready";
-
-        return Timer;
-    }
-
-
-    const RemainingTime =
-        Math.max(
-            0,
-            Plant.GrowthTime -
-            (
-                GetSimulationTime(
-                    GameSave
-                ) -
-                Plot.PlantedAt
-            )
-        );
-
-    Timer.textContent =
-        FormatGardenRemainingTime(
-            RemainingTime
-        );
-
-    return Timer;
-}
-
-
-function FormatGardenRemainingTime(
-    Milliseconds
-) {
-    const TotalSeconds =
-        Math.max(
-            0,
-            Math.ceil(
-                Number(
-                    Milliseconds
-                ) / 1000
-            )
-        );
-
-    const Hours =
-        Math.floor(
-            TotalSeconds / 3600
-        );
-
-    const Minutes =
-        Math.floor(
-            (
-                TotalSeconds % 3600
-            ) / 60
-        );
-
-    const Seconds =
-        TotalSeconds % 60;
-
-
-    if (Hours > 0) {
-        return (
-            Hours +
-            ":" +
-            String(Minutes).padStart(
-                2,
-                "0"
-            ) +
-            ":" +
-            String(Seconds).padStart(
-                2,
-                "0"
-            )
-        );
-    }
-
-    return (
-        Minutes +
-        ":" +
-        String(Seconds).padStart(
-            2,
-            "0"
-        )
-    );
 }
 
 

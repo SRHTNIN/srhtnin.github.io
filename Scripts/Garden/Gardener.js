@@ -447,6 +447,11 @@ function RenderCurrentGardenerGarden() {
     const Garden =
         Gardens[GardenerGardenIndex];
 
+    const Section =
+        document.getElementById(
+            "GardenerGardensSection"
+        );
+
     const Grid =
         document.getElementById(
             "GardenerGardenGrid"
@@ -485,6 +490,13 @@ function RenderCurrentGardenerGarden() {
     if (Grid === null) {
         return;
     }
+
+    Section?.style.setProperty(
+        "--GardenBorderColour",
+        GetGardenBorderColour(
+            GardenerGardenIndex
+        )
+    );
 
     Grid.style.setProperty(
         "--GardenWidth",
@@ -551,214 +563,89 @@ function RenderCurrentGardenerGarden() {
 function CreateGardenerGardenPlot(
     Plot
 ) {
-    const Tile =
-        document.createElement(
-            "div"
-        );
-
-    Tile.className =
-        "PlantTile GardenPlot GardenPlotReadOnly";
-
-    const Main =
-        document.createElement(
-            "button"
-        );
-
-    Main.type = "button";
-    Main.className =
-        "GardenPlotMain";
-    Main.disabled = true;
-
-    const Visual =
-        document.createElement(
-            "span"
-        );
-
-    Visual.className =
-        "GardenPlotVisual";
-
-    if (
+    const Plant =
         Plot === null ||
         typeof Plot !== "object"
+            ? null
+            : Plants[Plot.Plant];
+
+    let Progress = 0;
+    let ImagePath = null;
+    let TimerText = "";
+
+    const RenderTime =
+        Date.now();
+
+    if (
+        Plot !== null &&
+        typeof Plot === "object" &&
+        Plant !== undefined
     ) {
-        Tile.classList.add(
-            "GardenPlotEmpty"
-        );
-
-        Main.title = "Empty plot";
-        Main.appendChild(
-            Visual
-        );
-        Tile.appendChild(
-            Main
-        );
-
-        return Tile;
-    }
-
-    const Plant =
-        Plants[Plot.Plant];
-
-    Tile.classList.add(
-        "GardenPlotWithName"
-    );
-
-    const PlantName =
-        document.createElement(
-            "span"
-        );
-
-    PlantName.className =
-        "GardenPlotName";
-
-    PlantName.textContent =
-        Plant?.Name ?? Plot.Plant ?? "Unknown";
-
-    Main.appendChild(
-        PlantName
-    );
-
-    if (Plant === undefined) {
-        Visual.textContent = "?";
-        Main.title = "Unknown plant";
-        Main.appendChild(
-            Visual
-        );
-        Tile.appendChild(
-            Main
-        );
-
-        return Tile;
-    }
-
-    const Progress =
-        GetGardenerGardenPlantProgress(
-            Plot,
-            Plant
-        );
-
-    Tile.style.setProperty(
-        "--GrowthProgress",
-        (Progress * 100) + "%"
-    );
-
-    if (Progress >= 1) {
-        Tile.classList.add(
-            "GardenPlotMature"
-        );
-    }
-
-    const ImageSource =
-        GetGardenerGardenPlantImage(
-            Plot,
-            Plant,
-            Progress
-        );
-
-    if (ImageSource !== null) {
-        const Image =
-            document.createElement(
-                "img"
+        Progress =
+            GetGardenPlotGrowthProgress(
+                Plot,
+                Plant,
+                RenderTime
             );
 
-        Image.className =
-            "PlantSprite";
-        Image.src = ImageSource;
-        Image.alt = "";
-        Image.draggable = false;
+        ImagePath =
+            GetGardenPlotImage(
+                Plot,
+                Plant,
+                Progress
+            );
 
-        Visual.appendChild(
-            Image
-        );
+        TimerText =
+            GetGardenPlotTimerText(
+                Plot,
+                Plant,
+                Progress,
+                RenderTime
+            );
     }
 
-    Main.title =
-        Plant.Name +
-        (Progress >= 1
-            ? " — mature"
-            : " — growing");
-
-    Main.appendChild(
-        Visual
-    );
-
-    Tile.appendChild(
-        Main
-    );
-
-    return Tile;
-}
-
-
-function GetGardenerGardenPlantProgress(
-    Plot,
-    Plant
-) {
-    const GrowthTime =
-        Number(Plant.GrowthTime ?? 0);
-
-    if (GrowthTime <= 0) {
-        return 1;
-    }
-
-    const PlantedAt =
-        Number(Plot.PlantedAt ?? 0);
-
-    const Age =
-        Date.now() - PlantedAt;
-
-    return Math.max(
-        0,
-        Math.min(
-            Age / GrowthTime,
-            1
-        )
-    );
-}
-
-
-function GetGardenerGardenPlantImage(
-    Plot,
-    Plant,
-    Progress
-) {
-    const Direction =
-        Plant.DirectionalSprites === true
-            ? Plot.Rotation ?? "East"
-            : null;
-
-    const Images =
-        GetPlantImageSources(
+    const View =
+        CreateGardenPlotView({
+            Plot:
+                Plot !== null &&
+                typeof Plot === "object"
+                    ? Plot
+                    : null,
             Plant,
-            Direction
-        );
+            Progress,
+            BorderProgress: Progress,
+            DisplaySettings: {
+                ShowPlantNames: true,
+                ShowGrowthTimers: true,
+                ShowPlotRotation: false
+            },
+            ImagePath,
+            TimerText,
+            ReadOnly: true,
+            Mature:
+                Plant !== null &&
+                Plant !== undefined &&
+                Progress >= 1
+        });
 
-    if (Images.length === 0) {
-        return null;
+    if (Plot === null) {
+        View.MainButton.title =
+            "Empty plot";
+    } else if (
+        Plant === null ||
+        Plant === undefined
+    ) {
+        View.MainButton.title =
+            "Unknown plant";
+    } else {
+        View.MainButton.title =
+            Plant.Name +
+            (Progress >= 1
+                ? " — mature"
+                : " — growing");
     }
 
-    if (Images.length === 1) {
-        return Images[0] ?? null;
-    }
-
-    if (Progress >= 1) {
-        return Images[
-            Images.length - 1
-        ] ?? null;
-    }
-
-    const GrowingImageCount =
-        Images.length - 1;
-
-    const Index = Math.min(
-        Math.floor(
-            Progress *
-            GrowingImageCount
-        ),
-        GrowingImageCount - 1
-    );
-
-    return Images[Index] ?? null;
+    return View.Tile;
 }
 
 

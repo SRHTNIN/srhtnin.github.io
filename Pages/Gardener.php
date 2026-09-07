@@ -86,7 +86,7 @@ $PageSection = "Social";
 
             <section
                 id="GardenerGardensSection"
-                class="Panel SocialSection"
+                class="Panel SocialSection GardenPlotsPanel"
                 hidden
             >
                 <div class="PanelHeader PanelHeaderInset GardenerSectionHeader">
@@ -123,7 +123,7 @@ $PageSection = "Social";
                 <div class="GardenGridViewport">
                     <div
                         id="GardenerGardenGrid"
-                        class="GardenGrid GardenerGardenGrid"
+                        class="GardenGrid"
                     ></div>
                 </div>
 
@@ -218,6 +218,7 @@ $PageSection = "Social";
         </main>
 
         <script src="/Scripts/Garden/PlantImages.js"></script>
+        <script src="/Scripts/Garden/GardenView.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
