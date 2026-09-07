@@ -49,6 +49,117 @@ function GetGardenBorderColour(
 }
 
 
+
+
+function RenderGardenSelectorView(
+    Options
+) {
+    const Gardens =
+        Array.isArray(Options.Gardens)
+            ? Options.Gardens
+            : [];
+
+    const GardenIndex =
+        Number(Options.GardenIndex) || 0;
+
+    const PreviousButton =
+        Options.PreviousButton ?? null;
+
+    const NextButton =
+        Options.NextButton ?? null;
+
+    const NameInput =
+        Options.NameInput ?? null;
+
+    if (
+        PreviousButton === null ||
+        NextButton === null ||
+        NameInput === null ||
+        Gardens.length === 0
+    ) {
+        return;
+    }
+
+    const HasPreviousGarden =
+        GardenIndex > 0;
+
+    const HasNextGarden =
+        GardenIndex <
+        Gardens.length - 1;
+
+    PreviousButton.disabled =
+        !HasPreviousGarden;
+
+    NextButton.disabled =
+        !HasNextGarden;
+
+
+    PreviousButton.style.setProperty(
+        "--GardenSelectorBorderColour",
+        HasPreviousGarden
+            ? GetGardenBorderColour(
+                GardenIndex - 1
+            )
+            : "var(--Surface2)"
+    );
+
+    NameInput.style.setProperty(
+        "--GardenSelectorBorderColour",
+        GetGardenBorderColour(
+            GardenIndex
+        )
+    );
+
+    NextButton.style.setProperty(
+        "--GardenSelectorBorderColour",
+        HasNextGarden
+            ? GetGardenBorderColour(
+                GardenIndex + 1
+            )
+            : "var(--Surface2)"
+    );
+
+
+    PreviousButton.setAttribute(
+        "aria-label",
+        HasPreviousGarden
+            ? "Previous Garden: " +
+                Gardens[
+                    GardenIndex - 1
+                ].Name
+            : "No previous Garden"
+    );
+
+    NextButton.setAttribute(
+        "aria-label",
+        HasNextGarden
+            ? "Next Garden: " +
+                Gardens[
+                    GardenIndex + 1
+                ].Name
+            : "No next Garden"
+    );
+
+
+    if (
+        Options.PreserveFocusedName !==
+            true ||
+        document.activeElement !==
+            NameInput
+    ) {
+        NameInput.value =
+            Gardens[GardenIndex]
+                ?.Name ?? "Garden";
+    }
+
+    NameInput.title =
+        "Garden " +
+        (GardenIndex + 1) +
+        " of " +
+        Gardens.length;
+}
+
+
 function GetGardenPlotRotation(
     Plot
 ) {

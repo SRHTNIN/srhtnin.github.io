@@ -216,109 +216,24 @@ async function SwitchGarden(
 
 
 function RenderGardenSelector() {
-    const PreviousButton =
-        document.getElementById(
-            "PreviousGardenButton"
-        );
-
-    const NextButton =
-        document.getElementById(
-            "NextGardenButton"
-        );
-
-    const NameInput =
-        document.getElementById(
-            "GardenNameInput"
-        );
-
-    if (
-        PreviousButton === null ||
-        NextButton === null ||
-        NameInput === null
-    ) {
-        return;
-    }
-
-    const GardenCount =
-        GameSave.Gardens.length;
-
-    const GardenIndex =
-        GameSave.ActiveGardenIndex;
-
-    const HasPreviousGarden =
-        GardenIndex > 0;
-
-    const HasNextGarden =
-        GardenIndex <
-        GardenCount - 1;
-
-    PreviousButton.disabled =
-        !HasPreviousGarden;
-
-    NextButton.disabled =
-        !HasNextGarden;
-
-
-    PreviousButton.style.setProperty(
-        "--GardenSelectorBorderColour",
-        HasPreviousGarden
-            ? GetGardenBorderColour(
-                GardenIndex - 1
-            )
-            : "var(--Surface2)"
-    );
-
-    NameInput.style.setProperty(
-        "--GardenSelectorBorderColour",
-        GetGardenBorderColour(
-            GardenIndex
-        )
-    );
-
-    NextButton.style.setProperty(
-        "--GardenSelectorBorderColour",
-        HasNextGarden
-            ? GetGardenBorderColour(
-                GardenIndex + 1
-            )
-            : "var(--Surface2)"
-    );
-
-
-    PreviousButton.setAttribute(
-        "aria-label",
-        HasPreviousGarden
-            ? "Previous Garden: " +
-                GameSave.Gardens[
-                    GardenIndex - 1
-                ].Name
-            : "No previous Garden"
-    );
-
-    NextButton.setAttribute(
-        "aria-label",
-        HasNextGarden
-            ? "Next Garden: " +
-                GameSave.Gardens[
-                    GardenIndex + 1
-                ].Name
-            : "No next Garden"
-    );
-
-
-    if (
-        document.activeElement !==
-        NameInput
-    ) {
-        NameInput.value =
-            GameSave.Garden.Name;
-    }
-
-    NameInput.title =
-        "Garden " +
-        (GardenIndex + 1) +
-        " of " +
-        GardenCount;
+    RenderGardenSelectorView({
+        Gardens: GameSave.Gardens,
+        GardenIndex:
+            GameSave.ActiveGardenIndex,
+        PreviousButton:
+            document.getElementById(
+                "PreviousGardenButton"
+            ),
+        NameInput:
+            document.getElementById(
+                "GardenNameInput"
+            ),
+        NextButton:
+            document.getElementById(
+                "NextGardenButton"
+            ),
+        PreserveFocusedName: true
+    });
 }
 
 

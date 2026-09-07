@@ -86,50 +86,59 @@ $PageSection = "Social";
 
             <section
                 id="GardenerGardensSection"
-                class="Panel SocialSection GardenPlotsPanel"
+                class="SocialSection"
                 hidden
             >
-                <div class="PanelHeader PanelHeaderInset GardenerSectionHeader">
-                    <h2>Gardens</h2>
-                    <span id="GardenerGardenPosition"></span>
-                </div>
-
                 <div
-                    id="GardenerGardenControls"
-                    class="GardenerGardenControls"
+                    id="GardenerGardenSelector"
+                    class="GardenSelectorPanel"
                 >
                     <button
                         id="PreviousGardenerGardenButton"
-                        class="ActionButton"
+                        class="ActionButton GardenSelectorButton"
                         type="button"
+                        aria-label="Previous Garden"
                     >
-                        Previous
+                        &lt;
                     </button>
 
-                    <div class="GardenerGardenTitle">
-                        <strong id="GardenerGardenName">Garden</strong>
-                        <span id="GardenerGardenSize">0×0</span>
-                    </div>
+                    <input
+                        id="GardenerGardenName"
+                        class="GardenNameInput"
+                        type="text"
+                        value="Garden"
+                        aria-label="Garden name"
+                        readonly
+                    >
 
                     <button
                         id="NextGardenerGardenButton"
-                        class="ActionButton"
+                        class="ActionButton GardenSelectorButton"
                         type="button"
+                        aria-label="Next Garden"
                     >
-                        Next
+                        &gt;
                     </button>
                 </div>
 
-                <div class="GardenGridViewport">
-                    <div
-                        id="GardenerGardenGrid"
-                        class="GardenGrid"
-                    ></div>
-                </div>
+                <section
+                    id="GardenerPlots"
+                    class="Panel GardenPlotsPanel"
+                >
+                    <h2 class="PanelHeader PanelHeaderInset">Plots</h2>
+
+                    <div class="GardenGridViewport">
+                        <div
+                            id="GardenerGardenGrid"
+                            class="GardenGrid"
+                        ></div>
+                    </div>
+                </section>
 
                 <p
                     id="GardenerGardensMessage"
                     class="ProfileMessage"
+                    hidden
                 ></p>
             </section>
 

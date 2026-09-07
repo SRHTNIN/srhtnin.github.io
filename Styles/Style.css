@@ -1738,39 +1738,6 @@ a.GardenerIdentity:hover .GardenerIdentityName {
     flex-basis: 7rem;
 }
 
-.GardenerSectionHeader {
-    justify-content: space-between;
-}
-
-.GardenerGardenControls {
-    display: grid;
-    grid-template-columns: minmax(7rem, auto) minmax(0, 1fr) minmax(7rem, auto);
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    align-items: center;
-}
-
-.GardenerGardenTitle {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: 0.2rem;
-    align-items: center;
-    text-align: center;
-}
-
-.GardenerGardenTitle strong {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.GardenerGardenTitle span,
-.GardenerSectionHeader span {
-    color: var(--Subtext1);
-}
-
 .GardenPlotReadOnly,
 .GardenPlotReadOnly:hover {
     cursor: default;
@@ -1854,15 +1821,6 @@ a.GardenerIdentity:hover .GardenerIdentityName {
         width: 5.5rem;
         height: 5.5rem;
         flex-basis: 5.5rem;
-    }
-
-    .GardenerGardenControls {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .GardenerGardenTitle {
-        grid-column: 1 / -1;
-        grid-row: 1;
     }
 
     .GardenerCommentHeader {

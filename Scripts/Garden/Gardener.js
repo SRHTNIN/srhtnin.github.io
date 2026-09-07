@@ -370,6 +370,10 @@ function RenderGardenerGardens() {
     Section.hidden = false;
 
     if (!Array.isArray(GardenerData.Gardens)) {
+        Section.classList.add(
+            "Panel"
+        );
+
         Section.replaceChildren(
             CreateGardenerPrivateSection(
                 "Gardens",
@@ -380,6 +384,10 @@ function RenderGardenerGardens() {
         return;
     }
 
+    Section.classList.remove(
+        "Panel"
+    );
+
     if (GardenerData.Gardens.length === 0) {
         const Message =
             document.getElementById(
@@ -389,6 +397,7 @@ function RenderGardenerGardens() {
         if (Message !== null) {
             Message.textContent =
                 "This gardener has no Gardens to preview.";
+            Message.hidden = false;
         }
 
         document.getElementById(
@@ -417,17 +426,29 @@ function ChangeGardenerGarden(
         !Array.isArray(
             GardenerData?.Gardens
         ) ||
-        GardenerData.Gardens.length <= 1
+        GardenerData.Gardens.length === 0
+    ) {
+        return;
+    }
+
+    const NextIndex = Math.max(
+        0,
+        Math.min(
+            GardenerData.Gardens.length - 1,
+            GardenerGardenIndex +
+                Difference
+        )
+    );
+
+    if (
+        NextIndex ===
+        GardenerGardenIndex
     ) {
         return;
     }
 
     GardenerGardenIndex =
-        (
-            GardenerGardenIndex +
-            Difference +
-            GardenerData.Gardens.length
-        ) % GardenerData.Gardens.length;
+        NextIndex;
 
     RenderCurrentGardenerGarden();
 }
@@ -447,39 +468,14 @@ function RenderCurrentGardenerGarden() {
     const Garden =
         Gardens[GardenerGardenIndex];
 
-    const Section =
-        document.getElementById(
-            "GardenerGardensSection"
-        );
-
     const Grid =
         document.getElementById(
             "GardenerGardenGrid"
         );
 
-    const Name =
+    const PlotsPanel =
         document.getElementById(
-            "GardenerGardenName"
-        );
-
-    const Size =
-        document.getElementById(
-            "GardenerGardenSize"
-        );
-
-    const Position =
-        document.getElementById(
-            "GardenerGardenPosition"
-        );
-
-    const PreviousButton =
-        document.getElementById(
-            "PreviousGardenerGardenButton"
-        );
-
-    const NextButton =
-        document.getElementById(
-            "NextGardenerGardenButton"
+            "GardenerPlots"
         );
 
     const Message =
@@ -487,11 +483,32 @@ function RenderCurrentGardenerGarden() {
             "GardenerGardensMessage"
         );
 
-    if (Grid === null) {
+    if (
+        Grid === null ||
+        PlotsPanel === null
+    ) {
         return;
     }
 
-    Section?.style.setProperty(
+    RenderGardenSelectorView({
+        Gardens,
+        GardenIndex:
+            GardenerGardenIndex,
+        PreviousButton:
+            document.getElementById(
+                "PreviousGardenerGardenButton"
+            ),
+        NameInput:
+            document.getElementById(
+                "GardenerGardenName"
+            ),
+        NextButton:
+            document.getElementById(
+                "NextGardenerGardenButton"
+            )
+    });
+
+    PlotsPanel.style.setProperty(
         "--GardenBorderColour",
         GetGardenBorderColour(
             GardenerGardenIndex
@@ -521,41 +538,9 @@ function RenderCurrentGardenerGarden() {
         );
     }
 
-    if (Name !== null) {
-        Name.textContent =
-            Garden.Name ?? "Garden";
-    }
-
-    if (Size !== null) {
-        Size.textContent =
-            Number(Garden.Width) +
-            "×" +
-            Number(Garden.Height);
-    }
-
-    if (Position !== null) {
-        Position.textContent =
-            (GardenerGardenIndex + 1) +
-            " / " +
-            Gardens.length;
-    }
-
-    const HasMultiple =
-        Gardens.length > 1;
-
-    if (PreviousButton !== null) {
-        PreviousButton.disabled =
-            !HasMultiple;
-    }
-
-    if (NextButton !== null) {
-        NextButton.disabled =
-            !HasMultiple;
-    }
-
     if (Message !== null) {
-        Message.textContent =
-            "Read-only Garden preview.";
+        Message.textContent = "";
+        Message.hidden = true;
     }
 }
 
@@ -616,7 +601,7 @@ function CreateGardenerGardenPlot(
             BorderProgress: Progress,
             DisplaySettings: {
                 ShowPlantNames: true,
-                ShowGrowthTimers: true,
+                ShowGrowthTimers: false,
                 ShowPlotRotation: false
             },
             ImagePath,
