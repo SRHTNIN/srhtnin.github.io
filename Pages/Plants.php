@@ -72,6 +72,7 @@ $PageSection = "Plants";
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/PlantCatalogue.js"></script>
         <script src="/Scripts/Garden/PlantEncyclopedia.js"></script>
     </body>
 </html>

@@ -233,6 +233,29 @@ async function SetUsername(
     return await Response.json();
 }
 
+async function SetUserConfig(
+    Changes
+) {
+    const Response = await fetch(
+        ApiUrl + "/SetUserConfig.php",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                SaveKey: GetSaveKey(),
+                ...Changes
+            })
+        }
+    );
+
+    return await Response.json();
+}
+
+
 async function SetColour(
     Colour
 ) {

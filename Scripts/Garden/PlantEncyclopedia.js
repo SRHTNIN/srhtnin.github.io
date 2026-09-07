@@ -166,54 +166,11 @@ function DoesPlantEncyclopediaMatchSearch(
     Plant,
     SearchQuery
 ) {
-    if (SearchQuery.length === 0) {
-        return true;
-    }
-
-    const SearchParts = [
-        Plant.Id,
-        Plant.Name,
-        Plant.Description,
-        ...(Array.isArray(Plant.Tags)
-            ? Plant.Tags
-            : [])
-    ];
-
-    for (
-        const Mutation
-        of GetPlantRelatedMutations(
-            Plant.Id,
-            "PlantsCreated"
-        ).concat(
-            GetPlantRelatedMutations(
-                Plant.Id,
-                "PlantsUsed"
-            )
-        )
-    ) {
-        if (
-            HasDiscoveredMutation(
-                PlantEncyclopediaSave,
-                Mutation.Id
-            )
-        ) {
-            SearchParts.push(
-                Mutation.Name
-            );
-        }
-    }
-
-    return SearchParts
-        .filter(
-            Value =>
-                Value !== null &&
-                Value !== undefined
-        )
-        .join(" ")
-        .toLocaleLowerCase()
-        .includes(
-            SearchQuery
-        );
+    return DoesPlantCatalogueMatchSearch(
+        Plant,
+        SearchQuery,
+        PlantEncyclopediaSave
+    );
 }
 
 
@@ -221,154 +178,12 @@ function ComparePlantEncyclopediaPlants(
     A,
     B
 ) {
-    switch (PlantEncyclopediaSortMode) {
-        case "NameAsc":
-            return String(A.Name ?? "")
-                .localeCompare(
-                    String(B.Name ?? ""),
-                    undefined,
-                    {sensitivity: "base"}
-                ) || A.Id - B.Id;
-
-        case "GrowthAsc":
-            return ComparePlantEncyclopediaNumbers(
-                A.GrowthTime,
-                B.GrowthTime,
-                1
-            ) || A.Id - B.Id;
-
-        case "GrowthDesc":
-            return ComparePlantEncyclopediaNumbers(
-                A.GrowthTime,
-                B.GrowthTime,
-                -1
-            ) || A.Id - B.Id;
-
-        case "CostAsc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantShopCost(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantShopCost(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                1
-            ) || A.Id - B.Id;
-
-        case "CostDesc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantShopCost(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantShopCost(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                -1
-            ) || A.Id - B.Id;
-
-        case "RewardAsc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantHarvestReward(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantHarvestReward(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                1
-            ) || A.Id - B.Id;
-
-        case "RewardDesc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantHarvestReward(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantHarvestReward(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                -1
-            ) || A.Id - B.Id;
-
-        case "DphAsc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantDewPerHour(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantDewPerHour(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                1
-            ) || A.Id - B.Id;
-
-        case "DphDesc":
-            return ComparePlantEncyclopediaNumbers(
-                GetPlantDewPerHour(
-                    PlantEncyclopediaSave,
-                    A.Id
-                ),
-                GetPlantDewPerHour(
-                    PlantEncyclopediaSave,
-                    B.Id
-                ),
-                -1
-            ) || A.Id - B.Id;
-
-        case "IdAsc":
-        default:
-            return A.Id - B.Id;
-    }
-}
-
-
-function ComparePlantEncyclopediaNumbers(
-    A,
-    B,
-    Direction
-) {
-    const MissingA =
-        A === null ||
-        A === undefined ||
-        A === "";
-
-    const MissingB =
-        B === null ||
-        B === undefined ||
-        B === "";
-
-    const NumberA = Number(A);
-    const NumberB = Number(B);
-
-    const ValidA =
-        !MissingA &&
-        Number.isFinite(NumberA);
-
-    const ValidB =
-        !MissingB &&
-        Number.isFinite(NumberB);
-
-    if (!ValidA && !ValidB) {
-        return 0;
-    }
-
-    if (!ValidA) {
-        return 1;
-    }
-
-    if (!ValidB) {
-        return -1;
-    }
-
-    return (NumberA - NumberB) *
-        Direction;
+    return ComparePlantCataloguePlants(
+        A,
+        B,
+        PlantEncyclopediaSortMode,
+        PlantEncyclopediaSave
+    );
 }
 
 
@@ -840,28 +655,6 @@ function CreatePlantMutationRelation(
 
 
     return Item;
-}
-
-
-function GetPlantRelatedMutations(
-    PlantId,
-    RelationName
-) {
-    return Object.values(
-        MutationSets
-    )
-        .filter(
-            Mutation =>
-                Mutation.Relations?.[
-                    RelationName
-                ]?.includes(
-                    Number(PlantId)
-                )
-        )
-        .sort(
-            (A, B) =>
-                A.Id - B.Id
-        );
 }
 
 

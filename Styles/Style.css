@@ -1046,7 +1046,7 @@ input, button, textarea, select {
     color: var(--Blue);
 }
 
-.ProfileSection input, .ProfileSection textarea, .ProfileSection button {
+.ProfileSection input, .ProfileSection textarea, .ProfileSection select, .ProfileSection button {
     font-size: 1rem;
     color: var(--Text);
     background-color: var(--Surface0);
@@ -1055,13 +1055,17 @@ input, button, textarea, select {
     appearance: none;
 }
 
-.ProfileSection input, .ProfileSection textarea {
+.ProfileSection input, .ProfileSection textarea, .ProfileSection select {
     padding: 0.6rem;
     outline: none;
 }
 
 .ProfileSection input {
     min-width: 12rem;
+}
+
+.ProfileSection select {
+    appearance: auto;
 }
 
 .ProfileSection textarea {
@@ -1074,12 +1078,12 @@ input, button, textarea, select {
     color: var(--Overlay1);
 }
 
-.ProfileSection input:hover, .ProfileSection textarea:hover {
+.ProfileSection input:hover, .ProfileSection textarea:hover, .ProfileSection select:hover {
     background-color: var(--Surface1);
     border-color: var(--Overlay2);
 }
 
-.ProfileSection input:focus, .ProfileSection textarea:focus {
+.ProfileSection input:focus, .ProfileSection textarea:focus, .ProfileSection select:focus {
     background-color: var(--Surface1);
     border-color: var(--Sky);
 }
@@ -1260,7 +1264,7 @@ input, button, textarea, select {
         align-items: stretch;
     }
 
-    .ProfileSection input, .ProfileSection textarea, .ProfileSection button {
+    .ProfileSection input, .ProfileSection textarea, .ProfileSection select, .ProfileSection button {
         width: 100%;
     }
 
@@ -1522,6 +1526,87 @@ input, button, textarea, select {
 .ProfileColourPreview {
     min-width: 8rem;
     color: var(--Text);
+}
+
+.ProfilePictureSelectionRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, auto) auto;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: end;
+}
+
+.ProfilePictureSelectionLabel {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--Subtext1);
+}
+
+.ProfilePictureGrowthStageLabel {
+    margin-bottom: 0 !important;
+}
+
+.ProfilePictureGrowthStageLabel select {
+    display: block;
+    width: 100%;
+    min-width: 10rem;
+    margin-top: 0.35rem;
+    cursor: pointer;
+}
+
+.ProfilePictureGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.75rem;
+    max-height: 31rem;
+    padding: 0.25rem;
+    overflow-y: auto;
+}
+
+.ProfileSection .ProfilePictureOption {
+    display: flex;
+    min-width: 0;
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: stretch;
+}
+
+.ProfileSection .ProfilePictureOption[aria-pressed="true"] {
+    color: var(--Yellow);
+    border-color: var(--Yellow);
+}
+
+.ProfilePictureOptionName {
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ProfilePictureOptionVisual {
+    display: flex;
+    width: 100%;
+    aspect-ratio: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.ProfilePictureOptionMissing {
+    padding: 0.35rem;
+    color: var(--Overlay1);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .ProfilePictureSelectionRow {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ProfilePictureSelectionRow > :first-child {
+        grid-column: 1 / -1;
+    }
 }
 
 /* * Garden guide */

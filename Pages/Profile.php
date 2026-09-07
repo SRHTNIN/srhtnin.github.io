@@ -100,6 +100,172 @@ $PageTitle = "Profile";
             </section>
 
             <section
+                id="GardenerProfile"
+                class="Panel ProfileSection"
+            >
+                <h2 class="PanelHeader PanelHeaderInset">Gardener profile</h2>
+
+                <form id="ProfileDescriptionForm">
+                    <label
+                        for="ProfileDescriptionInput"
+                    >
+                        Description
+                    </label>
+
+                    <textarea
+                        id="ProfileDescriptionInput"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Write a short description..."
+                    ></textarea>
+
+                    <div class="ProfileButtonRow">
+                        <button type="submit">
+                            Save description
+                        </button>
+                    </div>
+
+                    <p
+                        id="ProfileDescriptionMessage"
+                        class="ProfileMessage"
+                    ></p>
+                </form>
+
+                <h3>Profile picture</h3>
+
+                <p>
+                    Choose any plant you have discovered.
+                    The selected growth stage is used anywhere
+                    your Gardener profile picture is shown.
+                </p>
+
+                <div class="ProfilePictureSelectionRow">
+                    <div>
+                        <span class="ProfilePictureSelectionLabel">
+                            Selected
+                        </span>
+
+                        <strong id="ProfilePictureSelectedName">
+                            None
+                        </strong>
+                    </div>
+
+                    <label
+                        class="ProfilePictureGrowthStageLabel"
+                        for="ProfilePictureGrowthStageSelect"
+                    >
+                        Growth stage
+
+                        <select
+                            id="ProfilePictureGrowthStageSelect"
+                            disabled
+                        >
+                            <option value="">None</option>
+                        </select>
+                    </label>
+
+                    <button
+                        id="SaveProfilePictureButton"
+                        type="button"
+                        disabled
+                    >
+                        Save
+                    </button>
+                </div>
+
+                <div
+                    class="CatalogueControls"
+                    aria-label="Profile picture plant search and sorting"
+                >
+                    <input
+                        id="ProfilePictureSearchInput"
+                        type="search"
+                        placeholder="Search plants..."
+                        aria-label="Search profile picture plants"
+                        autocomplete="off"
+                    >
+
+                    <select
+                        id="ProfilePictureSortSelect"
+                        aria-label="Sort profile picture plants"
+                    >
+                        <option value="IdAsc">ID</option>
+                        <option value="NameAsc">Name A-Z</option>
+                        <option value="GrowthAsc">Growth short-long</option>
+                        <option value="GrowthDesc">Growth long-short</option>
+                        <option value="CostAsc">Cost low-high</option>
+                        <option value="CostDesc">Cost high-low</option>
+                        <option value="RewardAsc">Reward low-high</option>
+                        <option value="RewardDesc">Reward high-low</option>
+                        <option value="DphDesc">DPH high-low</option>
+                        <option value="DphAsc">DPH low-high</option>
+                    </select>
+                </div>
+
+                <div
+                    id="ProfilePictureGrid"
+                    class="ProfilePictureGrid"
+                ></div>
+
+                <p
+                    id="ProfilePictureCatalogueMessage"
+                    class="ProfileMessage"
+                    aria-live="polite"
+                >
+                    Loading discovered plants...
+                </p>
+
+                <p
+                    id="ProfilePictureMessage"
+                    class="ProfileMessage"
+                    aria-live="polite"
+                ></p>
+
+                <h3>Privacy</h3>
+
+                <p>
+                    Choose which parts of your Gardener profile
+                    other players will be able to use or view.
+                </p>
+
+                <div class="ProfileButtonRow">
+                    <button
+                        id="ToggleGardenPreviewsButton"
+                        type="button"
+                    >
+                        Garden previews: On
+                    </button>
+
+                    <button
+                        id="ToggleCommentsButton"
+                        type="button"
+                    >
+                        Comments: On
+                    </button>
+
+                    <button
+                        id="ToggleDewDonationsButton"
+                        type="button"
+                    >
+                        Dew donations: On
+                    </button>
+
+                    <button
+                        id="ToggleProfileStatsButton"
+                        type="button"
+                    >
+                        Statistics: On
+                    </button>
+                </div>
+
+                <p
+                    id="ProfilePrivacyMessage"
+                    class="ProfileMessage"
+                    aria-live="polite"
+                ></p>
+            </section>
+
+            <section
                 id="GardenDisplay"
                 class="Panel ProfileSection"
             >
@@ -506,12 +672,15 @@ $PageTitle = "Profile";
         </main>
 
 
+        <script src="/Scripts/Garden/PlantImages.js"></script>
         <script src="/Scripts/Garden/Plants.js"></script>
         <script src="/Scripts/Garden/Mutations.js"></script>
         <script src="/Scripts/Garden/Save.js"></script>
         <script src="/Scripts/Garden/Content.js"></script>
         <script src="/Scripts/Garden/Upgrades.js"></script>
         <script src="/Scripts/Garden/Users.js"></script>
+        <script src="/Scripts/Garden/Economy.js"></script>
+        <script src="/Scripts/Garden/PlantCatalogue.js"></script>
         <script src="/Scripts/Garden/Profile.js"></script>
         <script src="/Scripts/Garden/Account.js"></script>
     </body>
