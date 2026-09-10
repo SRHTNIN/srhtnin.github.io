@@ -23,4 +23,6 @@
         rel="stylesheet"
         href="/Styles/Style.css"
     >
+
+    <script src="/Scripts/ConnectionStatus.js"></script>
 </head>
