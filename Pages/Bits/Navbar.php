@@ -9,6 +9,10 @@ $NavbarPages = [
         "Href" => "/Pages/Sarahtonin.html",
         "Icon" => "Sarahtonin.png"
     ],
+    "Projects" => [
+        "Href" => "/Pages/Projects.html",
+        "Icon" => "Projects.png"
+    ],
     "Garden" => [
         "Href" => "/Pages/Garden.html",
         "Icon" => "Garden.png"
