@@ -60,12 +60,21 @@ $DownloadBase = "https://view.srhtnin.garden/api/download?Root=Files&Path=Shared
 
             <p>
                 Installs, updates and removes my Sara programs.
-                It's a single AppImage: download it, run it, and pick a program.
+                It's a single file for Windows or Linux: download it, run it, and pick a program.
                 Your own config edits are kept when a program updates,
                 and removing a program takes out everything it installed.
             </p>
 
             <div class="DownloadButtons">
+                <a
+                    class="ActionButton DownloadButton DownloadButtonWindows"
+                    href="<?= htmlspecialchars($DownloadBase . "SaraSuite/SaraSuite.exe", ENT_QUOTES, "UTF-8") ?>"
+                    download
+                >
+                    Windows
+                    <span class="DownloadButtonFile">SaraSuite.exe</span>
+                </a>
+
                 <a
                     class="ActionButton DownloadButton DownloadButtonLinux"
                     href="<?= htmlspecialchars($DownloadBase . "SaraSuite/SaraSuite-x86_64.AppImage", ENT_QUOTES, "UTF-8") ?>"
@@ -75,6 +84,12 @@ $DownloadBase = "https://view.srhtnin.garden/api/download?Root=Files&Path=Shared
                     <span class="DownloadButtonFile">SaraSuite-x86_64.AppImage</span>
                 </a>
             </div>
+
+            <p>
+                On Linux, you might have to make the file executable first:
+            </p>
+
+            <pre><code>chmod +x SaraSuite-x86_64.AppImage</code></pre>
         </main>
 
         <script src="/Scripts/Script.js"></script>
