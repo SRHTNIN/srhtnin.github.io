@@ -220,6 +220,10 @@ body {
     --ActionAccent: var(--Mauve);
 }
 
+.DownloadButtonMac {
+    --ActionAccent: var(--Pink);
+}
+
 .DownloadButtonFile {
     font-size: 1rem;
     color: var(--Subtext0);

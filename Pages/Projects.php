@@ -60,7 +60,7 @@ $DownloadBase = "https://view.srhtnin.garden/api/download?Root=Files&Path=Shared
 
             <p>
                 Installs, updates and removes my Sara programs.
-                It's a single file for Windows or Linux: download it, run it, and pick a program.
+                It's a single download for Windows, Linux or macOS: download it, run it, and pick a program.
                 Your own config edits are kept when a program updates,
                 and removing a program takes out everything it installed.
             </p>
@@ -83,6 +83,15 @@ $DownloadBase = "https://view.srhtnin.garden/api/download?Root=Files&Path=Shared
                     Linux
                     <span class="DownloadButtonFile">SaraSuite-x86_64.AppImage</span>
                 </a>
+
+                <a
+                    class="ActionButton DownloadButton DownloadButtonMac"
+                    href="<?= htmlspecialchars($DownloadBase . "SaraSuite/SaraSuite-macOS.zip", ENT_QUOTES, "UTF-8") ?>"
+                    download
+                >
+                    macOS
+                    <span class="DownloadButtonFile">SaraSuite-macOS.zip</span>
+                </a>
             </div>
 
             <p>
@@ -90,6 +99,21 @@ $DownloadBase = "https://view.srhtnin.garden/api/download?Root=Files&Path=Shared
             </p>
 
             <pre><code>chmod +x SaraSuite-x86_64.AppImage</code></pre>
+
+            <p>
+                On macOS (Apple Silicon Macs, M1 and newer): unzip it, drag SaraSuite into Applications
+                and open it from there. The first time, macOS won't open it, since it isn't signed by an
+                Apple developer account. Click Done, go to System Settings, Privacy &amp; Security, and click
+                "Open Anyway" next to SaraSuite. If macOS says SaraSuite is damaged instead, run this in
+                Terminal once:
+            </p>
+
+            <pre><code>xattr -cr /Applications/SaraSuite.app</code></pre>
+
+            <p>
+                The Mac version is brand new and hasn't been tried on a real Mac yet,
+                so let me know if something doesn't work.
+            </p>
         </main>
 
         <script src="/Scripts/Script.js"></script>
